@@ -1,0 +1,71 @@
+{
+  "onboarding": {
+    "title": "Your personal notebook",
+    "subtitle": "Organise, blend and share your natural products.",
+    "button": "Let's go →",
+    "languageHint": "You can change the language anytime in Settings",
+    "selectCategory": "Choose your focus",
+    "categories": {
+      "oils": "Natural oils & products",
+      "supplements": "Supplements & vitamins",
+      "herbs": "Herbs & teas",
+      "other": "Your own category"
+    }
+  },
+  "home": {
+    "greeting": "Hello",
+    "greetingMorning": "Good morning 🌿",
+    "statsSubtitle": "%{productCount} products · %{blendCount} blends",
+    "collection": "Collection",
+    "blends": "Blends",
+    "allProducts": "All products",
+    "myBlends": "My blends",
+    "inventory": "Inventory",
+    "lastUsed": "Last used",
+    "searchPlaceholder": "Search products…",
+    "emptyProductsTitle": "No products yet",
+    "emptyProductsMessage": "Add products to see them here.",
+    "emptyBlendsTitle": "No blends yet",
+    "emptyBlendsMessage": "Create a blend from your products."
+  },
+  "import": {
+    "title": "Import",
+    "screenTitle": "Import",
+    "screenSubtitle": "Paste text from your source",
+    "pastePlaceholder": "Paste text here…",
+    "placeholder": "Paste text here…",
+    "detect": "Detect ✨",
+    "button": "Detect ✨",
+    "detecting": "Recognising data…",
+    "resultTitle": "Review",
+    "save": "Save",
+    "saveEmoji": "Save 💾",
+    "retry": "Try again",
+    "resetAgain": "Again",
+    "upgradeMessage": "You've used your %{limit} free imports. Upgrade to Pro.",
+    "fieldProductName": "Product name",
+    "fieldPlaceholderName": "Enter product name...",
+    "fieldBrand": "Brand",
+    "fieldCategory": "Category",
+    "fieldDescription": "Short description",
+    "fieldUsages": "Uses",
+    "fieldTags": "Tags",
+    "pasteTip": "💡 Tip: For best results, paste only the product description."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "pro": "Pro",
+    "lifetime": "Lifetime",
+    "tipsTitle": "Tips & Help",
+    "importTipTitle": "How to get the best import results",
+    "importTipBody": "Copy only the product description from a website - not the entire page. The AI will automatically ignore irrelevant content, but a focused text gives the best results."
+  },
+  "general": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back"
+  }
+}

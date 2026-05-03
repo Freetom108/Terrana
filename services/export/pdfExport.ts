@@ -104,8 +104,10 @@ function generateProductHTML(product: Product): string {
       ? '<p class="muted">Keine Anwendungen hinterlegt.</p>'
       : `<ul>${product.usages.map((u) => `<li>${escapeHtml(u)}</li>`).join('')}</ul>`;
 
-  const notesBlock = product.notes.trim()
-    ? `<p class="notes">${escapeHtml(product.notes)}</p>`
+  const descParts = [product.description.trim(), product.notes.trim()].filter(Boolean);
+  const detailText = descParts.length ? Array.from(new Set(descParts)).join('\n\n') : '';
+  const notesBlock = detailText
+    ? `<p class="notes">${escapeHtml(detailText)}</p>`
     : '<p class="muted">—</p>';
 
   const tagsBlock =
@@ -113,12 +115,17 @@ function generateProductHTML(product: Product): string {
       ? `<p class="tags">${escapeHtml(product.tags.join(', '))}</p>`
       : '<p class="muted">—</p>';
 
+  const brandLine = product.brand.trim()
+    ? `<p class="muted"><strong>Marke:</strong> ${escapeHtml(product.brand)}</p>`
+    : '';
+
   const inner = `
   <h1>${escapeHtml(product.name)}</h1>
+  ${brandLine}
   <p class="muted"><strong>Kategorie:</strong> ${escapeHtml(product.category)}</p>
   <h2>Anwendungen</h2>
   ${usagesHtml}
-  <h2>Notizen</h2>
+  <h2>Beschreibung & Notizen</h2>
   ${notesBlock}
   <h2>Tags</h2>
   ${tagsBlock}

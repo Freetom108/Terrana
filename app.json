@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "naturalremedyorganizer",
     "name": "NaturalRemedyOrganizer",
     "slug": "NaturalRemedyOrganizer",
     "version": "1.0.0",

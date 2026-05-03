@@ -1,0 +1,71 @@
+{
+  "onboarding": {
+    "title": "Votre carnet personnel",
+    "subtitle": "Organisez, mélangez et partagez vos produits naturels.",
+    "button": "C'est parti →",
+    "languageHint": "Vous pouvez changer la langue dans Paramètres",
+    "selectCategory": "Choisissez votre axe",
+    "categories": {
+      "oils": "Huiles et soins naturels",
+      "supplements": "Compléments et vitamines",
+      "herbs": "Plantes et tisanes",
+      "other": "Votre propre catégorie"
+    }
+  },
+  "home": {
+    "greeting": "Bonjour",
+    "greetingMorning": "Bonjour 🌿",
+    "statsSubtitle": "%{productCount} produits · %{blendCount} mélanges",
+    "collection": "Collection",
+    "blends": "Mélanges",
+    "allProducts": "Tous les produits",
+    "myBlends": "Mes mélanges",
+    "inventory": "Stock",
+    "lastUsed": "Récemment utilisés",
+    "searchPlaceholder": "Rechercher des produits…",
+    "emptyProductsTitle": "Aucun produit pour l'instant",
+    "emptyProductsMessage": "Ajoutez des produits pour les voir ici.",
+    "emptyBlendsTitle": "Aucun mélange pour l'instant",
+    "emptyBlendsMessage": "Créez un mélange à partir de vos produits."
+  },
+  "import": {
+    "title": "Importer",
+    "screenTitle": "Importer",
+    "screenSubtitle": "Collez le texte depuis votre source",
+    "pastePlaceholder": "Collez le texte ici…",
+    "placeholder": "Collez le texte ici…",
+    "detect": "Détecter ✨",
+    "button": "Détecter ✨",
+    "detecting": "Reconnaissance des données…",
+    "resultTitle": "Vérifier",
+    "save": "Enregistrer",
+    "saveEmoji": "Enregistrer 💾",
+    "retry": "Réessayer",
+    "resetAgain": "Recommencer",
+    "upgradeMessage": "Vous avez utilisé vos %{limit} importations gratuites. Passez à Pro.",
+    "fieldProductName": "Nom du produit",
+    "fieldPlaceholderName": "Entrez le nom du produit...",
+    "fieldBrand": "Marque",
+    "fieldCategory": "Catégorie",
+    "fieldDescription": "Brève description",
+    "fieldUsages": "Usages",
+    "fieldTags": "Tags",
+    "pasteTip": "💡 Astuce : pour de meilleurs résultats, collez uniquement la description du produit."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "language": "Langue",
+    "pro": "Pro",
+    "lifetime": "À vie",
+    "tipsTitle": "Conseils & Aide",
+    "importTipTitle": "Comment obtenir les meilleurs résultats",
+    "importTipBody": "Copiez uniquement la description du produit - pas la page entière."
+  },
+  "general": {
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour"
+  }
+}

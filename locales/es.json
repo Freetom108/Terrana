@@ -1,0 +1,71 @@
+{
+  "onboarding": {
+    "title": "Tu cuaderno personal",
+    "subtitle": "Organiza, mezcla y comparte tus productos naturales.",
+    "button": "Empecemos →",
+    "languageHint": "Puedes cambiar el idioma en Configuración",
+    "selectCategory": "Elige tu enfoque",
+    "categories": {
+      "oils": "Aceites y productos naturales",
+      "supplements": "Suplementos y vitaminas",
+      "herbs": "Hierbas e infusiones",
+      "other": "Tu propia categoría"
+    }
+  },
+  "home": {
+    "greeting": "Hola",
+    "greetingMorning": "Buenos días 🌿",
+    "statsSubtitle": "%{productCount} productos · %{blendCount} mezclas",
+    "collection": "Colección",
+    "blends": "Mezclas",
+    "allProducts": "Todos los productos",
+    "myBlends": "Mis mezclas",
+    "inventory": "Inventario",
+    "lastUsed": "Usados recientemente",
+    "searchPlaceholder": "Buscar productos…",
+    "emptyProductsTitle": "Aún no hay productos",
+    "emptyProductsMessage": "Añade productos para verlos aquí.",
+    "emptyBlendsTitle": "Aún no hay mezclas",
+    "emptyBlendsMessage": "Crea una mezcla a partir de tus productos."
+  },
+  "import": {
+    "title": "Importar",
+    "screenTitle": "Importar",
+    "screenSubtitle": "Pega el texto desde tu fuente",
+    "pastePlaceholder": "Pega el texto aquí…",
+    "placeholder": "Pega el texto aquí…",
+    "detect": "Detectar ✨",
+    "button": "Detectar ✨",
+    "detecting": "Reconociendo datos…",
+    "resultTitle": "Revisar",
+    "save": "Guardar",
+    "saveEmoji": "Guardar 💾",
+    "retry": "Reintentar",
+    "resetAgain": "Otra vez",
+    "upgradeMessage": "Has usado tus %{limit} importaciones gratuitas. Pasa a Pro.",
+    "fieldProductName": "Nombre del producto",
+    "fieldPlaceholderName": "Ingresa el nombre del producto...",
+    "fieldBrand": "Marca",
+    "fieldCategory": "Categoría",
+    "fieldDescription": "Descripción breve",
+    "fieldUsages": "Usos",
+    "fieldTags": "Etiquetas",
+    "pasteTip": "💡 Consejo: para mejores resultados, pega solo la descripción del producto."
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma",
+    "pro": "Pro",
+    "lifetime": "De por vida",
+    "tipsTitle": "Consejos & Ayuda",
+    "importTipTitle": "Cómo obtener los mejores resultados",
+    "importTipBody": "Copia solo la descripción del producto, no toda la página."
+  },
+  "general": {
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Atrás"
+  }
+}

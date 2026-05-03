@@ -1,7 +1,65 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Product } from '../../types/product';
+import type { ProductCategory } from '../../constants/categories';
+import { PRODUCT_CATEGORIES } from '../../constants/categories';
 
 const STORAGE_KEY = 'products';
+
+function clampRating(n: unknown): number {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return 3;
+  return Math.min(5, Math.max(1, Math.round(n)));
+}
+
+function normalizeCategory(raw: unknown): ProductCategory {
+  const s = typeof raw === 'string' ? raw.trim() : '';
+  if (PRODUCT_CATEGORIES.includes(s as ProductCategory)) {
+    return s as ProductCategory;
+  }
+  const lower = s.toLowerCase();
+  const hit = PRODUCT_CATEGORIES.find((c) => c.toLowerCase() === lower);
+  return hit ?? 'Sonstiges';
+}
+
+function normalizeInventory(raw: unknown): Product['inventory'] {
+  const v = typeof raw === 'string' ? raw : '';
+  if (v === 'full' || v === 'medium' || v === 'low' || v === 'empty') return v;
+  return 'full';
+}
+
+function normalizeProduct(raw: Record<string, unknown>): Product {
+  const description =
+    typeof raw.description === 'string'
+      ? raw.description
+      : typeof raw.notes === 'string'
+        ? raw.notes
+        : '';
+  const notes = typeof raw.notes === 'string' ? raw.notes : description;
+
+  let lastUsed: string | undefined;
+  if (typeof raw.lastUsed === 'string' && raw.lastUsed.length > 0) {
+    lastUsed = raw.lastUsed;
+  }
+
+  return {
+    id: String(raw.id ?? ''),
+    name: String(raw.name ?? ''),
+    brand: String(raw.brand ?? ''),
+    category: normalizeCategory(raw.category),
+    description,
+    notes,
+    usages: Array.isArray(raw.usages)
+      ? (raw.usages as unknown[]).filter((u): u is string => typeof u === 'string')
+      : [],
+    tags: Array.isArray(raw.tags)
+      ? (raw.tags as unknown[]).filter((u): u is string => typeof u === 'string')
+      : [],
+    rating: clampRating(raw.rating),
+    inventory: normalizeInventory(raw.inventory),
+    lastUsed,
+    createdAt: String(raw.createdAt ?? new Date().toISOString()),
+    updatedAt: String(raw.updatedAt ?? new Date().toISOString()),
+  };
+}
 
 async function readProducts(): Promise<Product[]> {
   const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -9,7 +67,11 @@ async function readProducts(): Promise<Product[]> {
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
-    return parsed as Product[];
+    return parsed.map((item) =>
+      normalizeProduct(
+        typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {}
+      )
+    );
   } catch {
     return [];
   }
@@ -30,11 +92,17 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function saveProduct(product: Product): Promise<void> {
   const products = await readProducts();
-  const idx = products.findIndex((p) => p.id === product.id);
+  const normalized: Product = {
+    ...product,
+    rating: clampRating(product.rating),
+    category: normalizeCategory(product.category),
+    inventory: normalizeInventory(product.inventory),
+  };
+  const idx = products.findIndex((p) => p.id === normalized.id);
   if (idx >= 0) {
-    products[idx] = product;
+    products[idx] = normalized;
   } else {
-    products.push(product);
+    products.push(normalized);
   }
   await writeProducts(products);
 }

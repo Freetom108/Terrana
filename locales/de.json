@@ -1,0 +1,71 @@
+{
+  "onboarding": {
+    "title": "Dein persönliches Notizbuch",
+    "subtitle": "Organisiere, mische und teile deine Naturprodukte.",
+    "button": "Los geht's →",
+    "languageHint": "Du kannst die Sprache jederzeit in den Einstellungen ändern",
+    "selectCategory": "Wähle deinen Schwerpunkt",
+    "categories": {
+      "oils": "Natürliche Öle & Produkte",
+      "supplements": "Supplements & Vitamine",
+      "herbs": "Kräuter & Tees",
+      "other": "Eigene Kategorie"
+    }
+  },
+  "home": {
+    "greeting": "Guten Tag",
+    "greetingMorning": "Guten Morgen 🌿",
+    "statsSubtitle": "%{productCount} Produkte · %{blendCount} Mischungen",
+    "collection": "Sammlung",
+    "blends": "Mischungen",
+    "allProducts": "Alle Produkte",
+    "myBlends": "Meine Mischungen",
+    "inventory": "Bestand",
+    "lastUsed": "Zuletzt verwendet",
+    "searchPlaceholder": "Produkte suchen…",
+    "emptyProductsTitle": "Noch keine Produkte",
+    "emptyProductsMessage": "Füge Produkte hinzu, um sie hier zu sehen.",
+    "emptyBlendsTitle": "Noch keine Mischungen",
+    "emptyBlendsMessage": "Lege eine Mischung aus deinen Produkten an."
+  },
+  "import": {
+    "title": "Importieren",
+    "screenTitle": "Importieren",
+    "screenSubtitle": "Füge Text aus deiner Quelle ein",
+    "pastePlaceholder": "Text hier einfügen...",
+    "placeholder": "Text hier einfügen...",
+    "detect": "Erkennen ✨",
+    "button": "Erkennen ✨",
+    "detecting": "Erkenne Daten...",
+    "resultTitle": "Prüfen",
+    "save": "Speichern",
+    "saveEmoji": "Speichern 💾",
+    "retry": "Erneut versuchen",
+    "resetAgain": "Nochmal",
+    "upgradeMessage": "Du hast deine %{limit} kostenlosen Imports verwendet. Upgrade auf Pro.",
+    "fieldProductName": "Produktname",
+    "fieldPlaceholderName": "Produktnamen eingeben...",
+    "fieldBrand": "Marke",
+    "fieldCategory": "Kategorie",
+    "fieldDescription": "Kurzbeschreibung",
+    "fieldUsages": "Anwendungen",
+    "fieldTags": "Tags",
+    "pasteTip": "💡 Tipp: Für beste Ergebnisse nur die Produktbeschreibung einfügen."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "pro": "Pro",
+    "lifetime": "Lifetime",
+    "tipsTitle": "Tipps & Hilfe",
+    "importTipTitle": "So gelingt der Import am besten",
+    "importTipBody": "Kopiere am besten nur die Produktbeschreibung einer Webseite - nicht die gesamte Seite. Die KI blendet irrelevante Inhalte automatisch aus, aber ein gezielter Text liefert die besten Ergebnisse."
+  },
+  "general": {
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "back": "Zurück"
+  }
+}

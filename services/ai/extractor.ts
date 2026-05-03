@@ -4,6 +4,7 @@ import { EXTRACTION_PROMPT } from './prompt';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-20250514';
 const MAX_TOKENS = 1000;
+const MAX_USER_TEXT_LENGTH = 3000;
 const ANTHROPIC_VERSION = '2023-06-01';
 
 export type ExtractProductResult =
@@ -24,7 +25,21 @@ function stripCodeFence(text: string): string {
   return fence ? fence[1].trim() : trimmed;
 }
 
-function parseModelJson(text: string): unknown {
+function sanitizeUserFacingError(message: string): string {
+  const stripped = message
+    .replace(/model:\s*[^\n\r]+/gi, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/^\s*,\s*|\s*,\s*$/g, '')
+    .trim();
+  return stripped.length > 0 ? stripped : 'Die Anfrage ist fehlgeschlagen.';
+}
+
+/** Anzeige wie „Fehler 401: Invalid API Key“ */
+function formatHttpApiError(status: number, apiMessage: string): string {
+  return `Fehler ${status}: ${sanitizeUserFacingError(apiMessage)}`;
+}
+
+function parseExtractedJson(text: string): unknown {
   return JSON.parse(stripCodeFence(text));
 }
 
@@ -50,28 +65,59 @@ function normalizeExtracted(raw: unknown): ExtractedData {
   };
 }
 
+function logApiKeyFingerprint(trimmedKey: string): void {
+  const len = trimmedKey.length;
+  if (len === 0) {
+    console.log('[Anthropic] EXPO_PUBLIC_ANTHROPIC_API_KEY: empty after trim');
+    return;
+  }
+  if (len < 8) {
+    console.log(
+      '[Anthropic] EXPO_PUBLIC_ANTHROPIC_API_KEY: loaded, length:',
+      len,
+      '(skipped 4+4 fingerprint — key too short)'
+    );
+    return;
+  }
+  const first = trimmedKey.slice(0, 4);
+  const last = trimmedKey.slice(-4);
+  console.log(
+    '[Anthropic] EXPO_PUBLIC_ANTHROPIC_API_KEY fingerprint:',
+    `${first}...${last}`,
+    'length:',
+    len
+  );
+}
+
 export async function extractProductFromText(
   userText: string
 ): Promise<ExtractProductResult> {
-  const apiKey = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
-  if (!apiKey || !apiKey.trim()) {
+  const rawKey = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
+  const trimmedKey = typeof rawKey === 'string' ? rawKey.trim() : '';
+
+  if (!trimmedKey) {
     return {
       success: false,
       error: 'EXPO_PUBLIC_ANTHROPIC_API_KEY ist nicht gesetzt (.env im Projektroot).',
     };
   }
 
+  logApiKeyFingerprint(trimmedKey);
+
   const text = userText.trim();
   if (!text) {
     return { success: false, error: 'Kein Text zum Extrahieren.' };
   }
+
+  /** Long input is truncated silently — no user-facing error. */
+  const excerpt = text.length > MAX_USER_TEXT_LENGTH ? text.slice(0, MAX_USER_TEXT_LENGTH) : text;
 
   try {
     const res = await fetch(ANTHROPIC_API_URL, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-api-key': apiKey.trim(),
+        'x-api-key': trimmedKey,
         'anthropic-version': ANTHROPIC_VERSION,
       },
       body: JSON.stringify({
@@ -84,7 +130,7 @@ export async function extractProductFromText(
             content: [
               {
                 type: 'text',
-                text: `Extract structured data from the following text. Follow the system instructions exactly. Return only the JSON object.\n\n---\n\n${text}`,
+                text: `Extract structured data from the following text. Follow the system instructions exactly. Return only the JSON object.\n\n---\n\n${excerpt}`,
               },
             ],
           },
@@ -98,26 +144,43 @@ export async function extractProductFromText(
     };
 
     if (!res.ok) {
-      const msg = body.error?.message ?? res.statusText ?? 'Unbekannter API-Fehler';
-      return { success: false, error: msg };
+      const errObj = body.error;
+      const msg = typeof errObj?.message === 'string' ? errObj.message.trim() : '';
+      const typ = typeof errObj?.type === 'string' ? errObj.type.trim() : '';
+      let raw: string;
+      if (msg && typ) {
+        raw = msg.includes(typ) ? msg : `${typ}: ${msg}`;
+      } else {
+        raw = msg || typ || res.statusText || 'Unbekannter API-Fehler';
+      }
+      return { success: false, error: formatHttpApiError(res.status, raw) };
     }
 
     const block = body.content?.find((c) => c.type === 'text' && typeof c.text === 'string');
     if (!block?.text) {
-      return { success: false, error: 'Leere oder ungültige Modell-Antwort.' };
+      return {
+        success: false,
+        error: formatHttpApiError(res.status, 'Leere oder ungültige Modell-Antwort.'),
+      };
     }
 
     let parsed: unknown;
     try {
-      parsed = parseModelJson(block.text);
+      parsed = parseExtractedJson(block.text);
     } catch {
-      return { success: false, error: 'Konnte JSON aus der Modell-Antwort nicht lesen.' };
+      return {
+        success: false,
+        error: formatHttpApiError(res.status, 'Konnte JSON aus der Modell-Antwort nicht lesen.'),
+      };
     }
 
     const data = normalizeExtracted(parsed);
     return { success: true, data };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    return { success: false, error: message || 'Netzwerk- oder Laufzeitfehler.' };
+    return {
+      success: false,
+      error: `Fehler: ${sanitizeUserFacingError(message || 'Netzwerk- oder Laufzeitfehler.')}`,
+    };
   }
 }

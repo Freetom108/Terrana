@@ -9,11 +9,13 @@ export const PRO_FEATURES = [
   'unlimited_products',
   'unlimited_blends',
   'importer',
+  'share_whatsapp_mail',
 ] as const;
 
 export const LIFETIME_FEATURES = [
   ...PRO_FEATURES,
   'pdf_export',
+  'printing',
   'inventory',
   'future_features',
 ] as const;
