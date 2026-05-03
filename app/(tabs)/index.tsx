@@ -1,22 +1,76 @@
 import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
+import { useBlends } from '../../hooks/useBlends';
+import { useProducts } from '../../hooks/useProducts';
 import { t } from '../../services/i18n/i18n';
+import type { Product } from '../../types/product';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Link, useFocusEffect } from 'expo-router';
+import { useCallback, useMemo } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const PLACEHOLDER_PRODUCT_COUNT = 0;
-const PLACEHOLDER_BLEND_COUNT = 0;
+function sortByUpdatedDesc(a: Product, b: Product): number {
+  const ta = Date.parse(a.updatedAt || a.createdAt);
+  const tb = Date.parse(b.updatedAt || b.createdAt);
+  return (Number.isFinite(tb) ? tb : 0) - (Number.isFinite(ta) ? ta : 0);
+}
+
+function sortByName(a: Product, b: Product): number {
+  return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+}
+
+function ProductRow({ product }: { product: Product }) {
+  return (
+    <Link href={`/product/${product.id}`} asChild>
+      <Pressable style={({ pressed }) => [styles.productRow, pressed && styles.productRowPressed]}>
+        <Text style={styles.productName} numberOfLines={2}>
+          {product.name}
+        </Text>
+        <Text style={styles.productMeta} numberOfLines={1}>
+          {product.brand ? `${product.brand} · ` : ''}
+          {product.category}
+        </Text>
+      </Pressable>
+    </Link>
+  );
+}
 
 export default function HomeTab() {
   const insets = useSafeAreaInsets();
+  const { products, refreshProducts } = useProducts();
+  const { blends, refreshBlends } = useBlends();
+
+  useFocusEffect(
+    useCallback(() => {
+      void refreshProducts();
+      void refreshBlends();
+    }, [refreshProducts, refreshBlends])
+  );
+
+  const productCount = products.length;
+  const blendCount = blends.length;
+
   const statsSubtitle = t('home.statsSubtitle', {
-    productCount: PLACEHOLDER_PRODUCT_COUNT,
-    blendCount: PLACEHOLDER_BLEND_COUNT,
+    productCount,
+    blendCount,
   });
 
-  const showProductEmpty = PLACEHOLDER_PRODUCT_COUNT === 0;
-  const showBlendEmpty = PLACEHOLDER_BLEND_COUNT === 0;
+  const byUpdated = useMemo(() => [...products].sort(sortByUpdatedDesc), [products]);
+  const byName = useMemo(() => [...products].sort(sortByName), [products]);
+
+  const recentlyUsed = useMemo(() => {
+    const withLast = products.filter((p) => p.lastUsed);
+    if (withLast.length === 0) {
+      return byUpdated.slice(0, 8);
+    }
+    return [...withLast].sort((a, b) =>
+      String(b.lastUsed ?? '').localeCompare(String(a.lastUsed ?? ''))
+    );
+  }, [products, byUpdated]);
+
+  const showProductEmpty = productCount === 0;
+  const showBlendEmpty = blendCount === 0;
 
   return (
     <View style={styles.root}>
@@ -29,10 +83,12 @@ export default function HomeTab() {
         <Text style={styles.greeting}>{t('home.greetingMorning')}</Text>
         <Text style={styles.statsLine}>{statsSubtitle}</Text>
 
-        <View style={styles.searchShell} pointerEvents="none">
-          <Text style={styles.searchIcon}>🔍</Text>
-          <Text style={styles.searchPlaceholder}>{t('home.searchPlaceholder')}</Text>
-        </View>
+        <Link href="/search" asChild>
+          <Pressable style={styles.searchShell} accessibilityRole="button">
+            <Text style={styles.searchIcon}>🔍</Text>
+            <Text style={styles.searchPlaceholder}>{t('home.searchPlaceholder')}</Text>
+          </Pressable>
+        </Link>
       </LinearGradient>
 
       <ScrollView
@@ -48,7 +104,13 @@ export default function HomeTab() {
               message={t('home.emptyProductsMessage')}
               emoji="🕐"
             />
-          ) : null}
+          ) : (
+            <View style={styles.productStack}>
+              {recentlyUsed.map((p) => (
+                <ProductRow key={`recent-${p.id}`} product={p} />
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -57,8 +119,15 @@ export default function HomeTab() {
             <EmptyState
               title={t('home.emptyProductsTitle')}
               message={t('home.emptyProductsMessage')}
+              emoji="📦"
             />
-          ) : null}
+          ) : (
+            <View style={styles.productStack}>
+              {byName.map((p) => (
+                <ProductRow key={`all-${p.id}`} product={p} />
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -69,7 +138,24 @@ export default function HomeTab() {
               message={t('home.emptyBlendsMessage')}
               emoji="🧪"
             />
-          ) : null}
+          ) : (
+            <View style={styles.productStack}>
+              {blends.map((blend) => (
+                <Link key={blend.id} href={`/blend/${blend.id}`} asChild>
+                  <Pressable
+                    style={({ pressed }) => [styles.productRow, pressed && styles.productRowPressed]}
+                  >
+                    <Text style={styles.productName} numberOfLines={2}>
+                      {blend.name}
+                    </Text>
+                    <Text style={styles.productMeta} numberOfLines={1}>
+                      {t('home.blendIngredientSummary', { count: blend.ingredients.length })}
+                    </Text>
+                  </Pressable>
+                </Link>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -130,5 +216,35 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.dark,
     marginBottom: 12,
+  },
+  productStack: {
+    gap: 10,
+  },
+  productRow: {
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.sageLight,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    shadowColor: colors.dark,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  productRowPressed: {
+    opacity: 0.85,
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.dark,
+    marginBottom: 4,
+  },
+  productMeta: {
+    fontSize: 13,
+    color: colors.mid,
+    fontWeight: '500',
   },
 });

@@ -2,7 +2,7 @@ import type { ExtractedData } from '../../types/import';
 import { EXTRACTION_PROMPT } from './prompt';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL = 'claude-sonnet-4-5';
 const MAX_TOKENS = 1000;
 const MAX_USER_TEXT_LENGTH = 3000;
 const ANTHROPIC_VERSION = '2023-06-01';

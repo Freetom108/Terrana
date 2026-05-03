@@ -26,7 +26,8 @@
     "emptyProductsTitle": "Aún no hay productos",
     "emptyProductsMessage": "Añade productos para verlos aquí.",
     "emptyBlendsTitle": "Aún no hay mezclas",
-    "emptyBlendsMessage": "Crea una mezcla a partir de tus productos."
+    "emptyBlendsMessage": "Crea una mezcla a partir de tus productos.",
+    "blendIngredientSummary": "%{count} ingredientes"
   },
   "import": {
     "title": "Importar",
@@ -50,6 +51,13 @@
     "fieldDescription": "Descripción breve",
     "fieldUsages": "Usos",
     "fieldTags": "Etiquetas",
+    "fieldNotes": "Mis notas 📝",
+    "fieldNotesPlaceholder": "Notas propias, experiencias, consejos…",
+    "fieldInventory": "Existencias",
+    "inventoryFull": "📦 Lleno",
+    "inventoryMedium": "🟡 Medio",
+    "inventoryLow": "🔴 Casi vacío",
+    "inventoryEmpty": "⬜ Vacío",
     "pasteTip": "💡 Consejo: para mejores resultados, pega solo la descripción del producto."
   },
   "settings": {

@@ -26,7 +26,8 @@
     "emptyProductsTitle": "No products yet",
     "emptyProductsMessage": "Add products to see them here.",
     "emptyBlendsTitle": "No blends yet",
-    "emptyBlendsMessage": "Create a blend from your products."
+    "emptyBlendsMessage": "Create a blend from your products.",
+    "blendIngredientSummary": "%{count} ingredients"
   },
   "import": {
     "title": "Import",
@@ -50,6 +51,13 @@
     "fieldDescription": "Short description",
     "fieldUsages": "Uses",
     "fieldTags": "Tags",
+    "fieldNotes": "My notes 📝",
+    "fieldNotesPlaceholder": "Your notes, experiences, tips…",
+    "fieldInventory": "Stock",
+    "inventoryFull": "📦 Full",
+    "inventoryMedium": "🟡 Half",
+    "inventoryLow": "🔴 Nearly empty",
+    "inventoryEmpty": "⬜ Empty",
     "pasteTip": "💡 Tip: For best results, paste only the product description."
   },
   "settings": {

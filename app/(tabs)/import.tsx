@@ -6,7 +6,7 @@ import { useImportLimit } from '../../hooks/useImportLimit';
 import { extractProductFromText } from '../../services/ai/extractor';
 import { t } from '../../services/i18n/i18n';
 import { saveProduct } from '../../services/storage/products';
-import type { Product } from '../../types/product';
+import type { InventoryLevel, Product } from '../../types/product';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
@@ -47,8 +47,10 @@ type FormState = {
   brand: string;
   category: string;
   description: string;
+  userNotes: string;
   usagesText: string;
   tagsText: string;
+  inventory: InventoryLevel;
 };
 
 const EMPTY_FORM: FormState = {
@@ -56,9 +58,18 @@ const EMPTY_FORM: FormState = {
   brand: '',
   category: '',
   description: '',
+  userNotes: '',
   usagesText: '',
   tagsText: '',
+  inventory: 'full',
 };
+
+const INVENTORY_OPTIONS: { value: InventoryLevel; labelKey: string }[] = [
+  { value: 'full', labelKey: 'import.inventoryFull' },
+  { value: 'medium', labelKey: 'import.inventoryMedium' },
+  { value: 'low', labelKey: 'import.inventoryLow' },
+  { value: 'empty', labelKey: 'import.inventoryEmpty' },
+];
 
 function FieldBlock({
   labelKey,
@@ -153,8 +164,10 @@ export default function ImportTab() {
         brand: '',
         category: d.category,
         description: d.notes,
+        userNotes: '',
         usagesText: d.usage.join('\n'),
         tagsText: d.tags.join(', '),
+        inventory: 'full',
       });
       setShowResult(true);
       try {
@@ -181,23 +194,23 @@ export default function ImportTab() {
     try {
       const now = new Date().toISOString();
       const desc = form.description.trim();
-      const product: Product = {
+      const savedProduct: Product = {
         id: newId(),
         name,
         brand: form.brand.trim(),
         category: toCategory(form.category),
         description: desc,
-        notes: desc,
+        notes: form.userNotes.trim(),
         usages: parseList(form.usagesText),
         tags: parseList(form.tagsText),
         rating: 3,
-        inventory: 'full',
+        inventory: form.inventory,
         createdAt: now,
         updatedAt: now,
       };
-      await saveProduct(product);
+      await saveProduct(savedProduct);
       resetFlow();
-      router.replace('/(tabs)');
+      router.push('/product/' + savedProduct.id);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       setSaveError(msg);
@@ -290,6 +303,21 @@ export default function ImportTab() {
                     multiline
                     minHeight={100}
                   />
+                  <View style={styles.fieldBlock}>
+                    <Text style={styles.fieldLabel}>{t('import.fieldNotes')}</Text>
+                    <TextInput
+                      value={form.userNotes}
+                      onChangeText={(userNotes) => setForm((f) => ({ ...f, userNotes }))}
+                      multiline
+                      placeholder={t('import.fieldNotesPlaceholder')}
+                      placeholderTextColor={colors.mid}
+                      style={[
+                        styles.fieldInput,
+                        styles.fieldInputMulti,
+                        styles.notesInput,
+                      ]}
+                    />
+                  </View>
                   <FieldBlock
                     labelKey="import.fieldUsages"
                     value={form.usagesText}
@@ -304,6 +332,47 @@ export default function ImportTab() {
                     multiline
                     minHeight={72}
                   />
+
+                  <View style={styles.fieldBlock}>
+                    <Text style={[styles.fieldLabel, styles.inventorySectionLabel]}>
+                      {t('import.fieldInventory')}
+                    </Text>
+                    <View style={styles.inventoryRow}>
+                      {INVENTORY_OPTIONS.map(({ value, labelKey }) => {
+                        const selected = form.inventory === value;
+                        return (
+                          <Pressable
+                            key={value}
+                            style={[
+                              styles.inventoryBtn,
+                              selected && styles.inventoryBtnSelected,
+                            ]}
+                            onPress={() =>
+                              setForm((f) => ({
+                                ...f,
+                                inventory: value,
+                              }))
+                            }
+                            accessibilityRole="button"
+                            accessibilityState={{ selected }}
+                          >
+                            <Text
+                              style={[
+                                styles.inventoryBtnText,
+                                selected && styles.inventoryBtnTextSelected,
+                              ]}
+                              numberOfLines={2}
+                              adjustsFontSizeToFit
+                              minimumFontScale={0.75}
+                              maxFontSizeMultiplier={1.1}
+                            >
+                              {t(labelKey)}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
 
                   {saveError ? <Text style={styles.errorText}>{saveError}</Text> : null}
 
@@ -443,6 +512,45 @@ const styles = StyleSheet.create({
   },
   fieldInputMulti: {
     textAlignVertical: 'top',
+  },
+  notesInput: {
+    minHeight: 80,
+  },
+  inventorySectionLabel: {
+    marginBottom: 8,
+  },
+  inventoryRow: {
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    columnGap: 6,
+    marginBottom: 2,
+  },
+  inventoryBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 3,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.cream,
+    borderWidth: 1,
+    borderColor: colors.sageLight,
+    minHeight: 44,
+  },
+  inventoryBtnSelected: {
+    backgroundColor: colors.sageDark,
+    borderColor: colors.sageDark,
+  },
+  inventoryBtnText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.mid,
+    textAlign: 'center',
+    lineHeight: 14,
+  },
+  inventoryBtnTextSelected: {
+    color: colors.white,
+    fontWeight: '700',
   },
   footerRow: {
     flexDirection: 'row',
