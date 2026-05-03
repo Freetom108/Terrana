@@ -1,7 +1,9 @@
+import { HomeBlendCard, HomeProductCard } from '../../components/home/HomeListCards';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
 import { useBlends } from '../../hooks/useBlends';
 import { useProducts } from '../../hooks/useProducts';
+import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
 import type { Product } from '../../types/product';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +12,9 @@ import { useCallback, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+const LAST_USED_LIMIT = 3;
+const ALL_PRODUCTS_LIMIT = 5;
+const BLENDS_LIMIT = 3;
 function sortByUpdatedDesc(a: Product, b: Product): number {
   const ta = Date.parse(a.updatedAt || a.createdAt);
   const tb = Date.parse(b.updatedAt || b.createdAt);
@@ -20,24 +25,10 @@ function sortByName(a: Product, b: Product): number {
   return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
 }
 
-function ProductRow({ product }: { product: Product }) {
-  return (
-    <Link href={`/product/${product.id}`} asChild>
-      <Pressable style={({ pressed }) => [styles.productRow, pressed && styles.productRowPressed]}>
-        <Text style={styles.productName} numberOfLines={2}>
-          {product.name}
-        </Text>
-        <Text style={styles.productMeta} numberOfLines={1}>
-          {product.brand ? `${product.brand} · ` : ''}
-          {product.category}
-        </Text>
-      </Pressable>
-    </Link>
-  );
-}
-
 export default function HomeTab() {
   const insets = useSafeAreaInsets();
+  const palette = useThemePalette();
+  const p = palette;
   const { products, refreshProducts } = useProducts();
   const { blends, refreshBlends } = useBlends();
 
@@ -45,7 +36,7 @@ export default function HomeTab() {
     useCallback(() => {
       void refreshProducts();
       void refreshBlends();
-    }, [refreshProducts, refreshBlends])
+    }, [refreshProducts, refreshBlends]),
   );
 
   const productCount = products.length;
@@ -60,20 +51,28 @@ export default function HomeTab() {
   const byName = useMemo(() => [...products].sort(sortByName), [products]);
 
   const recentlyUsed = useMemo(() => {
-    const withLast = products.filter((p) => p.lastUsed);
+    const withLast = products.filter((prod) => prod.lastUsed);
     if (withLast.length === 0) {
-      return byUpdated.slice(0, 8);
+      return byUpdated;
     }
     return [...withLast].sort((a, b) =>
-      String(b.lastUsed ?? '').localeCompare(String(a.lastUsed ?? ''))
+      String(b.lastUsed ?? '').localeCompare(String(a.lastUsed ?? '')),
     );
   }, [products, byUpdated]);
+
+  const recentlyUsedPreview = recentlyUsed.slice(0, LAST_USED_LIMIT);
+  const productsByNamePreview = byName.slice(0, ALL_PRODUCTS_LIMIT);
+  const blendsPreview = blends.slice(0, BLENDS_LIMIT);
+
+  const showMoreRecentlyUsed = recentlyUsed.length > LAST_USED_LIMIT;
+  const showMoreAllProducts = byName.length > ALL_PRODUCTS_LIMIT;
+  const showMoreBlends = blends.length > BLENDS_LIMIT;
 
   const showProductEmpty = productCount === 0;
   const showBlendEmpty = blendCount === 0;
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: p.surface }]}>
       <LinearGradient
         colors={[colors.sageDark, colors.sage]}
         start={{ x: 0, y: 0 }}
@@ -97,7 +96,18 @@ export default function HomeTab() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('home.lastUsed')}</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
+              {t('home.lastUsed')}
+            </Text>
+            {!showProductEmpty && showMoreRecentlyUsed ? (
+              <Link href="/recent-products" asChild>
+                <Pressable hitSlop={8} accessibilityRole="link">
+                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>{t('home.viewAll')}</Text>
+                </Pressable>
+              </Link>
+            ) : null}
+          </View>
           {showProductEmpty ? (
             <EmptyState
               title={t('home.emptyProductsTitle')}
@@ -106,15 +116,26 @@ export default function HomeTab() {
             />
           ) : (
             <View style={styles.productStack}>
-              {recentlyUsed.map((p) => (
-                <ProductRow key={`recent-${p.id}`} product={p} />
+              {recentlyUsedPreview.map((prod) => (
+                <HomeProductCard key={`recent-${prod.id}`} product={prod} palette={palette} />
               ))}
             </View>
           )}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('home.allProducts')}</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
+              {t('home.allProducts')}
+            </Text>
+            {!showProductEmpty && showMoreAllProducts ? (
+              <Link href="/all-products" asChild>
+                <Pressable hitSlop={8} accessibilityRole="link">
+                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>{t('home.viewAll')}</Text>
+                </Pressable>
+              </Link>
+            ) : null}
+          </View>
           {showProductEmpty ? (
             <EmptyState
               title={t('home.emptyProductsTitle')}
@@ -123,15 +144,26 @@ export default function HomeTab() {
             />
           ) : (
             <View style={styles.productStack}>
-              {byName.map((p) => (
-                <ProductRow key={`all-${p.id}`} product={p} />
+              {productsByNamePreview.map((prod) => (
+                <HomeProductCard key={`all-${prod.id}`} product={prod} palette={palette} />
               ))}
             </View>
           )}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('home.myBlends')}</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
+              {t('home.myBlends')}
+            </Text>
+            {!showBlendEmpty && showMoreBlends ? (
+              <Link href="/all-blends" asChild>
+                <Pressable hitSlop={8} accessibilityRole="link">
+                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>{t('home.viewAll')}</Text>
+                </Pressable>
+              </Link>
+            ) : null}
+          </View>
           {showBlendEmpty ? (
             <EmptyState
               title={t('home.emptyBlendsTitle')}
@@ -140,19 +172,8 @@ export default function HomeTab() {
             />
           ) : (
             <View style={styles.productStack}>
-              {blends.map((blend) => (
-                <Link key={blend.id} href={`/blend/${blend.id}`} asChild>
-                  <Pressable
-                    style={({ pressed }) => [styles.productRow, pressed && styles.productRowPressed]}
-                  >
-                    <Text style={styles.productName} numberOfLines={2}>
-                      {blend.name}
-                    </Text>
-                    <Text style={styles.productMeta} numberOfLines={1}>
-                      {t('home.blendIngredientSummary', { count: blend.ingredients.length })}
-                    </Text>
-                  </Pressable>
-                </Link>
+              {blendsPreview.map((blend) => (
+                <HomeBlendCard key={blend.id} blend={blend} palette={palette} />
               ))}
             </View>
           )}
@@ -165,7 +186,6 @@ export default function HomeTab() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.cream,
   },
   header: {
     paddingHorizontal: 20,
@@ -211,40 +231,25 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.dark,
-    marginBottom: 12,
+  },
+  sectionTitleFlex: {
+    flex: 1,
+  },
+  viewAll: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   productStack: {
     gap: 10,
-  },
-  productRow: {
-    backgroundColor: colors.white,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.sageLight,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    shadowColor: colors.dark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  productRowPressed: {
-    opacity: 0.85,
-  },
-  productName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.dark,
-    marginBottom: 4,
-  },
-  productMeta: {
-    fontSize: 13,
-    color: colors.mid,
-    fontWeight: '500',
   },
 });

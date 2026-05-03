@@ -1,10 +1,12 @@
+import { useThemePalette } from '../../hooks/useThemePalette';
+import { t } from '../../services/i18n/i18n';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../constants/colors';
 
 export default function SearchTab() {
+  const p = useThemePalette();
   return (
-    <View style={styles.box}>
-      <Text style={styles.text}>Suche</Text>
+    <View style={[styles.box, { backgroundColor: p.surface }]}>
+      <Text style={[styles.text, { color: p.text }]}>{t('tabs.search')}</Text>
     </View>
   );
 }
@@ -12,9 +14,8 @@ export default function SearchTab() {
 const styles = StyleSheet.create({
   box: {
     flex: 1,
-    backgroundColor: colors.cream,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  text: { color: colors.dark, fontSize: 18 },
+  text: { fontSize: 18 },
 });

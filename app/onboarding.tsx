@@ -1,4 +1,5 @@
 import { colors } from '../constants/colors';
+import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -24,9 +25,9 @@ const CATEGORY_EMOJI: Record<(typeof CATEGORY_KEYS)[number], string> = {
 function splitTitleForAccent(fullTitle: string): { lead: string; accent: string } {
   const trimmed = fullTitle.trim();
   const idx = trimmed.lastIndexOf(' ');
-    if (idx === -1) {
-      return { lead: trimmed, accent: '' };
-    }
+  if (idx === -1) {
+    return { lead: trimmed, accent: '' };
+  }
   return {
     lead: `${trimmed.slice(0, idx)} `,
     accent: trimmed.slice(idx + 1),
@@ -35,6 +36,8 @@ function splitTitleForAccent(fullTitle: string): { lead: string; accent: string 
 
 export default function Onboarding() {
   const router = useRouter();
+  const palette = useThemePalette();
+  const p = palette;
   const float = useRef(new Animated.Value(0)).current;
   const title = t('onboarding.title') as string;
   const { lead, accent } = splitTitleForAccent(title);
@@ -69,7 +72,7 @@ export default function Onboarding() {
     t(`onboarding.categories.${key}`);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: p.surface }]} edges={['top', 'bottom']}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -82,21 +85,32 @@ export default function Onboarding() {
           🌿
         </Animated.Text>
 
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: p.text }]}>
           {lead}
           {accent ? <Text style={styles.titleAccent}>{accent}</Text> : null}
         </Text>
 
-        <Text style={styles.subtitle}>{t('onboarding.subtitle')}</Text>
+        <Text style={[styles.subtitle, { color: p.muted }]}>{t('onboarding.subtitle')}</Text>
 
-        <Text style={styles.sectionLabel}>{t('onboarding.selectCategory')}</Text>
+        <Text style={[styles.sectionLabel, { color: p.muted }]}>
+          {t('onboarding.selectCategory')}
+        </Text>
 
         <View style={styles.grid}>
           {CATEGORY_KEYS.map((key) => (
             <View key={key} style={styles.cardOuter}>
-              <View style={styles.card}>
+              <View
+                style={[
+                  styles.card,
+                  {
+                    backgroundColor: p.card,
+                    borderColor: p.border,
+                    shadowOpacity: palette.isDark ? 0 : 0.06,
+                  },
+                ]}
+              >
                 <Text style={styles.cardEmoji}>{CATEGORY_EMOJI[key]}</Text>
-                <Text style={styles.cardLabel}>{categoryLabel(key)}</Text>
+                <Text style={[styles.cardLabel, { color: p.text }]}>{categoryLabel(key)}</Text>
               </View>
             </View>
           ))}
@@ -111,7 +125,7 @@ export default function Onboarding() {
           <Text style={styles.ctaText}>{t('onboarding.button')}</Text>
         </Pressable>
 
-        <Text style={styles.languageHint}>
+        <Text style={[styles.languageHint, { color: p.muted }]}>
           🌍 {t('onboarding.languageHint')}
         </Text>
       </ScrollView>
@@ -122,7 +136,6 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.cream,
   },
   scroll: {
     paddingHorizontal: 22,
@@ -138,7 +151,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '700',
-    color: colors.dark,
     textAlign: 'center',
     lineHeight: 34,
     marginBottom: 12,
@@ -150,7 +162,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: colors.mid,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 20,
@@ -159,7 +170,6 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.mid,
     textAlign: 'center',
     marginBottom: 12,
     textTransform: 'uppercase',
@@ -176,17 +186,14 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   card: {
-    backgroundColor: colors.white,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: colors.sageLight,
     paddingVertical: 16,
     paddingHorizontal: 12,
     minHeight: 104,
     justifyContent: 'center',
     shadowColor: colors.dark,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
     shadowRadius: 6,
     elevation: 2,
   },
@@ -197,7 +204,6 @@ const styles = StyleSheet.create({
   cardLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.dark,
     lineHeight: 19,
   },
   cta: {
@@ -221,7 +227,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     fontSize: 12,
     lineHeight: 17,
-    color: colors.mid,
     textAlign: 'center',
     paddingHorizontal: 12,
     opacity: 0.85,

@@ -31,13 +31,35 @@ i18n.defaultLocale = 'en';
 i18n.enableFallback = true;
 i18n.locale = resolveDeviceLocale();
 
+const localeListeners = new Set<() => void>();
+
+export function subscribeLocale(listener: () => void): () => void {
+  localeListeners.add(listener);
+  return () => {
+    localeListeners.delete(listener);
+  };
+}
+
+function notifyLocaleChanged(): void {
+  localeListeners.forEach((l) => {
+    try {
+      l();
+    } catch {
+      /* ignore subscriber errors */
+    }
+  });
+}
+
 export function syncLocaleFromDevice(): void {
   i18n.locale = resolveDeviceLocale();
 }
 
 export function setLocale(locale: string): void {
   const code = locale.split('-')[0]?.toLowerCase() ?? 'en';
-  i18n.locale = SUPPORTED.has(code) ? code : 'en';
+  const next = SUPPORTED.has(code) ? code : 'en';
+  if (i18n.locale === next) return;
+  i18n.locale = next;
+  notifyLocaleChanged();
 }
 
 export function getLocale(): string {

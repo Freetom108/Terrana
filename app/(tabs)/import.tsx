@@ -3,6 +3,8 @@ import { PRODUCT_CATEGORIES } from '../../constants/categories';
 import type { ProductCategory } from '../../constants/categories';
 import { FREE_IMPORT_LIMIT } from '../../constants/limits';
 import { useImportLimit } from '../../hooks/useImportLimit';
+import type { ThemePalette } from '../../hooks/useThemePalette';
+import { useThemePalette } from '../../hooks/useThemePalette';
 import { extractProductFromText } from '../../services/ai/extractor';
 import { t } from '../../services/i18n/i18n';
 import { saveProduct } from '../../services/storage/products';
@@ -72,6 +74,7 @@ const INVENTORY_OPTIONS: { value: InventoryLevel; labelKey: string }[] = [
 ];
 
 function FieldBlock({
+  palette,
   labelKey,
   value,
   onChangeText,
@@ -79,6 +82,7 @@ function FieldBlock({
   minHeight,
   placeholder,
 }: {
+  palette: ThemePalette;
   labelKey:
     | 'import.fieldProductName'
     | 'import.fieldBrand'
@@ -94,7 +98,7 @@ function FieldBlock({
 }) {
   return (
     <View style={styles.fieldBlock}>
-      <Text style={styles.fieldLabel}>
+      <Text style={[styles.fieldLabel, { color: palette.muted }]}>
         ✏️ {t(labelKey)}
       </Text>
       <TextInput
@@ -102,10 +106,15 @@ function FieldBlock({
         onChangeText={onChangeText}
         multiline={multiline}
         placeholder={placeholder}
-        placeholderTextColor={colors.mid}
+        placeholderTextColor={palette.placeholderColor}
         style={[
           styles.fieldInput,
           multiline && styles.fieldInputMulti,
+          {
+            backgroundColor: palette.inputBg,
+            borderColor: palette.border,
+            color: palette.text,
+          },
           minHeight !== undefined ? { minHeight } : null,
         ]}
       />
@@ -114,6 +123,7 @@ function FieldBlock({
 }
 
 export default function ImportTab() {
+  const palette = useThemePalette();
   const router = useRouter();
   const { canImport, incrementImport, refresh } = useImportLimit();
 
@@ -218,7 +228,7 @@ export default function ImportTab() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: palette.surface }]} edges={['top']}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -228,12 +238,20 @@ export default function ImportTab() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>{t('import.screenTitle')}</Text>
-          <Text style={styles.subtitle}>{t('import.screenSubtitle')}</Text>
+          <Text style={[styles.title, { color: palette.text }]}>{t('import.screenTitle')}</Text>
+          <Text style={[styles.subtitle, { color: palette.muted }]}>{t('import.screenSubtitle')}</Text>
 
           {!canImport ? (
-            <View style={styles.upgradeBox}>
-              <Text style={styles.upgradeText}>
+            <View
+              style={[
+                styles.upgradeBox,
+                {
+                  backgroundColor: palette.isDark ? 'rgba(122,158,126,0.22)' : colors.sageLight,
+                  borderColor: colors.sage,
+                },
+              ]}
+            >
+              <Text style={[styles.upgradeText, { color: palette.isDark ? colors.sageLight : colors.sageDark }]}>
                 {t('import.upgradeMessage', { limit: FREE_IMPORT_LIMIT })}
               </Text>
             </View>
@@ -243,12 +261,20 @@ export default function ImportTab() {
                 value={sourceText}
                 onChangeText={setSourceText}
                 placeholder={t('import.pastePlaceholder')}
-                placeholderTextColor={colors.mid}
+                placeholderTextColor={palette.placeholderColor}
                 multiline
                 editable={!loading && !showResult}
-                style={[styles.sourceInput, { minHeight: 150 }]}
+                style={[
+                  styles.sourceInput,
+                  {
+                    minHeight: 150,
+                    backgroundColor: palette.card,
+                    borderColor: palette.border,
+                    color: palette.text,
+                  },
+                ]}
               />
-              <Text style={styles.pasteTip}>{t('import.pasteTip')}</Text>
+              <Text style={[styles.pasteTip, { color: palette.muted }]}>{t('import.pasteTip')}</Text>
 
               {error ? (
                 <View style={styles.errorBanner} accessibilityRole="alert">
@@ -277,26 +303,30 @@ export default function ImportTab() {
                   )}
                 </Pressable>
               ) : (
-                <View style={styles.resultCard}>
-                  <Text style={styles.resultHeading}>{t('import.resultTitle')}</Text>
+                <View style={[styles.resultCard, { backgroundColor: palette.card, borderColor: palette.border }]}>
+                  <Text style={[styles.resultHeading, { color: palette.text }]}>{t('import.resultTitle')}</Text>
 
                   <FieldBlock
+                    palette={palette}
                     labelKey="import.fieldProductName"
                     value={form.name}
                     onChangeText={(name) => setForm((f) => ({ ...f, name }))}
                     placeholder={t('import.fieldPlaceholderName')}
                   />
                   <FieldBlock
+                    palette={palette}
                     labelKey="import.fieldBrand"
                     value={form.brand}
                     onChangeText={(brand) => setForm((f) => ({ ...f, brand }))}
                   />
                   <FieldBlock
+                    palette={palette}
                     labelKey="import.fieldCategory"
                     value={form.category}
                     onChangeText={(category) => setForm((f) => ({ ...f, category }))}
                   />
                   <FieldBlock
+                    palette={palette}
                     labelKey="import.fieldDescription"
                     value={form.description}
                     onChangeText={(description) => setForm((f) => ({ ...f, description }))}
@@ -304,21 +334,27 @@ export default function ImportTab() {
                     minHeight={100}
                   />
                   <View style={styles.fieldBlock}>
-                    <Text style={styles.fieldLabel}>{t('import.fieldNotes')}</Text>
+                    <Text style={[styles.fieldLabel, { color: palette.muted }]}>{t('import.fieldNotes')}</Text>
                     <TextInput
                       value={form.userNotes}
                       onChangeText={(userNotes) => setForm((f) => ({ ...f, userNotes }))}
                       multiline
                       placeholder={t('import.fieldNotesPlaceholder')}
-                      placeholderTextColor={colors.mid}
+                      placeholderTextColor={palette.placeholderColor}
                       style={[
                         styles.fieldInput,
                         styles.fieldInputMulti,
                         styles.notesInput,
+                        {
+                          backgroundColor: palette.inputBg,
+                          borderColor: palette.border,
+                          color: palette.text,
+                        },
                       ]}
                     />
                   </View>
                   <FieldBlock
+                    palette={palette}
                     labelKey="import.fieldUsages"
                     value={form.usagesText}
                     onChangeText={(usagesText) => setForm((f) => ({ ...f, usagesText }))}
@@ -326,6 +362,7 @@ export default function ImportTab() {
                     minHeight={80}
                   />
                   <FieldBlock
+                    palette={palette}
                     labelKey="import.fieldTags"
                     value={form.tagsText}
                     onChangeText={(tagsText) => setForm((f) => ({ ...f, tagsText }))}
@@ -334,17 +371,21 @@ export default function ImportTab() {
                   />
 
                   <View style={styles.fieldBlock}>
-                    <Text style={[styles.fieldLabel, styles.inventorySectionLabel]}>
+                    <Text style={[styles.fieldLabel, styles.inventorySectionLabel, { color: palette.muted }]}>
                       {t('import.fieldInventory')}
                     </Text>
                     <View style={styles.inventoryRow}>
-                      {INVENTORY_OPTIONS.map(({ value, labelKey }) => {
+                      {INVENTORY_OPTIONS.map(({ value, labelKey: invLabelKey }) => {
                         const selected = form.inventory === value;
                         return (
                           <Pressable
                             key={value}
                             style={[
                               styles.inventoryBtn,
+                              {
+                                backgroundColor: palette.inputBg,
+                                borderColor: palette.border,
+                              },
                               selected && styles.inventoryBtnSelected,
                             ]}
                             onPress={() =>
@@ -360,13 +401,14 @@ export default function ImportTab() {
                               style={[
                                 styles.inventoryBtnText,
                                 selected && styles.inventoryBtnTextSelected,
+                                { color: selected ? colors.white : palette.muted },
                               ]}
                               numberOfLines={2}
                               adjustsFontSizeToFit
                               minimumFontScale={0.75}
                               maxFontSizeMultiplier={1.1}
                             >
-                              {t(labelKey)}
+                              {t(invLabelKey)}
                             </Text>
                           </Pressable>
                         );
@@ -378,10 +420,16 @@ export default function ImportTab() {
 
                   <View style={styles.footerRow}>
                     <Pressable
-                      style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
+                      style={({ pressed }) => [
+                        styles.secondaryBtn,
+                        { borderColor: colors.sage },
+                        pressed && styles.pressed,
+                      ]}
                       onPress={resetFlow}
                     >
-                      <Text style={styles.secondaryBtnText}>{t('import.resetAgain')}</Text>
+                      <Text style={[styles.secondaryBtnText, { color: palette.secondaryBtnLabel }]}>
+                        {t('import.resetAgain')}
+                      </Text>
                     </Pressable>
                     <Pressable
                       style={({ pressed }) => [styles.primaryFooterBtn, pressed && styles.pressed]}
@@ -403,7 +451,6 @@ export default function ImportTab() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.cream,
   },
   flex: { flex: 1 },
   scroll: {
@@ -414,30 +461,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: colors.dark,
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 15,
-    color: colors.mid,
     marginBottom: 20,
     lineHeight: 22,
   },
   sourceInput: {
-    backgroundColor: colors.white,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: colors.sageLight,
     padding: 14,
     fontSize: 16,
-    color: colors.dark,
     textAlignVertical: 'top',
     marginBottom: 8,
   },
   pasteTip: {
     fontSize: 13,
     lineHeight: 19,
-    color: colors.mid,
     marginBottom: 14,
     opacity: 0.9,
   },
@@ -479,16 +520,13 @@ const styles = StyleSheet.create({
   spinner: { marginRight: 10 },
   resultCard: {
     marginTop: 8,
-    backgroundColor: colors.white,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.sageLight,
     padding: 16,
   },
   resultHeading: {
     fontSize: 17,
     fontWeight: '700',
-    color: colors.dark,
     marginBottom: 14,
   },
   fieldBlock: {
@@ -497,18 +535,14 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.mid,
     marginBottom: 6,
   },
   fieldInput: {
-    backgroundColor: colors.cream,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.sageLight,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: colors.dark,
   },
   fieldInputMulti: {
     textAlignVertical: 'top',
@@ -532,9 +566,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.cream,
     borderWidth: 1,
-    borderColor: colors.sageLight,
     minHeight: 44,
   },
   inventoryBtnSelected: {
@@ -544,7 +576,6 @@ const styles = StyleSheet.create({
   inventoryBtnText: {
     fontSize: 11,
     fontWeight: '600',
-    color: colors.mid,
     textAlign: 'center',
     lineHeight: 14,
   },
@@ -568,7 +599,6 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.sageDark,
   },
   primaryFooterBtn: {
     flex: 1,
@@ -587,15 +617,12 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   upgradeBox: {
-    backgroundColor: colors.sageLight,
     borderRadius: 14,
     padding: 18,
     borderWidth: 1,
-    borderColor: colors.sage,
   },
   upgradeText: {
     fontSize: 15,
-    color: colors.sageDark,
     lineHeight: 22,
     textAlign: 'center',
     fontWeight: '600',

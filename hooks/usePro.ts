@@ -15,5 +15,5 @@ export function usePro() {
     void load();
   }, [load]);
 
-  return { isPro, isLifetime };
+  return { isPro, isLifetime, reload: load };
 }

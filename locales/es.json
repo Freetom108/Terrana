@@ -27,7 +27,8 @@
     "emptyProductsMessage": "Añade productos para verlos aquí.",
     "emptyBlendsTitle": "Aún no hay mezclas",
     "emptyBlendsMessage": "Crea una mezcla a partir de tus productos.",
-    "blendIngredientSummary": "%{count} ingredientes"
+    "blendIngredientSummary": "%{count} ingredientes",
+    "viewAll": "Ver todo →"
   },
   "import": {
     "title": "Importar",
@@ -67,7 +68,39 @@
     "lifetime": "De por vida",
     "tipsTitle": "Consejos & Ayuda",
     "importTipTitle": "Cómo obtener los mejores resultados",
-    "importTipBody": "Copia solo la descripción del producto, no toda la página."
+    "importTipBody": "Copia solo la descripción del producto, no toda la página.",
+    "sectionAppearance": "APARIENCIA",
+    "appearanceLabel": "Aspecto visual",
+    "themeLight": "Claro",
+    "themeAuto": "Auto",
+    "themeDark": "Oscuro",
+    "sectionLanguage": "IDIOMA",
+    "langEnglish": "🇬🇧 English",
+    "langGerman": "🇩🇪 Deutsch",
+    "langFrench": "🇫🇷 Français",
+    "langSpanish": "🇪🇸 Español",
+    "sectionAbout": "ACERCA DE LA APP",
+    "versionLabel": "Versión",
+    "statusLabel": "Estado",
+    "statusFree": "Free",
+    "statusPro": "Pro",
+    "statusLifetime": "Lifetime"
+  },
+  "tabs": {
+    "home": "Colección",
+    "search": "Buscar",
+    "import": "Importar",
+    "blends": "Mezclas",
+    "settings": "Ajustes"
+  },
+  "product": {
+    "notFoundTitle": "Producto no encontrado",
+    "notFoundHint": "Vuelve e inténtalo de nuevo."
+  },
+  "blend": {
+    "notFoundTitle": "Mezcla no encontrada",
+    "notFoundHint": "Vuelve e inténtalo de nuevo.",
+    "ingredients": "Ingredientes"
   },
   "general": {
     "cancel": "Cancelar",

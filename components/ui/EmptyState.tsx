@@ -1,4 +1,4 @@
-import { colors } from '../../constants/colors';
+import { useThemePalette } from '../../hooks/useThemePalette';
 import { StyleSheet, Text, View } from 'react-native';
 
 type EmptyStateProps = {
@@ -8,11 +8,15 @@ type EmptyStateProps = {
 };
 
 export function EmptyState({ title, message, emoji = '📭' }: EmptyStateProps) {
+  const p = useThemePalette();
   return (
-    <View style={styles.wrap} accessibilityRole="text">
+    <View
+      style={[styles.wrap, { backgroundColor: p.card, borderColor: p.border }]}
+      accessibilityRole="text"
+    >
       <Text style={styles.emoji}>{emoji}</Text>
-      <Text style={styles.title}>{title}</Text>
-      {message ? <Text style={styles.message}>{message}</Text> : null}
+      <Text style={[styles.title, { color: p.text }]}>{title}</Text>
+      {message ? <Text style={[styles.message, { color: p.muted }]}>{message}</Text> : null}
     </View>
   );
 }
@@ -23,10 +27,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 28,
     paddingHorizontal: 16,
-    backgroundColor: colors.white,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: colors.sageLight,
     borderStyle: 'dashed',
   },
   emoji: {
@@ -36,13 +38,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.dark,
     textAlign: 'center',
   },
   message: {
     marginTop: 6,
     fontSize: 14,
-    color: colors.mid,
     textAlign: 'center',
     lineHeight: 20,
   },

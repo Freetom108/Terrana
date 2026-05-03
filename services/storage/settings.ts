@@ -1,8 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import type { ThemePreference } from '../../constants/themePreference';
+import { parseStoredTheme } from '../../constants/themePreference';
+
 const KEY_PRO = 'isPro';
 const KEY_LIFETIME = 'isLifetime';
 const KEY_IMPORT_COUNT = 'importCount';
+const KEY_THEME = 'theme';
+const KEY_LANGUAGE = 'language';
+
+const SUPPORTED_LANG_CODES = new Set(['en', 'de', 'fr', 'es']);
 
 function parseBoolean(raw: string | null): boolean {
   if (raw === null) return false;
@@ -51,4 +58,25 @@ export async function incrementImportCount(): Promise<void> {
 
 export async function resetImportCount(): Promise<void> {
   await AsyncStorage.setItem(KEY_IMPORT_COUNT, JSON.stringify(0));
+}
+
+export async function getThemePreference(): Promise<ThemePreference> {
+  return parseStoredTheme(await AsyncStorage.getItem(KEY_THEME));
+}
+
+export async function setThemePreference(value: ThemePreference): Promise<void> {
+  await AsyncStorage.setItem(KEY_THEME, value);
+}
+
+/** Saved app language (`en`|`de`|`fr`|`es`), or null to follow device locale. */
+export async function getSavedLanguageCode(): Promise<string | null> {
+  const raw = await AsyncStorage.getItem(KEY_LANGUAGE);
+  if (raw == null || raw.trim() === '') return null;
+  const code = raw.trim().split('-')[0]?.toLowerCase() ?? '';
+  return SUPPORTED_LANG_CODES.has(code) ? code : null;
+}
+
+export async function setSavedLanguageCode(code: string): Promise<void> {
+  const c = code.split('-')[0]?.toLowerCase() ?? 'en';
+  await AsyncStorage.setItem(KEY_LANGUAGE, SUPPORTED_LANG_CODES.has(c) ? c : 'en');
 }

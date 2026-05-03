@@ -1,14 +1,17 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { colors } from '../../constants/colors';
+import { useThemePalette } from '../../hooks/useThemePalette';
+import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useEffect, useReducer } from 'react';
 
-const TAB_LABELS: Record<string, string> = {
-  index: 'Sammlung',
-  search: 'Suche',
-  import: 'Import',
-  blends: 'Mischungen',
+const ROUTE_TAB_KEY: Record<string, string> = {
+  index: 'tabs.home',
+  search: 'tabs.search',
+  import: 'tabs.import',
+  blends: 'tabs.blends',
+  settings: 'tabs.settings',
 };
 
 const ICON_ROUTE_ICONS = {
@@ -16,15 +19,20 @@ const ICON_ROUTE_ICONS = {
   search: { inactive: 'search-outline' as const, active: 'search' as const },
   import: { inactive: 'add-circle-outline' as const, active: 'add-circle' as const },
   blends: { inactive: 'flask-outline' as const, active: 'flask' as const },
+  settings: { inactive: 'settings-outline' as const, active: 'settings' as const },
 } as const;
 
 const ICON_SIZE = 24;
 const ICON_ROW_MIN_HEIGHT = 28;
 
 export function IconTabBar(props: BottomTabBarProps) {
-  const { state, descriptors, navigation } = props;
+  const { state, navigation } = props;
   const insets = useSafeAreaInsets();
   const bottomPad = Math.max(insets.bottom, 8);
+  const p = useThemePalette();
+  const [, bumpTabs] = useReducer((n: number) => n + 1, 0);
+
+  useEffect(() => subscribeLocale(() => bumpTabs()), []);
 
   return (
     <View
@@ -32,26 +40,20 @@ export function IconTabBar(props: BottomTabBarProps) {
         styles.bar,
         {
           paddingBottom: bottomPad,
-          borderTopColor: colors.sageLight,
+          borderTopColor: p.tabBarBorder,
+          backgroundColor: p.tabBarBg,
         },
       ]}
       accessibilityRole="tablist"
     >
       {state.routes.map((route, index) => {
-        const descriptor = descriptors[route.key];
-        const options = descriptor?.options ?? {};
-        const metaLabel = TAB_LABELS[route.name] ?? route.name;
-        const label =
-          typeof options.tabBarLabel === 'string'
-            ? options.tabBarLabel
-            : typeof options.title === 'string'
-              ? options.title
-              : metaLabel;
+        const tabKey = ROUTE_TAB_KEY[route.name];
+        const label = tabKey ? (t(tabKey) as string) : route.name;
 
         const focused = state.index === index;
         const pair = ICON_ROUTE_ICONS[route.name as keyof typeof ICON_ROUTE_ICONS];
         const iconName = pair ? (focused ? pair.active : pair.inactive) : 'ellipse-outline';
-        const iconColor = focused ? colors.sageDark : colors.mid;
+        const iconColor = focused ? p.tabLabelActive : p.tabLabelInactive;
 
         const onPress = () => {
           const e = navigation.emit({
@@ -85,7 +87,10 @@ export function IconTabBar(props: BottomTabBarProps) {
               <Ionicons name={iconName} size={ICON_SIZE} color={iconColor} />
             </View>
             <Text
-              style={[styles.label, focused ? styles.labelActive : styles.labelInactive]}
+              style={[
+                styles.label,
+                { color: focused ? p.tabLabelActive : p.tabLabelInactive },
+              ]}
               numberOfLines={2}
               adjustsFontSizeToFit
               minimumFontScale={0.82}
@@ -104,8 +109,6 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    backgroundColor: colors.white,
-    borderTopWidth: StyleSheet.hairlineWidth,
     paddingTop: 6,
     ...Platform.select({
       ios: {
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 2,
+    paddingHorizontal: 1,
     paddingTop: 4,
     paddingBottom: 8,
     minHeight: 58,
@@ -141,12 +144,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 13,
-  },
-  labelActive: {
-    color: colors.sageDark,
-  },
-  labelInactive: {
-    color: colors.mid,
-    fontWeight: '500',
   },
 });

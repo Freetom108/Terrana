@@ -27,7 +27,8 @@
     "emptyProductsMessage": "Add products to see them here.",
     "emptyBlendsTitle": "No blends yet",
     "emptyBlendsMessage": "Create a blend from your products.",
-    "blendIngredientSummary": "%{count} ingredients"
+    "blendIngredientSummary": "%{count} ingredients",
+    "viewAll": "Show all →"
   },
   "import": {
     "title": "Import",
@@ -67,7 +68,39 @@
     "lifetime": "Lifetime",
     "tipsTitle": "Tips & Help",
     "importTipTitle": "How to get the best import results",
-    "importTipBody": "Copy only the product description from a website - not the entire page. The AI will automatically ignore irrelevant content, but a focused text gives the best results."
+    "importTipBody": "Copy only the product description from a website - not the entire page. The AI will automatically ignore irrelevant content, but a focused text gives the best results.",
+    "sectionAppearance": "DISPLAY",
+    "appearanceLabel": "Appearance",
+    "themeLight": "Light",
+    "themeAuto": "Auto",
+    "themeDark": "Dark",
+    "sectionLanguage": "LANGUAGE",
+    "langEnglish": "🇬🇧 English",
+    "langGerman": "🇩🇪 Deutsch",
+    "langFrench": "🇫🇷 Français",
+    "langSpanish": "🇪🇸 Español",
+    "sectionAbout": "ABOUT THE APP",
+    "versionLabel": "Version",
+    "statusLabel": "Status",
+    "statusFree": "Free",
+    "statusPro": "Pro",
+    "statusLifetime": "Lifetime"
+  },
+  "tabs": {
+    "home": "Collection",
+    "search": "Search",
+    "import": "Import",
+    "blends": "Blends",
+    "settings": "Settings"
+  },
+  "product": {
+    "notFoundTitle": "Product not found",
+    "notFoundHint": "Go back and try again."
+  },
+  "blend": {
+    "notFoundTitle": "Blend not found",
+    "notFoundHint": "Go back and try again.",
+    "ingredients": "Ingredients"
   },
   "general": {
     "cancel": "Cancel",

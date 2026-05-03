@@ -27,7 +27,8 @@
     "emptyProductsMessage": "Füge Produkte hinzu, um sie hier zu sehen.",
     "emptyBlendsTitle": "Noch keine Mischungen",
     "emptyBlendsMessage": "Lege eine Mischung aus deinen Produkten an.",
-    "blendIngredientSummary": "%{count} Zutaten"
+    "blendIngredientSummary": "%{count} Zutaten",
+    "viewAll": "Alle anzeigen →"
   },
   "import": {
     "title": "Importieren",
@@ -67,7 +68,39 @@
     "lifetime": "Lifetime",
     "tipsTitle": "Tipps & Hilfe",
     "importTipTitle": "So gelingt der Import am besten",
-    "importTipBody": "Kopiere am besten nur die Produktbeschreibung einer Webseite - nicht die gesamte Seite. Die KI blendet irrelevante Inhalte automatisch aus, aber ein gezielter Text liefert die besten Ergebnisse."
+    "importTipBody": "Kopiere am besten nur die Produktbeschreibung einer Webseite - nicht die gesamte Seite. Die KI blendet irrelevante Inhalte automatisch aus, aber ein gezielter Text liefert die besten Ergebnisse.",
+    "sectionAppearance": "DARSTELLUNG",
+    "appearanceLabel": "Erscheinungsbild",
+    "themeLight": "Hell",
+    "themeAuto": "Auto",
+    "themeDark": "Dunkel",
+    "sectionLanguage": "SPRACHE",
+    "langEnglish": "🇬🇧 English",
+    "langGerman": "🇩🇪 Deutsch",
+    "langFrench": "🇫🇷 Français",
+    "langSpanish": "🇪🇸 Español",
+    "sectionAbout": "ÜBER DIE APP",
+    "versionLabel": "Version",
+    "statusLabel": "Status",
+    "statusFree": "Free",
+    "statusPro": "Pro",
+    "statusLifetime": "Lifetime"
+  },
+  "tabs": {
+    "home": "Sammlung",
+    "search": "Suche",
+    "import": "Import",
+    "blends": "Mischungen",
+    "settings": "Einstellungen"
+  },
+  "product": {
+    "notFoundTitle": "Produkt nicht gefunden",
+    "notFoundHint": "Zurück und erneut versuchen."
+  },
+  "blend": {
+    "notFoundTitle": "Mischung nicht gefunden",
+    "notFoundHint": "Zurück und erneut versuchen.",
+    "ingredients": "Zutaten"
   },
   "general": {
     "cancel": "Abbrechen",

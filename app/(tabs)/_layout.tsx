@@ -8,6 +8,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="search" options={{ title: 'Suche', tabBarLabel: 'Suche' }} />
       <Tabs.Screen name="import" options={{ title: 'Import', tabBarLabel: 'Import' }} />
       <Tabs.Screen name="blends" options={{ title: 'Mischungen', tabBarLabel: 'Mischungen' }} />
+      <Tabs.Screen name="settings" options={{ title: 'Einstellungen', tabBarLabel: 'Einstellungen' }} />
     </Tabs>
   );
 }

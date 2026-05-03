@@ -27,7 +27,8 @@
     "emptyProductsMessage": "Ajoutez des produits pour les voir ici.",
     "emptyBlendsTitle": "Aucun mélange pour l'instant",
     "emptyBlendsMessage": "Créez un mélange à partir de vos produits.",
-    "blendIngredientSummary": "%{count} ingrédients"
+    "blendIngredientSummary": "%{count} ingrédients",
+    "viewAll": "Tout voir →"
   },
   "import": {
     "title": "Importer",
@@ -67,7 +68,39 @@
     "lifetime": "À vie",
     "tipsTitle": "Conseils & Aide",
     "importTipTitle": "Comment obtenir les meilleurs résultats",
-    "importTipBody": "Copiez uniquement la description du produit - pas la page entière."
+    "importTipBody": "Copiez uniquement la description du produit - pas la page entière.",
+    "sectionAppearance": "AFFICHAGE",
+    "appearanceLabel": "Apparence",
+    "themeLight": "Clair",
+    "themeAuto": "Auto",
+    "themeDark": "Sombre",
+    "sectionLanguage": "LANGUE",
+    "langEnglish": "🇬🇧 English",
+    "langGerman": "🇩🇪 Deutsch",
+    "langFrench": "🇫🇷 Français",
+    "langSpanish": "🇪🇸 Español",
+    "sectionAbout": "À PROPOS",
+    "versionLabel": "Version",
+    "statusLabel": "Statut",
+    "statusFree": "Free",
+    "statusPro": "Pro",
+    "statusLifetime": "Lifetime"
+  },
+  "tabs": {
+    "home": "Collection",
+    "search": "Recherche",
+    "import": "Importer",
+    "blends": "Mélanges",
+    "settings": "Réglages"
+  },
+  "product": {
+    "notFoundTitle": "Produit introuvable",
+    "notFoundHint": "Revenez en arrière et réessayez."
+  },
+  "blend": {
+    "notFoundTitle": "Mélange introuvable",
+    "notFoundHint": "Revenez en arrière et réessayez.",
+    "ingredients": "Ingrédients"
   },
   "general": {
     "cancel": "Annuler",
