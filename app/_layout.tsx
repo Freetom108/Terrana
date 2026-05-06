@@ -51,6 +51,7 @@ function RootNavigator() {
         <Stack.Screen name="recent-products" />
         <Stack.Screen name="all-products" />
         <Stack.Screen name="all-blends" />
+        <Stack.Screen name="paywall" />
       </Stack>
     </>
   );

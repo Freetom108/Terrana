@@ -237,10 +237,7 @@ export default function NewBlendScreen() {
       await saveBlend(blend, { isPro: isPro || isLifetime });
     } catch (e) {
       if (e instanceof LimitExceededError) {
-        Alert.alert(
-          t('limits.blendLimitTitle') as string,
-          t('limits.blendLimitMessage', { limit: e.limit }) as string,
-        );
+        router.push('/paywall');
         return;
       }
       throw e;

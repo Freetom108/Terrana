@@ -11,7 +11,7 @@ import {
   setSavedLanguageCode,
   setThemePreference,
 } from '../../services/storage/settings';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useReducer, useState } from 'react';
 import {
   Pressable,
@@ -44,6 +44,7 @@ export default function SettingsTab() {
   const palette = useThemePalette();
   const p = palette;
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { isPro, isLifetime, reload } = usePro();
   const [, bump] = useReducer((x: number) => x + 1, 0);
 
@@ -91,7 +92,52 @@ export default function SettingsTab() {
       >
         <Text style={[styles.screenTitle, { color: headline }]}>{t('settings.title')}</Text>
 
-        <Text style={[styles.sectionHeading, { color: muted }]}>{t('settings.sectionAppearance')}</Text>
+        {/* ── Upgrade card ── */}
+        <Text style={[styles.sectionHeading, { color: muted }]}>{t('settings.sectionUpgrade')}</Text>
+        {isLifetime ? (
+          <View style={[styles.upgradeCard, styles.upgradeCardLifetime, { borderColor: colors.sageDark }]}>
+            <Text style={[styles.upgradeTitle, { color: colors.sageDark }]}>
+              {t('settings.upgradeLifetimeTitle') as string}
+            </Text>
+            <Text style={[styles.upgradeHint, { color: p.muted }]}>
+              {t('settings.upgradeLifetimeHint') as string}
+            </Text>
+          </View>
+        ) : isPro ? (
+          <View style={[styles.upgradeCard, styles.upgradeCardPro, { borderColor: colors.sage }]}>
+            <Text style={[styles.upgradeTitle, { color: colors.sage }]}>
+              {t('settings.upgradeProTitle') as string}
+            </Text>
+            <Text style={[styles.upgradeHint, { color: p.muted }]}>
+              {t('settings.upgradeProHint') as string}
+            </Text>
+            <Pressable
+              style={[styles.upgradeBtn, styles.upgradeBtnPro]}
+              onPress={() => router.push('/paywall')}
+              accessibilityRole="button"
+            >
+              <Text style={styles.upgradeBtnText}>{t('settings.upgradeProButton') as string}</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={[styles.upgradeCard, styles.upgradeCardFree, { borderColor: colors.sage }]}>
+            <Text style={[styles.upgradeTitle, { color: p.text }]}>
+              {t('settings.upgradeFreeTitle') as string}
+            </Text>
+            <Text style={[styles.upgradeFeatures, { color: p.muted }]}>
+              {t('settings.upgradeFreeFeatures') as string}
+            </Text>
+            <Pressable
+              style={[styles.upgradeBtn, styles.upgradeBtnFree]}
+              onPress={() => router.push('/paywall')}
+              accessibilityRole="button"
+            >
+              <Text style={styles.upgradeBtnText}>{t('settings.upgradeFreeButton') as string}</Text>
+            </Pressable>
+          </View>
+        )}
+
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>{t('settings.sectionAppearance')}</Text>
         <Text style={[styles.sectionLabel, { color: muted }]}>{t('settings.appearanceLabel')}</Text>
         <View style={styles.rowGap}>
           {THEME_OPTIONS.map(({ value, labelKey }) => {
@@ -275,6 +321,55 @@ const styles = StyleSheet.create({
   },
   aboutVal: {
     fontSize: 15,
+    fontWeight: '700',
+  },
+
+  /* Upgrade card */
+  upgradeCard: {
+    borderRadius: 16,
+    borderWidth: 1.5,
+    padding: 16,
+    marginBottom: 4,
+  },
+  upgradeCardFree: {
+    backgroundColor: 'rgba(122,158,126,0.10)',
+  },
+  upgradeCardPro: {
+    backgroundColor: 'rgba(122,158,126,0.08)',
+  },
+  upgradeCardLifetime: {
+    backgroundColor: 'rgba(74,107,78,0.10)',
+  },
+  upgradeTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  upgradeHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '500',
+    marginBottom: 12,
+  },
+  upgradeFeatures: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 12,
+  },
+  upgradeBtn: {
+    borderRadius: 12,
+    paddingVertical: 11,
+    alignItems: 'center',
+  },
+  upgradeBtnFree: {
+    backgroundColor: colors.sage,
+  },
+  upgradeBtnPro: {
+    backgroundColor: colors.sageDark,
+  },
+  upgradeBtnText: {
+    color: colors.white,
+    fontSize: 14,
     fontWeight: '700',
   },
 });

@@ -1,13 +1,20 @@
 import { HomeBlendCard, HomeProductCard } from '../../components/home/HomeListCards';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
+import {
+  FREE_BLEND_LIMIT,
+  FREE_BLEND_WARN,
+  FREE_PRODUCT_LIMIT,
+  FREE_PRODUCT_WARN,
+} from '../../constants/limits';
 import { useBlends } from '../../hooks/useBlends';
+import { usePro } from '../../hooks/usePro';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
 import type { Product } from '../../types/product';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link, useFocusEffect } from 'expo-router';
+import { Link, useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,15 +36,20 @@ export default function HomeTab() {
   const insets = useSafeAreaInsets();
   const palette = useThemePalette();
   const p = palette;
+  const router = useRouter();
   const { products, refreshProducts } = useProducts();
   const { blends, refreshBlends } = useBlends();
+  const { isPro, isLifetime, reload: reloadPro } = usePro();
 
   useFocusEffect(
     useCallback(() => {
       void refreshProducts();
       void refreshBlends();
-    }, [refreshProducts, refreshBlends]),
+      void reloadPro();
+    }, [refreshProducts, refreshBlends, reloadPro]),
   );
+
+  const isFreeUser = !isPro && !isLifetime;
 
   const productCount = products.length;
   const blendCount = blends.length;
@@ -149,6 +161,20 @@ export default function HomeTab() {
               ))}
             </View>
           )}
+          {isFreeUser && productCount >= FREE_PRODUCT_WARN ? (
+            <Pressable
+              style={[styles.limitBanner, { backgroundColor: p.isDark ? '#3D2E1A' : '#FFF3E0', borderColor: '#E6A817' }]}
+              onPress={() => router.push('/paywall')}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
+                {t('limits.productWarning', { used: productCount, max: FREE_PRODUCT_LIMIT }) as string}
+              </Text>
+              <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
+                {t('limits.upgradeLink') as string}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
 
         <View style={styles.section}>
@@ -177,6 +203,20 @@ export default function HomeTab() {
               ))}
             </View>
           )}
+          {isFreeUser && blendCount >= FREE_BLEND_WARN ? (
+            <Pressable
+              style={[styles.limitBanner, { backgroundColor: p.isDark ? '#3D2E1A' : '#FFF3E0', borderColor: '#E6A817' }]}
+              onPress={() => router.push('/paywall')}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
+                {t('limits.blendWarning', { used: blendCount, max: FREE_BLEND_LIMIT }) as string}
+              </Text>
+              <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
+                {t('limits.upgradeLink') as string}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       </ScrollView>
     </View>
@@ -251,5 +291,27 @@ const styles = StyleSheet.create({
   },
   productStack: {
     gap: 10,
+  },
+  limitBanner: {
+    marginTop: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  limitBannerText: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '600',
+    lineHeight: 17,
+  },
+  limitBannerLink: {
+    fontSize: 12,
+    fontWeight: '700',
+    flexShrink: 0,
   },
 });

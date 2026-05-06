@@ -1,7 +1,7 @@
 import { colors } from '../../constants/colors';
 import { PRODUCT_CATEGORIES } from '../../constants/categories';
 import type { ProductCategory } from '../../constants/categories';
-import { FREE_IMPORT_LIMIT } from '../../constants/limits';
+import { FREE_IMPORT_LIMIT, FREE_IMPORT_WARN } from '../../constants/limits';
 import { useImportLimit } from '../../hooks/useImportLimit';
 import { usePro } from '../../hooks/usePro';
 import type { ThemePalette } from '../../hooks/useThemePalette';
@@ -15,7 +15,6 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -128,8 +127,10 @@ function FieldBlock({
 export default function ImportTab() {
   const palette = useThemePalette();
   const router = useRouter();
-  const { canImport, incrementImport, refresh } = useImportLimit();
+  const { canImport, importsUsed, incrementImport, refresh } = useImportLimit();
   const { isPro, isLifetime } = usePro();
+  const isFreeUser = !isPro && !isLifetime;
+  const showImportProgress = isFreeUser && importsUsed >= FREE_IMPORT_WARN;
 
   const [sourceText, setSourceText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -229,10 +230,7 @@ export default function ImportTab() {
       router.push('/product/' + savedProduct.id);
     } catch (e) {
       if (e instanceof LimitExceededError) {
-        Alert.alert(
-          t('limits.productLimitTitle') as string,
-          t('limits.productLimitMessage', { limit: e.limit }) as string,
-        );
+        router.push('/paywall');
         return;
       }
       const msg = e instanceof Error ? e.message : String(e);
@@ -254,8 +252,40 @@ export default function ImportTab() {
           <Text style={[styles.title, { color: palette.text }]}>{t('import.screenTitle')}</Text>
           <Text style={[styles.subtitle, { color: palette.muted }]}>{t('import.screenSubtitle')}</Text>
 
+          {/* Import progress bar for free users near limit */}
+          {showImportProgress && (
+            <View style={[styles.importProgressWrap, { backgroundColor: palette.isDark ? '#3D2E1A' : '#FFF3E0', borderColor: '#E6A817' }]}>
+              <View style={styles.importProgressRow}>
+                <Text style={[styles.importProgressText, { color: palette.isDark ? '#FFD580' : '#8A5A00' }]}>
+                  {t('limits.importProgress', { used: importsUsed, max: FREE_IMPORT_LIMIT }) as string}
+                </Text>
+                <Pressable onPress={() => router.push('/paywall')} hitSlop={8}>
+                  <Text style={[styles.importProgressLink, { color: palette.isDark ? '#FFD580' : '#8A5A00' }]}>
+                    {t('limits.upgradeLink') as string}
+                  </Text>
+                </Pressable>
+              </View>
+              <View style={[styles.importProgressBar, { backgroundColor: palette.isDark ? '#5A4020' : '#FFD9A0' }]}>
+                <View
+                  style={[
+                    styles.importProgressFill,
+                    {
+                      backgroundColor: importsUsed >= FREE_IMPORT_LIMIT ? '#E65C00' : '#E6A817',
+                      width: `${Math.min(100, (importsUsed / FREE_IMPORT_LIMIT) * 100)}%` as `${number}%`,
+                    },
+                  ]}
+                />
+              </View>
+              {importsUsed >= FREE_IMPORT_LIMIT - 1 ? (
+                <Text style={[styles.importNearLimit, { color: palette.isDark ? '#FFD580' : '#8A5A00' }]}>
+                  {t('limits.importNearLimit') as string}
+                </Text>
+              ) : null}
+            </View>
+          )}
+
           {!canImport ? (
-            <View
+            <Pressable
               style={[
                 styles.upgradeBox,
                 {
@@ -263,11 +293,13 @@ export default function ImportTab() {
                   borderColor: colors.sage,
                 },
               ]}
+              onPress={() => router.push('/paywall')}
+              accessibilityRole="button"
             >
               <Text style={[styles.upgradeText, { color: palette.isDark ? colors.sageLight : colors.sageDark }]}>
                 {t('import.upgradeMessage', { limit: FREE_IMPORT_LIMIT })}
               </Text>
-            </View>
+            </Pressable>
           ) : (
             <>
               <TextInput
@@ -639,5 +671,41 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textAlign: 'center',
     fontWeight: '600',
+  },
+  importProgressWrap: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 12,
+    marginBottom: 14,
+    gap: 8,
+  },
+  importProgressRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  importProgressText: {
+    fontSize: 12,
+    fontWeight: '600',
+    flex: 1,
+  },
+  importProgressLink: {
+    fontSize: 12,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
+  importProgressBar: {
+    height: 5,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  importProgressFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  importNearLimit: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
   },
 });
