@@ -81,6 +81,7 @@
     "upgradeProButton": "Lifetime ansehen",
     "upgradeLifetimeTitle": "Lifetime-Mitglied 💎",
     "upgradeLifetimeHint": "Danke für deine Unterstützung!",
+    "sectionFaq": "FAQ",
     "sectionAbout": "ÜBER TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -202,10 +203,10 @@
     "featureAiImport": "KI-Import",
     "featureSharing": "Teilen",
     "featurePdf": "PDF-Export",
-    "featurePrint": "Drucken",
+    "featurePrint": "🖨️ Blends",
     "featureInventory": "Inventar",
     "sharing": "Teile mit deiner Community",
-    "sharingDesc": "Teile deine Blends und Produkte direkt aus der App",
+    "sharingDesc": "Teile via WhatsApp, Mail, SMS & alle Apps",
     "sharingBadge": "Ab Pro verfügbar",
     "buyPro": "Jetzt Pro werden",
     "buyProPrice": "9,99 € einmalig",
@@ -270,5 +271,17 @@
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "back": "Zurück"
+  },
+  "faq": {
+    "q1": "Kann ich später von Pro auf Lifetime upgraden?",
+    "a1": "Ja, jederzeit! Deine Pro-Inhalte bleiben erhalten und du erhältst vollen Zugriff auf alle Lifetime-Features. Bitte beachte dass der Lifetime-Preis in voller Höhe anfällt, da eine nachträgliche Verrechnung technisch nicht möglich ist.",
+    "q2": "Was bedeutet ∞ (unbegrenzt)?",
+    "a2": "Unbegrenzt bedeutet bei Terrana ein sehr hohes Limit (≥10.000 Einträge), das für den normalen Gebrauch nicht erreicht wird.",
+    "q3": "Was passiert mit meinen Daten?",
+    "a3": "Alle deine Daten werden ausschließlich lokal auf deinem Gerät gespeichert. Terrana hat keinen Zugriff auf deine persönlichen Daten.",
+    "q4": "Was ist Restore Purchases?",
+    "a4": "Falls du die App neu installiert hast oder ein neues Gerät verwendest, kannst du deine gekauften Upgrades kostenlos wiederherstellen. Tippe dazu auf 'Käufe wiederherstellen' in der Paywall.",
+    "q5": "Wie funktioniert der KI-Import?",
+    "a5": "Kopiere den Text einer Produktseite und füge ihn in den Import-Bereich ein. Die KI erkennt automatisch Produktname, Kategorie, Beschreibung, Anwendungen und Tags."
   }
 }

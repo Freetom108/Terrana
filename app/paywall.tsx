@@ -49,7 +49,7 @@ const FEATURES: FeatureRow[] = [
   },
   {
     labelKey: 'paywall.featureAiImport',
-    free: `${String(FREE_IMPORT_LIMIT)}×`,
+    free: String(FREE_IMPORT_LIMIT),
     pro: '∞',
     lifetime: '∞',
   },

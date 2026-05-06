@@ -81,6 +81,7 @@
     "upgradeProButton": "View Lifetime",
     "upgradeLifetimeTitle": "Lifetime Member 💎",
     "upgradeLifetimeHint": "Thank you for your support!",
+    "sectionFaq": "FAQ",
     "sectionAbout": "ABOUT TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -202,10 +203,10 @@
     "featureAiImport": "AI Import",
     "featureSharing": "Sharing",
     "featurePdf": "PDF Export",
-    "featurePrint": "Print",
+    "featurePrint": "🖨️ Blends",
     "featureInventory": "Inventory",
     "sharing": "Share with your community",
-    "sharingDesc": "Share your blends and products directly from the app",
+    "sharingDesc": "Share via WhatsApp, Mail, SMS & all apps",
     "sharingBadge": "From Pro",
     "buyPro": "Go Pro Now",
     "buyProPrice": "€9.99 one-time",
@@ -270,5 +271,17 @@
     "delete": "Delete",
     "edit": "Edit",
     "back": "Back"
+  },
+  "faq": {
+    "q1": "Can I upgrade from Pro to Lifetime later?",
+    "a1": "Yes, anytime! Your Pro content stays and you get full access to all Lifetime features. Please note that the full Lifetime price applies, as a partial credit is technically not possible.",
+    "q2": "What does ∞ (unlimited) mean?",
+    "a2": "Unlimited at Terrana means a very high limit (≥10,000 entries) that will not be reached in normal use.",
+    "q3": "What happens to my data?",
+    "a3": "All your data is stored exclusively on your device. Terrana has no access to your personal data.",
+    "q4": "What is Restore Purchases?",
+    "a4": "If you reinstalled the app or have a new device, you can restore your purchases for free. Tap 'Restore Purchases' in the upgrade screen.",
+    "q5": "How does the AI import work?",
+    "a5": "Copy the text from a product page and paste it into the import area. The AI automatically detects product name, category, description, applications and tags."
   }
 }

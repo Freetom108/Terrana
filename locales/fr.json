@@ -81,6 +81,7 @@
     "upgradeProButton": "Voir Lifetime",
     "upgradeLifetimeTitle": "Membre Lifetime 💎",
     "upgradeLifetimeHint": "Merci pour votre soutien !",
+    "sectionFaq": "FAQ",
     "sectionAbout": "À PROPOS DE TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -202,10 +203,10 @@
     "featureAiImport": "Import IA",
     "featureSharing": "Partage",
     "featurePdf": "Export PDF",
-    "featurePrint": "Impression",
+    "featurePrint": "🖨️ Blends",
     "featureInventory": "Inventaire",
     "sharing": "Partagez avec votre communauté",
-    "sharingDesc": "Partagez vos mélanges et produits directement depuis l'app",
+    "sharingDesc": "Partage via WhatsApp, Mail, SMS & toutes les apps",
     "sharingBadge": "Dès Pro",
     "buyPro": "Passer à Pro",
     "buyProPrice": "9,99 € unique",
@@ -270,5 +271,17 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "back": "Retour"
+  },
+  "faq": {
+    "q1": "Puis-je passer de Pro à Lifetime plus tard ?",
+    "a1": "Oui, à tout moment ! Votre contenu Pro est conservé et vous obtenez un accès complet à toutes les fonctionnalités Lifetime. Notez que le prix Lifetime complet s'applique, car un crédit partiel n'est techniquement pas possible.",
+    "q2": "Que signifie ∞ (illimité) ?",
+    "a2": "Illimité chez Terrana signifie une limite très élevée (≥10 000 entrées) qui ne sera pas atteinte en usage normal.",
+    "q3": "Qu'arrive-t-il à mes données ?",
+    "a3": "Toutes vos données sont stockées exclusivement sur votre appareil. Terrana n'a pas accès à vos données personnelles.",
+    "q4": "Qu'est-ce que Restaurer les achats ?",
+    "a4": "Si vous avez réinstallé l'app ou avez un nouvel appareil, vous pouvez restaurer vos achats gratuitement. Appuyez sur 'Restaurer les achats' dans l'écran de mise à niveau.",
+    "q5": "Comment fonctionne l'import IA ?",
+    "a5": "Copiez le texte d'une page produit et collez-le dans la zone d'import. L'IA détecte automatiquement le nom du produit, la catégorie, la description, les applications et les tags."
   }
 }

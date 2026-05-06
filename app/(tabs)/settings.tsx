@@ -11,6 +11,7 @@ import {
   setSavedLanguageCode,
   setThemePreference,
 } from '../../services/storage/settings';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useReducer, useState } from 'react';
 import {
@@ -26,6 +27,14 @@ import {
 } from 'react-native-safe-area-context';
 
 const APP_VERSION = '1.0.0';
+
+const FAQ_ITEMS = [
+  { q: 'faq.q1', a: 'faq.a1' },
+  { q: 'faq.q2', a: 'faq.a2' },
+  { q: 'faq.q3', a: 'faq.a3' },
+  { q: 'faq.q4', a: 'faq.a4' },
+  { q: 'faq.q5', a: 'faq.a5' },
+] as const;
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
   { value: 'light', labelKey: 'settings.themeLight' },
@@ -47,6 +56,7 @@ export default function SettingsTab() {
   const router = useRouter();
   const { isPro, isLifetime, reload } = usePro();
   const [, bump] = useReducer((x: number) => x + 1, 0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const [themePref, setThemePrefState] = useState<ThemePreference>('auto');
 
@@ -192,6 +202,43 @@ export default function SettingsTab() {
         <View style={[styles.tipCard, { backgroundColor: cardBg, borderColor: p.border }]}>
           <Text style={[styles.tipTitle, { color: headline }]}>{t('settings.importTipTitle')}</Text>
           <Text style={[styles.tipBody, { color: muted }]}>{t('settings.importTipBody')}</Text>
+        </View>
+
+        {/* ── FAQ ── */}
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
+          {t('settings.sectionFaq')}
+        </Text>
+        <View style={[styles.faqCard, { backgroundColor: cardBg, borderColor: p.border }]}>
+          {FAQ_ITEMS.map(({ q, a }, idx) => {
+            const isOpen = openFaq === idx;
+            const isLast = idx === FAQ_ITEMS.length - 1;
+            return (
+              <View key={q}>
+                <Pressable
+                  style={styles.faqRow}
+                  onPress={() => setOpenFaq(isOpen ? null : idx)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: isOpen }}
+                >
+                  <Text style={[styles.faqQuestion, { color: headline }]} numberOfLines={isOpen ? undefined : 2}>
+                    {t(q) as string}
+                  </Text>
+                  <Ionicons
+                    name={isOpen ? 'chevron-up' : 'chevron-down'}
+                    size={16}
+                    color={muted}
+                    style={styles.faqChevron}
+                  />
+                </Pressable>
+                {isOpen ? (
+                  <Text style={[styles.faqAnswer, { color: muted }]}>{t(a) as string}</Text>
+                ) : null}
+                {!isLast ? (
+                  <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+                ) : null}
+              </View>
+            );
+          })}
         </View>
 
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
@@ -371,5 +418,39 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 14,
     fontWeight: '700',
+  },
+
+  /* FAQ accordion */
+  faqCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  faqRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 8,
+  },
+  faqQuestion: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
+  },
+  faqChevron: {
+    flexShrink: 0,
+  },
+  faqAnswer: {
+    fontSize: 13,
+    lineHeight: 20,
+    fontWeight: '400',
+    paddingHorizontal: 16,
+    paddingBottom: 14,
+  },
+  faqDivider: {
+    height: StyleSheet.hairlineWidth,
+    marginHorizontal: 16,
   },
 });
