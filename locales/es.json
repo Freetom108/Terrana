@@ -1,7 +1,7 @@
 {
   "onboarding": {
-    "title": "Tu cuaderno personal",
-    "subtitle": "Organiza, mezcla y comparte tus productos naturales.",
+    "title": "Organiza, registra & comparte tus notas naturales",
+    "subtitle": "Tu espacio personal para aceites, hierbas, suplementos y mezclas.",
     "button": "Empecemos →",
     "languageHint": "Puedes cambiar el idioma en Configuración",
     "selectCategory": "Elige tu enfoque",
@@ -79,7 +79,9 @@
     "langGerman": "🇩🇪 Deutsch",
     "langFrench": "🇫🇷 Français",
     "langSpanish": "🇪🇸 Español",
-    "sectionAbout": "ACERCA DE LA APP",
+    "sectionAbout": "ACERCA DE TERRANA",
+    "appNameLabel": "App",
+    "appName": "Terrana",
     "versionLabel": "Versión",
     "statusLabel": "Estado",
     "statusFree": "Free",

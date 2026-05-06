@@ -1,7 +1,7 @@
 {
   "onboarding": {
-    "title": "Votre carnet personnel",
-    "subtitle": "Organisez, mélangez et partagez vos produits naturels.",
+    "title": "Organisez, suivez & partagez vos notes naturelles",
+    "subtitle": "Votre espace personnel pour les huiles, plantes, compléments et mélanges.",
     "button": "C'est parti →",
     "languageHint": "Vous pouvez changer la langue dans Paramètres",
     "selectCategory": "Choisissez votre axe",
@@ -79,7 +79,9 @@
     "langGerman": "🇩🇪 Deutsch",
     "langFrench": "🇫🇷 Français",
     "langSpanish": "🇪🇸 Español",
-    "sectionAbout": "À PROPOS",
+    "sectionAbout": "À PROPOS DE TERRANA",
+    "appNameLabel": "App",
+    "appName": "Terrana",
     "versionLabel": "Version",
     "statusLabel": "Statut",
     "statusFree": "Free",

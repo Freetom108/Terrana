@@ -1,8 +1,8 @@
 {
   "expo": {
-    "scheme": "naturalremedyorganizer",
-    "name": "NaturalRemedyOrganizer",
-    "slug": "NaturalRemedyOrganizer",
+    "scheme": "terrana",
+    "name": "Terrana",
+    "slug": "terrana",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

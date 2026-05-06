@@ -1,7 +1,7 @@
 {
   "onboarding": {
-    "title": "Your personal notebook",
-    "subtitle": "Organise, blend and share your natural products.",
+    "title": "Organize, track & share your natural notes",
+    "subtitle": "Your personal space for oils, herbs, supplements and blends.",
     "button": "Let's go →",
     "languageHint": "You can change the language anytime in Settings",
     "selectCategory": "Choose your focus",
@@ -79,7 +79,9 @@
     "langGerman": "🇩🇪 Deutsch",
     "langFrench": "🇫🇷 Français",
     "langSpanish": "🇪🇸 Español",
-    "sectionAbout": "ABOUT THE APP",
+    "sectionAbout": "ABOUT TERRANA",
+    "appNameLabel": "App",
+    "appName": "Terrana",
     "versionLabel": "Version",
     "statusLabel": "Status",
     "statusFree": "Free",

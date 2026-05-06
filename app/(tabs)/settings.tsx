@@ -153,6 +153,10 @@ export default function SettingsTab() {
         </Text>
         <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
           <View style={styles.aboutRow}>
+            <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.appNameLabel')}</Text>
+            <Text style={[styles.aboutVal, { color: headline }]}>{t('settings.appName')}</Text>
+          </View>
+          <View style={styles.aboutRow}>
             <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.versionLabel')}</Text>
             <Text style={[styles.aboutVal, { color: headline }]}>{APP_VERSION}</Text>
           </View>

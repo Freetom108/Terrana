@@ -1,7 +1,7 @@
 {
   "onboarding": {
-    "title": "Dein persönliches Notizbuch",
-    "subtitle": "Organisiere, mische und teile deine Naturprodukte.",
+    "title": "Organisiere, verfolge & teile deine Naturnotizen",
+    "subtitle": "Dein persönlicher Bereich für Öle, Kräuter, Supplements und Mischungen.",
     "button": "Los geht's →",
     "languageHint": "Du kannst die Sprache jederzeit in den Einstellungen ändern",
     "selectCategory": "Wähle deinen Schwerpunkt",
@@ -79,7 +79,9 @@
     "langGerman": "🇩🇪 Deutsch",
     "langFrench": "🇫🇷 Français",
     "langSpanish": "🇪🇸 Español",
-    "sectionAbout": "ÜBER DIE APP",
+    "sectionAbout": "ÜBER TERRANA",
+    "appNameLabel": "App",
+    "appName": "Terrana",
     "versionLabel": "Version",
     "statusLabel": "Status",
     "statusFree": "Free",
