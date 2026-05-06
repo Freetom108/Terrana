@@ -1,16 +1,9 @@
 {
   "onboarding": {
-    "title": "Organize, track & share your natural notes",
-    "subtitle": "Your personal space for oils, herbs, supplements and blends.",
+    "title": "Organize your collection",
+    "subtitle": "Everything that matters to you in one place",
     "button": "Let's go →",
-    "languageHint": "You can change the language anytime in Settings",
-    "selectCategory": "Choose your focus",
-    "categories": {
-      "oils": "Natural oils & products",
-      "supplements": "Supplements & vitamins",
-      "herbs": "Herbs & teas",
-      "other": "Your own category"
-    }
+    "languageHint": "You can change the language anytime in Settings"
   },
   "home": {
     "greeting": "Hello",
@@ -198,11 +191,12 @@
     "readOnlyHint": "Tap the pencil to edit."
   },
   "paywall": {
-    "title": "Upgrade to Terrana Pro",
+    "title": "Choose Your Upgrade",
     "headerSubtitle": "Unlock the full power of Terrana",
     "free": "Free",
     "pro": "Pro",
     "lifetime": "Lifetime",
+    "lifetimeCol": "LIFE",
     "featureProducts": "Products",
     "featureBlends": "Blends",
     "featureAiImport": "AI Import",

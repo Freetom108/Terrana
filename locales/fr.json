@@ -1,16 +1,9 @@
 {
   "onboarding": {
-    "title": "Organisez, suivez & partagez vos notes naturelles",
-    "subtitle": "Votre espace personnel pour les huiles, plantes, compléments et mélanges.",
+    "title": "Organisez votre collection",
+    "subtitle": "Tout ce qui compte pour vous en un seul endroit",
     "button": "C'est parti →",
-    "languageHint": "Vous pouvez changer la langue dans Paramètres",
-    "selectCategory": "Choisissez votre axe",
-    "categories": {
-      "oils": "Huiles et soins naturels",
-      "supplements": "Compléments et vitamines",
-      "herbs": "Plantes et tisanes",
-      "other": "Votre propre catégorie"
-    }
+    "languageHint": "Vous pouvez changer la langue dans Paramètres"
   },
   "home": {
     "greeting": "Bonjour",
@@ -198,11 +191,12 @@
     "readOnlyHint": "Touchez le crayon pour modifier."
   },
   "paywall": {
-    "title": "Passer à Terrana Pro",
+    "title": "Choisissez votre Upgrade",
     "headerSubtitle": "Profitez de toute la puissance de Terrana",
     "free": "Gratuit",
     "pro": "Pro",
     "lifetime": "Lifetime",
+    "lifetimeCol": "LIFE",
     "featureProducts": "Produits",
     "featureBlends": "Mélanges",
     "featureAiImport": "Import IA",

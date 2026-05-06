@@ -12,17 +12,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const CATEGORY_KEYS = ['oils', 'supplements', 'herbs', 'other'] as const;
-const CATEGORY_EMOJI: Record<(typeof CATEGORY_KEYS)[number], string> = {
-  oils: '🌿',
-  supplements: '💊',
-  herbs: '🌱',
-  other: '📦',
-};
 
 function splitTitleForAccent(fullTitle: string): { lead: string; accent: string } {
   const trimmed = fullTitle.trim();
@@ -70,9 +61,6 @@ export default function Onboarding() {
     outputRange: [0, -12],
   });
 
-  const categoryLabel = (key: (typeof CATEGORY_KEYS)[number]) =>
-    t(`onboarding.categories.${key}`);
-
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: p.surface }]} edges={['top', 'bottom']}>
       <ScrollView
@@ -93,30 +81,6 @@ export default function Onboarding() {
         </Text>
 
         <Text style={[styles.subtitle, { color: p.muted }]}>{t('onboarding.subtitle')}</Text>
-
-        <Text style={[styles.sectionLabel, { color: p.muted }]}>
-          {t('onboarding.selectCategory')}
-        </Text>
-
-        <View style={styles.grid}>
-          {CATEGORY_KEYS.map((key) => (
-            <View key={key} style={styles.cardOuter}>
-              <View
-                style={[
-                  styles.card,
-                  {
-                    backgroundColor: p.card,
-                    borderColor: p.border,
-                    shadowOpacity: palette.isDark ? 0 : 0.06,
-                  },
-                ]}
-              >
-                <Text style={styles.cardEmoji}>{CATEGORY_EMOJI[key]}</Text>
-                <Text style={[styles.cardLabel, { color: p.text }]}>{categoryLabel(key)}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
 
         <Pressable
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
@@ -169,47 +133,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 20,
+    marginBottom: 32,
     paddingHorizontal: 6,
-  },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: 12,
-    marginBottom: 28,
-  },
-  cardOuter: {
-    width: '48%',
-  },
-  card: {
-    borderRadius: 14,
-    borderWidth: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    minHeight: 104,
-    justifyContent: 'center',
-    shadowColor: colors.dark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  cardEmoji: {
-    fontSize: 28,
-    marginBottom: 8,
-  },
-  cardLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    lineHeight: 19,
   },
   cta: {
     backgroundColor: colors.sage,

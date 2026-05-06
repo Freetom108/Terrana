@@ -172,7 +172,7 @@ export default function PaywallScreen() {
             </View>
             <View style={[styles.colPlan, styles.colLifetime]}>
               <Text style={[styles.planLabel, styles.planLabelLifetime]}>
-                {t('paywall.lifetime') as string}
+                {t('paywall.lifetimeCol') as string}
               </Text>
             </View>
           </View>
@@ -256,11 +256,8 @@ export default function PaywallScreen() {
             <Text style={styles.buyBtnPrice}>{t('paywall.buyProPrice') as string}</Text>
           </Pressable>
 
-          {/* Lifetime button */}
+          {/* Lifetime button — golden border + floating badge top-right */}
           <View style={styles.lifetimeWrap}>
-            <View style={styles.popularBadge}>
-              <Text style={styles.popularBadgeText}>{t('paywall.mostPopular') as string}</Text>
-            </View>
             <Pressable
               style={({ pressed }) => [
                 styles.buyBtn,
@@ -273,6 +270,9 @@ export default function PaywallScreen() {
               <Text style={styles.buyBtnTitle}>{t('paywall.buyLifetime') as string}</Text>
               <Text style={styles.buyBtnPrice}>{t('paywall.buyLifetimePrice') as string}</Text>
             </Pressable>
+            <View style={styles.popularBadge} pointerEvents="none">
+              <Text style={styles.popularBadgeText}>{t('paywall.mostPopular') as string}</Text>
+            </View>
           </View>
         </View>
 
@@ -491,13 +491,13 @@ const styles = StyleSheet.create({
   },
   popularBadge: {
     position: 'absolute',
-    top: -11,
-    alignSelf: 'center',
-    zIndex: 2,
+    top: -10,
+    right: 14,
     backgroundColor: colors.earth,
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    zIndex: 2,
   },
   popularBadgeText: {
     color: colors.white,
@@ -515,6 +515,8 @@ const styles = StyleSheet.create({
   },
   buyBtnLifetime: {
     backgroundColor: colors.sageDark,
+    borderWidth: 2,
+    borderColor: '#C9A84C',
   },
   buyBtnPressed: {
     opacity: 0.82,
