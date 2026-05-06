@@ -186,6 +186,12 @@
   "blendEdit": {
     "readOnlyHint": "Toca el lápiz para editar."
   },
+  "search": {
+    "placeholder": "# Etiqueta o término…",
+    "popular": "Etiquetas populares",
+    "empty": "Escribe una etiqueta o término",
+    "noResults": "Nada encontrado para \"%{query}\""
+  },
   "general": {
     "cancel": "Cancelar",
     "save": "Guardar",

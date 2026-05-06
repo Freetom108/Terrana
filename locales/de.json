@@ -186,6 +186,12 @@
   "blendEdit": {
     "readOnlyHint": "Zum Bearbeiten auf den Stift tippen."
   },
+  "search": {
+    "placeholder": "# Tag oder Begriff…",
+    "popular": "Beliebte Tags",
+    "empty": "Tippe einen Tag oder Begriff",
+    "noResults": "Nichts gefunden für \"%{query}\""
+  },
   "general": {
     "cancel": "Abbrechen",
     "save": "Speichern",

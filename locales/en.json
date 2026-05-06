@@ -186,6 +186,12 @@
   "blendEdit": {
     "readOnlyHint": "Tap the pencil to edit."
   },
+  "search": {
+    "placeholder": "# Tag or keyword…",
+    "popular": "Popular tags",
+    "empty": "Type a tag or keyword",
+    "noResults": "Nothing found for \"%{query}\""
+  },
   "general": {
     "cancel": "Cancel",
     "save": "Save",
