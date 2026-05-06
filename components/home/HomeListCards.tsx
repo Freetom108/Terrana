@@ -1,7 +1,7 @@
 import { colors } from '../../constants/colors';
 import type { ThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
-import type { Blend } from '../../types/blend';
+import { blendKindLabelKey, blendStructuredItemCount, type Blend } from '../../types/blend';
 import type { Product } from '../../types/product';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text } from 'react-native';
@@ -51,8 +51,18 @@ export function HomeBlendCard({ blend, palette }: { blend: Blend; palette: Theme
         <Text style={[styles.name, { color: p.text }]} numberOfLines={2}>
           {blend.name}
         </Text>
-        <Text style={[styles.meta, { color: p.muted }]} numberOfLines={1}>
-          {t('home.blendIngredientSummary', { count: blend.ingredients.length })}
+        <Text style={[styles.kindLine, { color: p.muted }]} numberOfLines={1}>
+          {t(blendKindLabelKey(blend.kind))}
+        </Text>
+        <Text style={[styles.meta, { color: p.muted }]} numberOfLines={2}>
+          {t(
+            blend.kind === 'mix'
+              ? 'blends.heroSubtitleMix'
+              : blend.kind === 'combination'
+                ? 'blends.heroSubtitleCombo'
+                : 'blends.heroSubtitleProtocol',
+            { count: blendStructuredItemCount(blend) },
+          )}
         </Text>
       </Pressable>
     </Link>
@@ -77,6 +87,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
+  },
+  kindLine: {
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.35,
   },
   meta: {
     fontSize: 13,

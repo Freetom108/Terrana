@@ -64,17 +64,31 @@ ${bodyInner}
 </html>`;
 }
 
+function formatBlendIsoDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  try {
+    return d.toLocaleDateString('de-DE', { dateStyle: 'medium' });
+  } catch {
+    return iso;
+  }
+}
+
 /** Erstellt druckfreundliches HTML für eine Mischung. */
 export function generateBlendHTML(blend: Blend): string {
-  const ingredientsHtml =
-    blend.ingredients.length === 0
-      ? '<p class="muted">Keine Zutaten hinterlegt.</p>'
-      : `<ul>${blend.ingredients
-          .map(
-            (ing) =>
-              `<li>${escapeHtml(ing.productName)} — ${escapeHtml(String(ing.amount))} ${escapeHtml(ing.unit)}</li>`
-          )
-          .join('')}</ul>`;
+  const kindLabels: Record<Blend['kind'], string> = {
+    mix: 'Mix',
+    combination: 'Kombination',
+    protocol: 'Protokoll',
+  };
+  const kindPretty = kindLabels[blend.kind];
+
+  const timingDe: Record<'morning' | 'evening' | 'as_needed' | 'flexible', string> = {
+    morning: 'Morgens',
+    evening: 'Abends',
+    as_needed: 'Bei Bedarf',
+    flexible: 'Flexibel',
+  };
 
   const notesBlock = blend.notes.trim()
     ? `<p class="notes">${escapeHtml(blend.notes)}</p>`
@@ -85,14 +99,102 @@ export function generateBlendHTML(blend: Blend): string {
       ? `<p class="tags">${escapeHtml(blend.tags.join(', '))}</p>`
       : '<p class="muted">—</p>';
 
+  const created = escapeHtml(formatBlendIsoDate(blend.createdAt));
+
+  let typeBody = '';
+
+  if (blend.kind === 'mix') {
+    const mr = blend.mixRecipe;
+    const base = mr?.baseOil;
+    let baseBlock = '';
+    if (base) {
+      const name = (base.name ?? '').trim();
+      const amt =
+        typeof base.amount === 'number' && Number.isFinite(base.amount) ? String(base.amount) : '';
+      const unit = (base.unit ?? '').trim();
+      let baseLine = '';
+      if (name && amt && unit) baseLine = `${escapeHtml(name)}: ${escapeHtml(amt)} ${escapeHtml(unit)}`;
+      else if (name && amt) baseLine = `${escapeHtml(name)}: ${escapeHtml(amt)}`;
+      else if (amt && unit) baseLine = `${escapeHtml(amt)} ${escapeHtml(unit)}`;
+      else if (name) baseLine = escapeHtml(name);
+      if (baseLine) baseBlock = `<h2>Basisöl / Trägeröl</h2><p>${baseLine}</p>`;
+    }
+    const dropletsHtml =
+      mr && mr.droplets.length > 0
+        ? `<ul>${mr.droplets
+            .map((d) => {
+              const qty =
+                typeof d.quantityLabel === 'string' && d.quantityLabel.trim()
+                  ? d.quantityLabel.trim()
+                  : `${String(d.drops)} Tr.`;
+              return `<li>${escapeHtml(d.productName)} — ${escapeHtml(qty)}</li>`;
+            })
+            .join('')}</ul>`
+        : '<p class="muted">—</p>';
+
+    const vol =
+      mr?.totalVolumeAmount !== undefined && mr?.totalVolumeUnit
+        ? `<p>${escapeHtml(String(mr.totalVolumeAmount))} ${escapeHtml(mr.totalVolumeUnit)}</p>`
+        : '<p class="muted">—</p>';
+
+    typeBody = `
+  ${baseBlock}
+  <h2>Tropfen / Zutaten</h2>
+  ${dropletsHtml}
+  <h2>Gesamtvolumen</h2>
+  ${vol}
+`;
+  } else if (blend.kind === 'combination') {
+    const slots = blend.combinationSlots ?? [];
+    const list =
+      slots.length > 0
+        ? `<ul>${slots
+            .map(
+              (s) =>
+                `<li><strong>${escapeHtml(s.productName)}</strong><br /><span class="muted">Ort: ${escapeHtml(s.applicationSite || '—')}</span></li>`,
+            )
+            .join('')}</ul>`
+        : '<p class="muted">—</p>';
+    typeBody = `
+  <h2>Parallel — Produkte</h2>
+  ${list}
+`;
+  } else {
+    const steps = blend.protocolSteps ?? [];
+    const stepsHtml =
+      steps.length > 0
+        ? `<ol>${steps
+            .map(
+              (st) =>
+                `<li><strong>${escapeHtml(st.productName)}</strong> — ${escapeHtml(timingDe[st.timing])}${
+                  st.stepNote?.trim()
+                    ? `<br /><span class="muted">${escapeHtml(st.stepNote.trim())}</span>`
+                    : ''
+                }</li>`,
+            )
+            .join('')}</ol>`
+        : '<p class="muted">—</p>';
+    typeBody = `
+  <h2>Schritte</h2>
+  ${stepsHtml}
+`;
+  }
+
+  const descPara = blend.description.trim()
+    ? `<h2>Beschreibung</h2><p>${escapeHtml(blend.description.trim())}</p>`
+    : '';
+
   const inner = `
   <h1>${escapeHtml(blend.name)}</h1>
-  <h2>Zutaten</h2>
-  ${ingredientsHtml}
+  <p class="muted">Typ: ${escapeHtml(kindPretty)}</p>
+${descPara}
+${typeBody}
   <h2>Notizen</h2>
   ${notesBlock}
   <h2>Tags</h2>
   ${tagsBlock}
+  <h2>Erstellungsdatum</h2>
+  <p>${created}</p>
 `;
 
   return wrapDocument(blend.name, inner);

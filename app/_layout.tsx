@@ -45,6 +45,7 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="product/[id]" />
         <Stack.Screen name="blend/[id]" />
+        <Stack.Screen name="blend/new" />
         <Stack.Screen name="recent-products" />
         <Stack.Screen name="all-products" />
         <Stack.Screen name="all-blends" />
