@@ -186,6 +186,36 @@
   "blendEdit": {
     "readOnlyHint": "Toca el lápiz para editar."
   },
+  "extractor": {
+    "errorNoJson": "La extracción no devolvió JSON válido.",
+    "errorNoText": "No hay texto para extraer.",
+    "errorGeneric": "La solicitud falló.",
+    "errorNoKey": "Clave API no configurada. Por favor contacta con soporte.",
+    "errorEmptyResponse": "Respuesta del modelo vacía o inválida.",
+    "errorParseJson": "No se pudo leer el JSON de la respuesta del modelo."
+  },
+  "pdf": {
+    "blendType": "Tipo",
+    "blendBaseOil": "Aceite base / Vehículo",
+    "blendDroplets": "Gotas / Ingredientes",
+    "dropsUnit": "gotas",
+    "blendTotalVolume": "Volumen total",
+    "blendParallelProducts": "Paralelo — Productos",
+    "blendApplicationSite": "Zona",
+    "blendSteps": "Pasos",
+    "blendDescription": "Descripción",
+    "blendNotes": "Notas",
+    "blendTags": "Tags",
+    "blendCreatedAt": "Fecha de creación",
+    "productNoUsages": "No se han registrado usos.",
+    "productBrand": "Marca",
+    "productCategory": "Categoría",
+    "productUsages": "Usos",
+    "productDescriptionNotes": "Descripción y notas",
+    "productTags": "Tags",
+    "blendDialogTitle": "Mezcla: %{name}",
+    "productDialogTitle": "Producto: %{name}"
+  },
   "limits": {
     "productLimitTitle": "Límite alcanzado",
     "productLimitMessage": "La versión gratuita admite hasta %{limit} productos. Actualiza a Pro para acceso ilimitado.",

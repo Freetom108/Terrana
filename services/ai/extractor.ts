@@ -1,3 +1,4 @@
+import { t } from '../i18n/i18n';
 import type { ExtractedData } from '../../types/import';
 import { EXTRACTION_PROMPT } from './prompt';
 
@@ -31,7 +32,7 @@ function sanitizeUserFacingError(message: string): string {
     .replace(/[ \t]{2,}/g, ' ')
     .replace(/^\s*,\s*|\s*,\s*$/g, '')
     .trim();
-  return stripped.length > 0 ? stripped : 'Die Anfrage ist fehlgeschlagen.';
+  return stripped.length > 0 ? stripped : (t('extractor.errorGeneric') as string);
 }
 
 /** Anzeige wie „Fehler 401: Invalid API Key“ */
@@ -49,7 +50,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function normalizeExtracted(raw: unknown): ExtractedData {
   if (!isRecord(raw)) {
-    throw new Error('Extraktion lieferte kein JSON-Objekt.');
+    throw new Error(t('extractor.errorNoJson') as string);
   }
 
   const r = raw as RawExtracted;
@@ -66,6 +67,7 @@ function normalizeExtracted(raw: unknown): ExtractedData {
 }
 
 function logApiKeyFingerprint(trimmedKey: string): void {
+  if (!__DEV__) return;
   const len = trimmedKey.length;
   if (len === 0) {
     console.log('[Anthropic] EXPO_PUBLIC_ANTHROPIC_API_KEY: empty after trim');
@@ -98,7 +100,7 @@ export async function extractProductFromText(
   if (!trimmedKey) {
     return {
       success: false,
-      error: 'EXPO_PUBLIC_ANTHROPIC_API_KEY ist nicht gesetzt (.env im Projektroot).',
+      error: t('extractor.errorNoKey') as string,
     };
   }
 
@@ -106,7 +108,7 @@ export async function extractProductFromText(
 
   const text = userText.trim();
   if (!text) {
-    return { success: false, error: 'Kein Text zum Extrahieren.' };
+    return { success: false, error: t('extractor.errorNoText') as string };
   }
 
   /** Long input is truncated silently — no user-facing error. */
@@ -160,7 +162,7 @@ export async function extractProductFromText(
     if (!block?.text) {
       return {
         success: false,
-        error: formatHttpApiError(res.status, 'Leere oder ungültige Modell-Antwort.'),
+        error: formatHttpApiError(res.status, t('extractor.errorEmptyResponse') as string),
       };
     }
 
@@ -170,7 +172,7 @@ export async function extractProductFromText(
     } catch {
       return {
         success: false,
-        error: formatHttpApiError(res.status, 'Konnte JSON aus der Modell-Antwort nicht lesen.'),
+        error: formatHttpApiError(res.status, t('extractor.errorParseJson') as string),
       };
     }
 

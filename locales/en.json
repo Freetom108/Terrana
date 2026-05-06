@@ -186,6 +186,36 @@
   "blendEdit": {
     "readOnlyHint": "Tap the pencil to edit."
   },
+  "extractor": {
+    "errorNoJson": "Extraction returned no valid JSON.",
+    "errorNoText": "No text to extract.",
+    "errorGeneric": "The request failed.",
+    "errorNoKey": "API key is not configured. Please contact support.",
+    "errorEmptyResponse": "Empty or invalid model response.",
+    "errorParseJson": "Could not read JSON from model response."
+  },
+  "pdf": {
+    "blendType": "Type",
+    "blendBaseOil": "Carrier / Base Oil",
+    "blendDroplets": "Drops / Ingredients",
+    "dropsUnit": "drops",
+    "blendTotalVolume": "Total Volume",
+    "blendParallelProducts": "Parallel — Products",
+    "blendApplicationSite": "Site",
+    "blendSteps": "Steps",
+    "blendDescription": "Description",
+    "blendNotes": "Notes",
+    "blendTags": "Tags",
+    "blendCreatedAt": "Created",
+    "productNoUsages": "No applications recorded.",
+    "productBrand": "Brand",
+    "productCategory": "Category",
+    "productUsages": "Applications",
+    "productDescriptionNotes": "Description & Notes",
+    "productTags": "Tags",
+    "blendDialogTitle": "Blend: %{name}",
+    "productDialogTitle": "Product: %{name}"
+  },
   "limits": {
     "productLimitTitle": "Limit reached",
     "productLimitMessage": "The free version supports up to %{limit} products. Upgrade to Pro for unlimited access.",

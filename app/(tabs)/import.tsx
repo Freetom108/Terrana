@@ -160,14 +160,16 @@ export default function ImportTab() {
     setSaveError(null);
     setLoading(true);
     try {
-      console.log('[Import] extractProductFromText: calling API', {
-        inputLength: text.length,
-      });
+      if (__DEV__) {
+        console.log('[Import] extractProductFromText: calling API', { inputLength: text.length });
+      }
       const result = await extractProductFromText(text);
-      console.log('[Import] extractProductFromText: response', {
-        ok: result.success,
-        error: result.success ? undefined : result.error,
-      });
+      if (__DEV__) {
+        console.log('[Import] extractProductFromText: response', {
+          ok: result.success,
+          error: result.success ? undefined : result.error,
+        });
+      }
       if (!result.success) {
         setError(result.error);
         return;
@@ -187,11 +189,11 @@ export default function ImportTab() {
       try {
         await incrementImport();
       } catch (inc) {
-        console.warn('[Import] incrementImport failed', inc);
+        if (__DEV__) console.warn('[Import] incrementImport failed', inc);
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.warn('[Import] extractProductFromText: threw', e);
+      if (__DEV__) console.warn('[Import] extractProductFromText: threw', e);
       setError(msg || t('import.retry'));
     } finally {
       setLoading(false);

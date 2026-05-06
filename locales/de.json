@@ -186,6 +186,36 @@
   "blendEdit": {
     "readOnlyHint": "Zum Bearbeiten auf den Stift tippen."
   },
+  "extractor": {
+    "errorNoJson": "Extraktion lieferte kein gültiges JSON.",
+    "errorNoText": "Kein Text zum Extrahieren.",
+    "errorGeneric": "Die Anfrage ist fehlgeschlagen.",
+    "errorNoKey": "API-Schlüssel nicht konfiguriert. Bitte Support kontaktieren.",
+    "errorEmptyResponse": "Leere oder ungültige Modell-Antwort.",
+    "errorParseJson": "Konnte JSON aus der Modell-Antwort nicht lesen."
+  },
+  "pdf": {
+    "blendType": "Typ",
+    "blendBaseOil": "Basisöl / Trägeröl",
+    "blendDroplets": "Tropfen / Zutaten",
+    "dropsUnit": "Tr.",
+    "blendTotalVolume": "Gesamtvolumen",
+    "blendParallelProducts": "Parallel — Produkte",
+    "blendApplicationSite": "Ort",
+    "blendSteps": "Schritte",
+    "blendDescription": "Beschreibung",
+    "blendNotes": "Notizen",
+    "blendTags": "Tags",
+    "blendCreatedAt": "Erstellungsdatum",
+    "productNoUsages": "Keine Anwendungen hinterlegt.",
+    "productBrand": "Marke",
+    "productCategory": "Kategorie",
+    "productUsages": "Anwendungen",
+    "productDescriptionNotes": "Beschreibung & Notizen",
+    "productTags": "Tags",
+    "blendDialogTitle": "Mischung: %{name}",
+    "productDialogTitle": "Produkt: %{name}"
+  },
   "limits": {
     "productLimitTitle": "Limit erreicht",
     "productLimitMessage": "Die kostenlose Version unterstützt bis zu %{limit} Produkte. Upgrade auf Pro für unbegrenzten Zugriff.",

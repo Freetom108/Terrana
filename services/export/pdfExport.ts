@@ -1,5 +1,6 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { getLocale, t } from '../../services/i18n/i18n';
 import type { Blend } from '../../types/blend';
 import type { Product } from '../../types/product';
 
@@ -51,7 +52,7 @@ function escapeHtml(text: string): string {
 
 function wrapDocument(title: string, bodyInner: string): string {
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${escapeHtml(getLocale())}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -68,7 +69,7 @@ function formatBlendIsoDate(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   try {
-    return d.toLocaleDateString('de-DE', { dateStyle: 'medium' });
+    return d.toLocaleDateString(getLocale(), { dateStyle: 'medium' });
   } catch {
     return iso;
   }
@@ -77,17 +78,17 @@ function formatBlendIsoDate(iso: string): string {
 /** Erstellt druckfreundliches HTML für eine Mischung. */
 export function generateBlendHTML(blend: Blend): string {
   const kindLabels: Record<Blend['kind'], string> = {
-    mix: 'Mix',
-    combination: 'Kombination',
-    protocol: 'Protokoll',
+    mix: t('blends.kindMix') as string,
+    combination: t('blends.kindCombination') as string,
+    protocol: t('blends.kindProtocol') as string,
   };
   const kindPretty = kindLabels[blend.kind];
 
-  const timingDe: Record<'morning' | 'evening' | 'as_needed' | 'flexible', string> = {
-    morning: 'Morgens',
-    evening: 'Abends',
-    as_needed: 'Bei Bedarf',
-    flexible: 'Flexibel',
+  const timingLabels: Record<'morning' | 'evening' | 'as_needed' | 'flexible', string> = {
+    morning: t('blends.timingMorning') as string,
+    evening: t('blends.timingEvening') as string,
+    as_needed: t('blends.timingAsNeeded') as string,
+    flexible: t('blends.timingFlexible') as string,
   };
 
   const notesBlock = blend.notes.trim()
@@ -117,8 +118,9 @@ export function generateBlendHTML(blend: Blend): string {
       else if (name && amt) baseLine = `${escapeHtml(name)}: ${escapeHtml(amt)}`;
       else if (amt && unit) baseLine = `${escapeHtml(amt)} ${escapeHtml(unit)}`;
       else if (name) baseLine = escapeHtml(name);
-      if (baseLine) baseBlock = `<h2>Basisöl / Trägeröl</h2><p>${baseLine}</p>`;
+      if (baseLine) baseBlock = `<h2>${escapeHtml(t('pdf.blendBaseOil') as string)}</h2><p>${baseLine}</p>`;
     }
+    const dropsUnit = t('pdf.dropsUnit') as string;
     const dropletsHtml =
       mr && mr.droplets.length > 0
         ? `<ul>${mr.droplets
@@ -126,7 +128,7 @@ export function generateBlendHTML(blend: Blend): string {
               const qty =
                 typeof d.quantityLabel === 'string' && d.quantityLabel.trim()
                   ? d.quantityLabel.trim()
-                  : `${String(d.drops)} Tr.`;
+                  : `${String(d.drops)} ${dropsUnit}`;
               return `<li>${escapeHtml(d.productName)} — ${escapeHtml(qty)}</li>`;
             })
             .join('')}</ul>`
@@ -139,24 +141,25 @@ export function generateBlendHTML(blend: Blend): string {
 
     typeBody = `
   ${baseBlock}
-  <h2>Tropfen / Zutaten</h2>
+  <h2>${escapeHtml(t('pdf.blendDroplets') as string)}</h2>
   ${dropletsHtml}
-  <h2>Gesamtvolumen</h2>
+  <h2>${escapeHtml(t('pdf.blendTotalVolume') as string)}</h2>
   ${vol}
 `;
   } else if (blend.kind === 'combination') {
     const slots = blend.combinationSlots ?? [];
+    const siteLabel = t('pdf.blendApplicationSite') as string;
     const list =
       slots.length > 0
         ? `<ul>${slots
             .map(
               (s) =>
-                `<li><strong>${escapeHtml(s.productName)}</strong><br /><span class="muted">Ort: ${escapeHtml(s.applicationSite || '—')}</span></li>`,
+                `<li><strong>${escapeHtml(s.productName)}</strong><br /><span class="muted">${escapeHtml(siteLabel)}: ${escapeHtml(s.applicationSite || '—')}</span></li>`,
             )
             .join('')}</ul>`
         : '<p class="muted">—</p>';
     typeBody = `
-  <h2>Parallel — Produkte</h2>
+  <h2>${escapeHtml(t('pdf.blendParallelProducts') as string)}</h2>
   ${list}
 `;
   } else {
@@ -166,7 +169,7 @@ export function generateBlendHTML(blend: Blend): string {
         ? `<ol>${steps
             .map(
               (st) =>
-                `<li><strong>${escapeHtml(st.productName)}</strong> — ${escapeHtml(timingDe[st.timing])}${
+                `<li><strong>${escapeHtml(st.productName)}</strong> — ${escapeHtml(timingLabels[st.timing])}${
                   st.stepNote?.trim()
                     ? `<br /><span class="muted">${escapeHtml(st.stepNote.trim())}</span>`
                     : ''
@@ -175,25 +178,25 @@ export function generateBlendHTML(blend: Blend): string {
             .join('')}</ol>`
         : '<p class="muted">—</p>';
     typeBody = `
-  <h2>Schritte</h2>
+  <h2>${escapeHtml(t('pdf.blendSteps') as string)}</h2>
   ${stepsHtml}
 `;
   }
 
   const descPara = blend.description.trim()
-    ? `<h2>Beschreibung</h2><p>${escapeHtml(blend.description.trim())}</p>`
+    ? `<h2>${escapeHtml(t('pdf.blendDescription') as string)}</h2><p>${escapeHtml(blend.description.trim())}</p>`
     : '';
 
   const inner = `
   <h1>${escapeHtml(blend.name)}</h1>
-  <p class="muted">Typ: ${escapeHtml(kindPretty)}</p>
+  <p class="muted">${escapeHtml(t('pdf.blendType') as string)}: ${escapeHtml(kindPretty)}</p>
 ${descPara}
 ${typeBody}
-  <h2>Notizen</h2>
+  <h2>${escapeHtml(t('pdf.blendNotes') as string)}</h2>
   ${notesBlock}
-  <h2>Tags</h2>
+  <h2>${escapeHtml(t('pdf.blendTags') as string)}</h2>
   ${tagsBlock}
-  <h2>Erstellungsdatum</h2>
+  <h2>${escapeHtml(t('pdf.blendCreatedAt') as string)}</h2>
   <p>${created}</p>
 `;
 
@@ -203,7 +206,7 @@ ${typeBody}
 function generateProductHTML(product: Product): string {
   const usagesHtml =
     product.usages.length === 0
-      ? '<p class="muted">Keine Anwendungen hinterlegt.</p>'
+      ? `<p class="muted">${escapeHtml(t('pdf.productNoUsages') as string)}</p>`
       : `<ul>${product.usages.map((u) => `<li>${escapeHtml(u)}</li>`).join('')}</ul>`;
 
   const descParts = [product.description.trim(), product.notes.trim()].filter(Boolean);
@@ -218,18 +221,18 @@ function generateProductHTML(product: Product): string {
       : '<p class="muted">—</p>';
 
   const brandLine = product.brand.trim()
-    ? `<p class="muted"><strong>Marke:</strong> ${escapeHtml(product.brand)}</p>`
+    ? `<p class="muted"><strong>${escapeHtml(t('pdf.productBrand') as string)}:</strong> ${escapeHtml(product.brand)}</p>`
     : '';
 
   const inner = `
   <h1>${escapeHtml(product.name)}</h1>
   ${brandLine}
-  <p class="muted"><strong>Kategorie:</strong> ${escapeHtml(product.category)}</p>
-  <h2>Anwendungen</h2>
+  <p class="muted"><strong>${escapeHtml(t('pdf.productCategory') as string)}:</strong> ${escapeHtml(product.category)}</p>
+  <h2>${escapeHtml(t('pdf.productUsages') as string)}</h2>
   ${usagesHtml}
-  <h2>Beschreibung & Notizen</h2>
+  <h2>${escapeHtml(t('pdf.productDescriptionNotes') as string)}</h2>
   ${notesBlock}
-  <h2>Tags</h2>
+  <h2>${escapeHtml(t('pdf.productTags') as string)}</h2>
   ${tagsBlock}
 `;
 
@@ -265,18 +268,24 @@ async function shareHtmlAsPdf(html: string, dialogTitle: string): Promise<void> 
 
 export async function exportBlendAsPDF(blend: Blend): Promise<void> {
   try {
-    await shareHtmlAsPdf(generateBlendHTML(blend), `Mischung: ${blend.name}`);
+    await shareHtmlAsPdf(
+      generateBlendHTML(blend),
+      t('pdf.blendDialogTitle', { name: blend.name }) as string,
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    throw new Error(`Export der Mischung fehlgeschlagen: ${msg}`, { cause: e });
+    throw new Error(`PDF export failed: ${msg}`, { cause: e });
   }
 }
 
 export async function exportProductAsPDF(product: Product): Promise<void> {
   try {
-    await shareHtmlAsPdf(generateProductHTML(product), `Produkt: ${product.name}`);
+    await shareHtmlAsPdf(
+      generateProductHTML(product),
+      t('pdf.productDialogTitle', { name: product.name }) as string,
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    throw new Error(`Export des Produkts fehlgeschlagen: ${msg}`, { cause: e });
+    throw new Error(`PDF export failed: ${msg}`, { cause: e });
   }
 }

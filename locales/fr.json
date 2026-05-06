@@ -186,6 +186,36 @@
   "blendEdit": {
     "readOnlyHint": "Touchez le crayon pour modifier."
   },
+  "extractor": {
+    "errorNoJson": "L'extraction n'a pas retourné de JSON valide.",
+    "errorNoText": "Aucun texte à extraire.",
+    "errorGeneric": "La requête a échoué.",
+    "errorNoKey": "Clé API non configurée. Veuillez contacter le support.",
+    "errorEmptyResponse": "Réponse du modèle vide ou invalide.",
+    "errorParseJson": "Impossible de lire le JSON de la réponse du modèle."
+  },
+  "pdf": {
+    "blendType": "Type",
+    "blendBaseOil": "Huile de base / Vecteur",
+    "blendDroplets": "Gouttes / Ingrédients",
+    "dropsUnit": "gouttes",
+    "blendTotalVolume": "Volume total",
+    "blendParallelProducts": "Parallèle — Produits",
+    "blendApplicationSite": "Zone",
+    "blendSteps": "Étapes",
+    "blendDescription": "Description",
+    "blendNotes": "Notes",
+    "blendTags": "Tags",
+    "blendCreatedAt": "Date de création",
+    "productNoUsages": "Aucune utilisation enregistrée.",
+    "productBrand": "Marque",
+    "productCategory": "Catégorie",
+    "productUsages": "Utilisations",
+    "productDescriptionNotes": "Description et notes",
+    "productTags": "Tags",
+    "blendDialogTitle": "Mélange : %{name}",
+    "productDialogTitle": "Produit : %{name}"
+  },
   "limits": {
     "productLimitTitle": "Limite atteinte",
     "productLimitMessage": "La version gratuite prend en charge jusqu'à %{limit} produits. Passez à Pro pour un accès illimité.",
