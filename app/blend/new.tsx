@@ -1,7 +1,9 @@
 import { colors } from '../../constants/colors';
+import { usePro } from '../../hooks/usePro';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
 import { saveBlend } from '../../services/storage/blends';
+import { LimitExceededError } from '../../services/storage/errors';
 import {
   blendKindLabelKey,
   createNewBlendId,
@@ -69,6 +71,7 @@ export default function NewBlendScreen() {
   const palette = useThemePalette();
   const p = palette;
   const insets = useSafeAreaInsets();
+  const { isPro, isLifetime } = usePro();
 
   const [phase, setPhase] = useState<'pick' | 'form'>('pick');
   const [kind, setKind] = useState<BlendKind>('mix');
@@ -230,7 +233,18 @@ export default function NewBlendScreen() {
       };
     }
 
-    await saveBlend(blend);
+    try {
+      await saveBlend(blend, { isPro: isPro || isLifetime });
+    } catch (e) {
+      if (e instanceof LimitExceededError) {
+        Alert.alert(
+          t('limits.blendLimitTitle') as string,
+          t('limits.blendLimitMessage', { limit: e.limit }) as string,
+        );
+        return;
+      }
+      throw e;
+    }
     router.replace(`/blend/${id}`);
   }, [
     name,
@@ -246,6 +260,8 @@ export default function NewBlendScreen() {
     totalVolUnit,
     comboRows,
     protoRows,
+    isPro,
+    isLifetime,
   ]);
 
   const topPad = Math.max(insets.top, 12);

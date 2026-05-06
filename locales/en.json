@@ -186,6 +186,12 @@
   "blendEdit": {
     "readOnlyHint": "Tap the pencil to edit."
   },
+  "limits": {
+    "productLimitTitle": "Limit reached",
+    "productLimitMessage": "The free version supports up to %{limit} products. Upgrade to Pro for unlimited access.",
+    "blendLimitTitle": "Limit reached",
+    "blendLimitMessage": "The free version supports up to %{limit} blends. Upgrade to Pro for unlimited access."
+  },
   "search": {
     "placeholder": "# Tag or keyword…",
     "popular": "Popular tags",

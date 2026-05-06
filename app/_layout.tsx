@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { applyThemePreference, screenSurfaceColor } from '../constants/themePreference';
 import { subscribeLocale, setLocale } from '../services/i18n/i18n';
+import { runStorageMigration } from '../services/storage/migration';
 import { useEffect, useReducer } from 'react';
 import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -20,6 +21,7 @@ function RootNavigator() {
     const unsub = subscribeLocale(() => redraw());
 
     void (async () => {
+      await runStorageMigration();
       const lang = await getSavedLanguageCode();
       if (!cancelled && lang) setLocale(lang);
       const theme = await getThemePreference();

@@ -1,6 +1,8 @@
 import { colors } from '../constants/colors';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ONBOARDED_KEY } from './index';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import {
@@ -118,7 +120,10 @@ export default function Onboarding() {
 
         <Pressable
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
-          onPress={() => router.replace('/(tabs)')}
+          onPress={() => {
+            void AsyncStorage.setItem(ONBOARDED_KEY, 'true').catch(() => {});
+            router.replace('/(tabs)');
+          }}
           accessibilityRole="button"
           accessibilityLabel={t('onboarding.button')}
         >

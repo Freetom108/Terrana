@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FREE_BLEND_LIMIT } from '../../constants/limits';
+import { LimitExceededError } from './errors';
 import type {
   Blend,
   BlendIngredient,
@@ -13,7 +15,7 @@ import {
   normalizeProtocolTiming,
 } from '../../types/blend';
 
-const STORAGE_KEY = 'blends';
+const STORAGE_KEY = 'terrana_blends';
 
 function asRecord(v: unknown): Record<string, unknown> | null {
   return v !== null && typeof v === 'object' && !Array.isArray(v)
@@ -380,7 +382,12 @@ async function readBlends(): Promise<Blend[]> {
 }
 
 async function writeBlends(blends: Blend[]): Promise<void> {
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(blends));
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(blends));
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Failed to persist blends: ${msg}`, { cause: e });
+  }
 }
 
 export async function getAllBlends(): Promise<Blend[]> {
@@ -392,21 +399,27 @@ export async function getBlendById(id: string): Promise<Blend | null> {
   return blends.find((b) => b.id === id) ?? null;
 }
 
-export async function saveBlend(blend: Blend): Promise<void> {
+export async function saveBlend(
+  blend: Blend,
+  options?: { isPro?: boolean },
+): Promise<void> {
   const normalized = normalizeStoredBlend(blend);
   const blends = await readBlends();
   const idx = blends.findIndex((b) => b.id === normalized.id);
   if (idx >= 0) {
     blends[idx] = normalized;
   } else {
+    if (!options?.isPro && blends.length >= FREE_BLEND_LIMIT) {
+      throw new LimitExceededError('blend', FREE_BLEND_LIMIT);
+    }
     blends.push(normalized);
   }
   await writeBlends(blends);
 }
 
-/** Persist changes to an existing blend (same as saveBlend). */
+/** Persist changes to an existing blend (same as saveBlend, no limit check). */
 export async function updateBlend(blend: Blend): Promise<void> {
-  return saveBlend(blend);
+  return saveBlend(blend, { isPro: true });
 }
 
 export async function deleteBlend(id: string): Promise<void> {

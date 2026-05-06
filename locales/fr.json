@@ -186,6 +186,12 @@
   "blendEdit": {
     "readOnlyHint": "Touchez le crayon pour modifier."
   },
+  "limits": {
+    "productLimitTitle": "Limite atteinte",
+    "productLimitMessage": "La version gratuite prend en charge jusqu'à %{limit} produits. Passez à Pro pour un accès illimité.",
+    "blendLimitTitle": "Limite atteinte",
+    "blendLimitMessage": "La version gratuite prend en charge jusqu'à %{limit} mélanges. Passez à Pro pour un accès illimité."
+  },
   "search": {
     "placeholder": "# Tag ou mot-clé…",
     "popular": "Tags populaires",

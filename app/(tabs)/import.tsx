@@ -3,16 +3,19 @@ import { PRODUCT_CATEGORIES } from '../../constants/categories';
 import type { ProductCategory } from '../../constants/categories';
 import { FREE_IMPORT_LIMIT } from '../../constants/limits';
 import { useImportLimit } from '../../hooks/useImportLimit';
+import { usePro } from '../../hooks/usePro';
 import type { ThemePalette } from '../../hooks/useThemePalette';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { extractProductFromText } from '../../services/ai/extractor';
 import { t } from '../../services/i18n/i18n';
+import { LimitExceededError } from '../../services/storage/errors';
 import { saveProduct } from '../../services/storage/products';
 import type { InventoryLevel, Product } from '../../types/product';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -126,6 +129,7 @@ export default function ImportTab() {
   const palette = useThemePalette();
   const router = useRouter();
   const { canImport, incrementImport, refresh } = useImportLimit();
+  const { isPro, isLifetime } = usePro();
 
   const [sourceText, setSourceText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -218,10 +222,17 @@ export default function ImportTab() {
         createdAt: now,
         updatedAt: now,
       };
-      await saveProduct(savedProduct);
+      await saveProduct(savedProduct, { isPro: isPro || isLifetime });
       resetFlow();
       router.push('/product/' + savedProduct.id);
     } catch (e) {
+      if (e instanceof LimitExceededError) {
+        Alert.alert(
+          t('limits.productLimitTitle') as string,
+          t('limits.productLimitMessage', { limit: e.limit }) as string,
+        );
+        return;
+      }
       const msg = e instanceof Error ? e.message : String(e);
       setSaveError(msg);
     }

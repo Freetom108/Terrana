@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Product } from '../../types/product';
+import { FREE_PRODUCT_LIMIT } from '../../constants/limits';
 import type { ProductCategory } from '../../constants/categories';
 import { PRODUCT_CATEGORIES } from '../../constants/categories';
+import { LimitExceededError } from './errors';
+import type { Product } from '../../types/product';
 
-const STORAGE_KEY = 'products';
+const STORAGE_KEY = 'terrana_products';
 
 function clampRating(n: unknown): number {
   if (typeof n !== 'number' || !Number.isFinite(n)) return 3;
@@ -78,7 +80,12 @@ async function readProducts(): Promise<Product[]> {
 }
 
 async function writeProducts(products: Product[]): Promise<void> {
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Failed to persist products: ${msg}`, { cause: e });
+  }
 }
 
 export async function getAllProducts(): Promise<Product[]> {
@@ -90,7 +97,10 @@ export async function getProductById(id: string): Promise<Product | null> {
   return products.find((p) => p.id === id) ?? null;
 }
 
-export async function saveProduct(product: Product): Promise<void> {
+export async function saveProduct(
+  product: Product,
+  options?: { isPro?: boolean },
+): Promise<void> {
   const products = await readProducts();
   const normalized: Product = {
     ...product,
@@ -102,6 +112,9 @@ export async function saveProduct(product: Product): Promise<void> {
   if (idx >= 0) {
     products[idx] = normalized;
   } else {
+    if (!options?.isPro && products.length >= FREE_PRODUCT_LIMIT) {
+      throw new LimitExceededError('product', FREE_PRODUCT_LIMIT);
+    }
     products.push(normalized);
   }
   await writeProducts(products);

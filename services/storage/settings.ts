@@ -3,11 +3,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { ThemePreference } from '../../constants/themePreference';
 import { parseStoredTheme } from '../../constants/themePreference';
 
-const KEY_PRO = 'isPro';
-const KEY_LIFETIME = 'isLifetime';
-const KEY_IMPORT_COUNT = 'importCount';
-const KEY_THEME = 'theme';
-const KEY_LANGUAGE = 'language';
+const KEY_PRO = 'terrana_isPro';
+const KEY_LIFETIME = 'terrana_isLifetime';
+const KEY_IMPORT_COUNT = 'terrana_importCount';
+const KEY_THEME = 'terrana_theme';
+const KEY_LANGUAGE = 'terrana_language';
 
 const SUPPORTED_LANG_CODES = new Set(['en', 'de', 'fr', 'es']);
 
