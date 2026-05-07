@@ -2,7 +2,7 @@ import { PRODUCT_CATEGORIES } from '../../constants/categories';
 import { colors } from '../../constants/colors';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
-import { getProductById, saveProduct } from '../../services/storage/products';
+import { deleteProduct, getProductById, saveProduct } from '../../services/storage/products';
 import type { InventoryLevel, Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,6 +11,7 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -132,6 +133,24 @@ export default function ProductScreen() {
     setTagInput('');
   }, [draft, usagesBuffer]);
 
+  const handleDelete = useCallback(() => {
+    if (!product) return;
+    Alert.alert(
+      t('product.deleteTitle') as string,
+      t('product.deleteMessage', { name: product.name }) as string,
+      [
+        { text: t('general.cancel') as string, style: 'cancel' },
+        {
+          text: t('product.deleteConfirm') as string,
+          style: 'destructive',
+          onPress: () => {
+            void deleteProduct(product.id).then(() => router.back());
+          },
+        },
+      ],
+    );
+  }, [product]);
+
   const starColor = p.isDark ? colors.sageLight : colors.sageDark;
   const starEmpty = p.muted;
 
@@ -209,15 +228,26 @@ export default function ProductScreen() {
               </Pressable>
             </View>
           ) : (
-            <Pressable
-              onPress={enterEdit}
-              accessibilityRole="button"
-              accessibilityLabel={t('product.edit')}
-              style={styles.iconBtn}
-              hitSlop={12}
-            >
-              <Ionicons name="pencil-outline" size={26} color={colors.white} />
-            </Pressable>
+            <View style={styles.heroActions}>
+              <Pressable
+                onPress={handleDelete}
+                accessibilityRole="button"
+                accessibilityLabel={t('product.deleteTitle')}
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="trash-outline" size={23} color="rgba(255,255,255,0.80)" />
+              </Pressable>
+              <Pressable
+                onPress={enterEdit}
+                accessibilityRole="button"
+                accessibilityLabel={t('product.edit')}
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="pencil-outline" size={26} color={colors.white} />
+              </Pressable>
+            </View>
           )}
         </View>
 

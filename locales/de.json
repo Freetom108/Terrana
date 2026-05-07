@@ -140,7 +140,10 @@
     "usagesHint": "Eine Anwendung pro Zeile",
     "addTag": "Hinzufügen",
     "tagPlaceholder": "Neues Tag…",
-    "removeTagA11y": "Tag entfernen: %{tag}"
+    "removeTagA11y": "Tag entfernen: %{tag}",
+    "deleteTitle": "Produkt löschen",
+    "deleteMessage": "Möchtest du \"%{name}\" wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+    "deleteConfirm": "Löschen"
   },
   "blend": {
     "notFoundTitle": "Mischung nicht gefunden",

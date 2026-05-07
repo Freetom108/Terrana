@@ -140,7 +140,10 @@
     "usagesHint": "One application per line",
     "addTag": "Add",
     "tagPlaceholder": "New tag…",
-    "removeTagA11y": "Remove tag %{tag}"
+    "removeTagA11y": "Remove tag %{tag}",
+    "deleteTitle": "Delete product",
+    "deleteMessage": "Do you really want to delete \"%{name}\"? This cannot be undone.",
+    "deleteConfirm": "Delete"
   },
   "blend": {
     "notFoundTitle": "Blend not found",

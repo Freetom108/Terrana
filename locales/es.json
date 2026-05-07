@@ -140,7 +140,10 @@
     "usagesHint": "Un uso por línea",
     "addTag": "Añadir",
     "tagPlaceholder": "Nueva etiqueta…",
-    "removeTagA11y": "Quitar etiqueta %{tag}"
+    "removeTagA11y": "Quitar etiqueta %{tag}",
+    "deleteTitle": "Eliminar producto",
+    "deleteMessage": "¿Realmente quieres eliminar \"%{name}\"? Esta acción no se puede deshacer.",
+    "deleteConfirm": "Eliminar"
   },
   "blend": {
     "notFoundTitle": "Mezcla no encontrada",
