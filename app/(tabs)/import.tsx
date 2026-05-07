@@ -128,8 +128,8 @@ export default function ImportTab() {
   const palette = useThemePalette();
   const router = useRouter();
   const [, redraw] = useReducer((n: number) => n + 1, 0);
-  const { canImport, importsUsed, incrementImport, refresh } = useImportLimit();
   const { isPro, isLifetime } = usePro();
+  const { canImport, importsUsed, incrementImport, refresh } = useImportLimit({ isPro, isLifetime });
   const isFreeUser = !isPro && !isLifetime;
   const showImportProgress = isFreeUser && importsUsed >= FREE_IMPORT_WARN;
 

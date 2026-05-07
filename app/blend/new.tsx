@@ -1,5 +1,6 @@
 import { colors } from '../../constants/colors';
 import { usePro } from '../../hooks/usePro';
+import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
 import { saveBlend } from '../../services/storage/blends';
@@ -12,11 +13,14 @@ import {
   type BlendKind,
   type ProtocolTiming,
 } from '../../types/blend';
+import type { Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
+  FlatList,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -67,11 +71,20 @@ function uniqueTrimmedTags(tags: string[]): string[] {
   return out;
 }
 
+type PickerTarget =
+  | { kind: 'mix'; idx: number }
+  | { kind: 'combo'; idx: number }
+  | { kind: 'proto'; idx: number };
+
 export default function NewBlendScreen() {
   const palette = useThemePalette();
   const p = palette;
   const insets = useSafeAreaInsets();
   const { isPro, isLifetime } = usePro();
+  const { products } = useProducts();
+
+  const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
+  const [pickerSearch, setPickerSearch] = useState('');
 
   const [phase, setPhase] = useState<'pick' | 'form'>('pick');
   const [kind, setKind] = useState<BlendKind>('mix');
@@ -112,6 +125,46 @@ export default function NewBlendScreen() {
     setComboRows([{ productName: '', applicationSite: '' }]);
     setProtoRows([{ productName: '', timing: 'morning', stepNote: '' }]);
   }, []);
+
+  const filteredPickerProducts = useMemo(() => {
+    const q = pickerSearch.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter(
+      (prod) =>
+        prod.name.toLowerCase().includes(q) ||
+        prod.category.toLowerCase().includes(q) ||
+        prod.brand.toLowerCase().includes(q),
+    );
+  }, [products, pickerSearch]);
+
+  const openPicker = useCallback((target: PickerTarget) => {
+    setPickerSearch('');
+    setPickerTarget(target);
+  }, []);
+
+  const closePicker = useCallback(() => {
+    setPickerTarget(null);
+    setPickerSearch('');
+  }, []);
+
+  const selectProduct = useCallback(
+    (product: Product) => {
+      if (!pickerTarget) return;
+      const name = product.name;
+      if (pickerTarget.kind === 'mix') {
+        const idx = pickerTarget.idx;
+        setMixRows((prev) => prev.map((r, i) => (i === idx ? { ...r, productName: name } : r)));
+      } else if (pickerTarget.kind === 'combo') {
+        const idx = pickerTarget.idx;
+        setComboRows((prev) => prev.map((r, i) => (i === idx ? { ...r, productName: name } : r)));
+      } else {
+        const idx = pickerTarget.idx;
+        setProtoRows((prev) => prev.map((r, i) => (i === idx ? { ...r, productName: name } : r)));
+      }
+      closePicker();
+    },
+    [pickerTarget, closePicker],
+  );
 
   const pickKind = useCallback(
     (k: BlendKind) => {
@@ -408,17 +461,35 @@ export default function NewBlendScreen() {
                 <FieldLabel text={t('blends.detailMixDropletsHeading') as string} muted={p.muted} />
                 {mixRows.map((row, idx) => (
                   <View key={idx} style={[styles.ingredientCard, { borderColor: p.border, backgroundColor: p.card }]}>
-                    <TextInput
-                      value={row.productName}
-                      onChangeText={(txt) => {
-                        setMixRows((prev) =>
-                          prev.map((r, i) => (i === idx ? { ...r, productName: txt } : r)),
-                        );
-                      }}
-                      placeholder={t('blendNew.fieldIngredientProduct') as string}
-                      placeholderTextColor={p.placeholderColor}
-                      style={[styles.inputInCard, { color: p.text }]}
-                    />
+                    <View style={styles.pickRow}>
+                      <TextInput
+                        value={row.productName}
+                        onChangeText={(txt) => {
+                          setMixRows((prev) =>
+                            prev.map((r, i) => (i === idx ? { ...r, productName: txt } : r)),
+                          );
+                        }}
+                        placeholder={t('blendNew.fieldIngredientProduct') as string}
+                        placeholderTextColor={p.placeholderColor}
+                        style={[styles.inputInCard, styles.pickInput, { color: p.text }]}
+                      />
+                      {products.length > 0 ? (
+                        <Pressable
+                          onPress={() => openPicker({ kind: 'mix', idx })}
+                          style={styles.pickBtn}
+                          accessibilityRole="button"
+                          accessibilityLabel={t('blendNew.pickFromCollection') as string}
+                          hitSlop={8}
+                        >
+                          <Ionicons name="add-circle-outline" size={24} color={colors.sage} />
+                        </Pressable>
+                      ) : null}
+                    </View>
+                    {products.length > 0 ? (
+                      <Text style={[styles.pickHint, { color: p.muted }]}>
+                        {t('blendNew.addIngredientHint')}
+                      </Text>
+                    ) : null}
                     <TextInput
                       value={row.quantityLabel}
                       onChangeText={(txt) => {
@@ -480,17 +551,35 @@ export default function NewBlendScreen() {
                 <FieldLabel text={t('blends.detailComboHeading') as string} muted={p.muted} />
                 {comboRows.map((row, idx) => (
                   <View key={idx} style={[styles.ingredientCard, { borderColor: p.border, backgroundColor: p.card }]}>
-                    <TextInput
-                      value={row.productName}
-                      onChangeText={(txt) => {
-                        setComboRows((prev) =>
-                          prev.map((r, i) => (i === idx ? { ...r, productName: txt } : r)),
-                        );
-                      }}
-                      placeholder={t('blendNew.fieldComboProduct') as string}
-                      placeholderTextColor={p.placeholderColor}
-                      style={[styles.inputInCard, { color: p.text }]}
-                    />
+                    <View style={styles.pickRow}>
+                      <TextInput
+                        value={row.productName}
+                        onChangeText={(txt) => {
+                          setComboRows((prev) =>
+                            prev.map((r, i) => (i === idx ? { ...r, productName: txt } : r)),
+                          );
+                        }}
+                        placeholder={t('blendNew.fieldComboProduct') as string}
+                        placeholderTextColor={p.placeholderColor}
+                        style={[styles.inputInCard, styles.pickInput, { color: p.text }]}
+                      />
+                      {products.length > 0 ? (
+                        <Pressable
+                          onPress={() => openPicker({ kind: 'combo', idx })}
+                          style={styles.pickBtn}
+                          accessibilityRole="button"
+                          accessibilityLabel={t('blendNew.pickFromCollection') as string}
+                          hitSlop={8}
+                        >
+                          <Ionicons name="add-circle-outline" size={24} color={colors.sage} />
+                        </Pressable>
+                      ) : null}
+                    </View>
+                    {products.length > 0 ? (
+                      <Text style={[styles.pickHint, { color: p.muted }]}>
+                        {t('blendNew.addProductHint')}
+                      </Text>
+                    ) : null}
                     <TextInput
                       value={row.applicationSite}
                       onChangeText={(txt) => {
@@ -535,17 +624,35 @@ export default function NewBlendScreen() {
                 <FieldLabel text={t('blends.detailProtocolHeading') as string} muted={p.muted} />
                 {protoRows.map((row, idx) => (
                   <View key={idx} style={[styles.ingredientCard, { borderColor: p.border, backgroundColor: p.card }]}>
-                    <TextInput
-                      value={row.productName}
-                      onChangeText={(txt) => {
-                        setProtoRows((prev) =>
-                          prev.map((r, i) => (i === idx ? { ...r, productName: txt } : r)),
-                        );
-                      }}
-                      placeholder={t('blendNew.fieldStepProduct') as string}
-                      placeholderTextColor={p.placeholderColor}
-                      style={[styles.inputInCard, { color: p.text }]}
-                    />
+                    <View style={styles.pickRow}>
+                      <TextInput
+                        value={row.productName}
+                        onChangeText={(txt) => {
+                          setProtoRows((prev) =>
+                            prev.map((r, i) => (i === idx ? { ...r, productName: txt } : r)),
+                          );
+                        }}
+                        placeholder={t('blendNew.fieldStepProduct') as string}
+                        placeholderTextColor={p.placeholderColor}
+                        style={[styles.inputInCard, styles.pickInput, { color: p.text }]}
+                      />
+                      {products.length > 0 ? (
+                        <Pressable
+                          onPress={() => openPicker({ kind: 'proto', idx })}
+                          style={styles.pickBtn}
+                          accessibilityRole="button"
+                          accessibilityLabel={t('blendNew.pickFromCollection') as string}
+                          hitSlop={8}
+                        >
+                          <Ionicons name="add-circle-outline" size={24} color={colors.sage} />
+                        </Pressable>
+                      ) : null}
+                    </View>
+                    {products.length > 0 ? (
+                      <Text style={[styles.pickHint, { color: p.muted }]}>
+                        {t('blendNew.addStepHint')}
+                      </Text>
+                    ) : null}
                     <Text style={[styles.timingLabel, { color: p.muted }]}>
                       {t('blendNew.fieldStepTiming')}
                     </Text>
@@ -691,6 +798,70 @@ export default function NewBlendScreen() {
           </>
         )}
       </ScrollView>
+
+      <Modal
+        visible={pickerTarget !== null}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={closePicker}
+      >
+        <View style={[styles.pickerRoot, { backgroundColor: p.surface }]}>
+          <View style={[styles.pickerHeader, { borderBottomColor: p.border }]}>
+            <Text style={[styles.pickerTitle, { color: p.text }]}>{t('blendNew.pickerTitle')}</Text>
+            <Pressable onPress={closePicker} hitSlop={12} accessibilityRole="button">
+              <Ionicons name="close" size={24} color={p.secondaryBtnLabel} />
+            </Pressable>
+          </View>
+
+          <View style={[styles.pickerSearchWrap, { borderBottomColor: p.border }]}>
+            <Ionicons name="search-outline" size={18} color={p.muted} style={{ marginRight: 8 }} />
+            <TextInput
+              value={pickerSearch}
+              onChangeText={setPickerSearch}
+              placeholder={t('blendNew.pickerSearch') as string}
+              placeholderTextColor={p.placeholderColor}
+              style={[styles.pickerSearchInput, { color: p.text }]}
+              autoFocus
+              clearButtonMode="while-editing"
+            />
+          </View>
+
+          {filteredPickerProducts.length === 0 ? (
+            <View style={styles.pickerEmpty}>
+              <Text style={[styles.pickerEmptyText, { color: p.muted }]}>
+                {t('blendNew.pickerEmpty')}
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredPickerProducts}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+              keyboardShouldPersistTaps="handled"
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => selectProduct(item)}
+                  style={({ pressed }) => [
+                    styles.pickerItem,
+                    { borderBottomColor: p.border },
+                    pressed && { backgroundColor: p.card },
+                  ]}
+                  accessibilityRole="button"
+                >
+                  <Text style={[styles.pickerItemName, { color: p.text }]} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  {item.brand ? (
+                    <Text style={[styles.pickerItemSub, { color: p.muted }]} numberOfLines={1}>
+                      {item.brand}
+                    </Text>
+                  ) : null}
+                </Pressable>
+              )}
+            />
+          )}
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -813,4 +984,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   savePillText: { color: colors.white, fontSize: 17, fontWeight: '700' },
+  pickRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  pickInput: { flex: 1 },
+  pickBtn: { padding: 4 },
+  pickHint: { fontSize: 11, marginTop: 2, fontStyle: 'italic' },
+  pickerRoot: { flex: 1 },
+  pickerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  pickerTitle: { fontSize: 18, fontWeight: '700' },
+  pickerSearchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  pickerSearchInput: { flex: 1, fontSize: 16 },
+  pickerEmpty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+  pickerEmptyText: { fontSize: 15, textAlign: 'center' },
+  pickerItem: {
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  pickerItemName: { fontSize: 16, fontWeight: '600' },
+  pickerItemSub: { fontSize: 13, marginTop: 2 },
 });

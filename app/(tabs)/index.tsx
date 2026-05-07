@@ -276,11 +276,16 @@ export default function HomeTab() {
             ) : null}
           </View>
           {showBlendEmpty ? (
-            <EmptyState
-              title={t('home.emptyBlendsTitle')}
-              message={t('home.emptyBlendsMessage')}
-              emoji="🧪"
-            />
+            <Pressable
+              onPress={() => router.push('/blend/new')}
+              accessibilityRole="button"
+            >
+              <EmptyState
+                title={t('home.emptyBlendsTitle')}
+                message={t('home.emptyBlendsMessage')}
+                emoji="🧪"
+              />
+            </Pressable>
           ) : (
             <View style={styles.productStack}>
               {blendsPreview.map((blend) => (

@@ -36,7 +36,20 @@ export default function SearchTab() {
   const [rawQuery, setRawQuery] = useState('');
   const inputRef = useRef<TextInput>(null);
   const [, redraw] = useReducer((n: number) => n + 1, 0);
-  useEffect(() => subscribeLocale(redraw), []);
+
+  // Re-render UI text AND reload products on locale change so popular tags stay visible
+  useEffect(() => {
+    const unsub = subscribeLocale(() => {
+      redraw();
+      void refreshProducts();
+    });
+    return unsub;
+  }, [refreshProducts]);
+
+  // Load products on mount
+  useEffect(() => {
+    void refreshProducts();
+  }, [refreshProducts]);
 
   useFocusEffect(
     useCallback(() => {

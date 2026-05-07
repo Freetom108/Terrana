@@ -1,26 +1,36 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FREE_IMPORT_LIMIT } from '../constants/limits';
-import { getImportCount, getIsPro, incrementImportCount } from '../services/storage/settings';
+import { FREE_IMPORT_LIMIT, PRO_IMPORT_LIMIT } from '../constants/limits';
+import { getImportCount, incrementImportCount } from '../services/storage/settings';
 
-export function useImportLimit() {
+interface ImportLimitOptions {
+  /** Pass isPro / isLifetime from usePro() so test-mode overrides are respected. */
+  isPro?: boolean;
+  isLifetime?: boolean;
+}
+
+export function useImportLimit({ isPro = false, isLifetime = false }: ImportLimitOptions = {}) {
   const [importsUsed, setImportsUsed] = useState(0);
-  const [isPro, setIsPro] = useState(false);
 
   const refresh = useCallback(async () => {
-    const [count, pro] = await Promise.all([getImportCount(), getIsPro()]);
+    const count = await getImportCount();
     setImportsUsed(count);
-    setIsPro(pro);
   }, []);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  const importsRemaining = isPro
+  const effectiveLimit = isLifetime
     ? Number.POSITIVE_INFINITY
-    : Math.max(0, FREE_IMPORT_LIMIT - importsUsed);
+    : isPro
+      ? PRO_IMPORT_LIMIT
+      : FREE_IMPORT_LIMIT;
 
-  const canImport = isPro || importsUsed < FREE_IMPORT_LIMIT;
+  const importsRemaining = Number.isFinite(effectiveLimit)
+    ? Math.max(0, (effectiveLimit as number) - importsUsed)
+    : Number.POSITIVE_INFINITY;
+
+  const canImport = isLifetime || isPro || importsUsed < FREE_IMPORT_LIMIT;
 
   const incrementImport = useCallback(async () => {
     await incrementImportCount();
