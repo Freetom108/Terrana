@@ -1,5 +1,5 @@
 export const FREE_PRODUCT_LIMIT = 10;
-export const FREE_BLEND_LIMIT = 5;
+export const FREE_BLEND_LIMIT = 10;
 export const FREE_IMPORT_LIMIT = 10;
 
 export const PRO_PRODUCT_LIMIT = 100;

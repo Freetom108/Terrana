@@ -87,7 +87,7 @@
     "sectionFaq": "FAQ",
     "sectionExport": "EXPORT",
     "exportCollection": "Exporter la collection en PDF",
-    "exportCollectionHint": "Tous les produits en un PDF (Lifetime)",
+    "exportCollectionHint": "Tous les produits en un PDF (Pro & Lifetime)",
     "sectionAbout": "À PROPOS DE TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -212,7 +212,7 @@
     "featureAiImport": "Import IA",
     "featureSharing": "Partage",
     "featurePdf": "Export PDF",
-    "featurePrint": "🖨️ Blends",
+    "featurePrint": "🖨️ Collections",
     "featureInventory": "Inventaire",
     "sharing": "Partagez avec votre communauté",
     "sharingDesc": "Partage via WhatsApp, Mail, SMS & toutes les apps",
@@ -304,6 +304,9 @@
     "q4": "Qu'est-ce que Restaurer les achats ?",
     "a4": "Si vous avez réinstallé l'app ou avez un nouvel appareil, vous pouvez restaurer vos achats gratuitement. Appuyez sur 'Restaurer les achats' dans l'écran de mise à niveau.",
     "q5": "Comment fonctionne l'import IA ?",
-    "a5": "Copiez le texte d'une page produit et collez-le dans la zone d'import. L'IA détecte automatiquement le nom du produit, la catégorie, la description, les applications et les tags."
+    "a5": "Copiez le texte d'une page produit et collez-le dans la zone d'import. L'IA détecte automatiquement le nom du produit, la catégorie, la description, les applications et les tags.",
+    "q6": "Où puis-je trouver les options d'upgrade ?",
+    "a6": "Vous trouverez toutes les options de mise à niveau dans l'écran Upgrade de Terrana.",
+    "a6Btn": "Voir les options d'upgrade →"
   }
 }

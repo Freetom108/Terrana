@@ -87,7 +87,7 @@
     "sectionFaq": "FAQ",
     "sectionExport": "EXPORT",
     "exportCollection": "Export collection as PDF",
-    "exportCollectionHint": "All products in one PDF (Lifetime)",
+    "exportCollectionHint": "All products in one PDF (Pro & Lifetime)",
     "sectionAbout": "ABOUT TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -212,7 +212,7 @@
     "featureAiImport": "AI Import",
     "featureSharing": "Sharing",
     "featurePdf": "PDF Export",
-    "featurePrint": "🖨️ Blends",
+    "featurePrint": "🖨️ Collections",
     "featureInventory": "Inventory",
     "sharing": "Share with your community",
     "sharingDesc": "Share via WhatsApp, Mail, SMS & all apps",
@@ -304,6 +304,9 @@
     "q4": "What is Restore Purchases?",
     "a4": "If you reinstalled the app or have a new device, you can restore your purchases for free. Tap 'Restore Purchases' in the upgrade screen.",
     "q5": "How does the AI import work?",
-    "a5": "Copy the text from a product page and paste it into the import area. The AI automatically detects product name, category, description, applications and tags."
+    "a5": "Copy the text from a product page and paste it into the import area. The AI automatically detects product name, category, description, applications and tags.",
+    "q6": "Where can I find the upgrade options?",
+    "a6": "You can view all upgrade options in the Terrana upgrade screen.",
+    "a6Btn": "View upgrade options →"
   }
 }

@@ -87,7 +87,7 @@
     "sectionFaq": "FAQ",
     "sectionExport": "EXPORT",
     "exportCollection": "Sammlung als PDF exportieren",
-    "exportCollectionHint": "Alle Produkte in einem PDF (Lifetime)",
+    "exportCollectionHint": "Alle Produkte in einem PDF (Pro & Lifetime)",
     "sectionAbout": "ÜBER TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -212,7 +212,7 @@
     "featureAiImport": "KI-Import",
     "featureSharing": "Teilen",
     "featurePdf": "PDF-Export",
-    "featurePrint": "🖨️ Blends",
+    "featurePrint": "🖨️ Sammlung",
     "featureInventory": "Inventar",
     "sharing": "Teile mit deiner Community",
     "sharingDesc": "Teile via WhatsApp, Mail, SMS & alle Apps",
@@ -304,6 +304,9 @@
     "q4": "Was ist Restore Purchases?",
     "a4": "Falls du die App neu installiert hast oder ein neues Gerät verwendest, kannst du deine gekauften Upgrades kostenlos wiederherstellen. Tippe dazu auf 'Käufe wiederherstellen' in der Paywall.",
     "q5": "Wie funktioniert der KI-Import?",
-    "a5": "Kopiere den Text einer Produktseite und füge ihn in den Import-Bereich ein. Die KI erkennt automatisch Produktname, Kategorie, Beschreibung, Anwendungen und Tags."
+    "a5": "Kopiere den Text einer Produktseite und füge ihn in den Import-Bereich ein. Die KI erkennt automatisch Produktname, Kategorie, Beschreibung, Anwendungen und Tags.",
+    "q6": "Wo finde ich die Upgrade-Optionen?",
+    "a6": "Du findest alle Upgrade-Optionen im Terrana Upgrade-Bereich.",
+    "a6Btn": "Upgrade-Optionen ansehen →"
   }
 }

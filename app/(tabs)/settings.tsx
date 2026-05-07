@@ -32,12 +32,13 @@ import {
 const APP_VERSION = '1.0.0';
 
 const FAQ_ITEMS = [
-  { q: 'faq.q1', a: 'faq.a1' },
-  { q: 'faq.q2', a: 'faq.a2' },
-  { q: 'faq.q3', a: 'faq.a3' },
-  { q: 'faq.q4', a: 'faq.a4' },
-  { q: 'faq.q5', a: 'faq.a5' },
-] as const;
+  { q: 'faq.q1', a: 'faq.a1', btnKey: undefined },
+  { q: 'faq.q2', a: 'faq.a2', btnKey: undefined },
+  { q: 'faq.q3', a: 'faq.a3', btnKey: undefined },
+  { q: 'faq.q4', a: 'faq.a4', btnKey: undefined },
+  { q: 'faq.q5', a: 'faq.a5', btnKey: undefined },
+  { q: 'faq.q6', a: 'faq.a6', btnKey: 'faq.a6Btn' },
+] satisfies Array<{ q: string; a: string; btnKey: string | undefined }>;
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
   { value: 'light', labelKey: 'settings.themeLight' },
@@ -74,7 +75,7 @@ export default function SettingsTab() {
   );
 
   const handleExportCollection = useCallback(async () => {
-    if (!isLifetime) {
+    if (!isPro && !isLifetime) {
       router.push('/paywall');
       return;
     }
@@ -91,7 +92,7 @@ export default function SettingsTab() {
     } finally {
       setExportingPdf(false);
     }
-  }, [isLifetime, products, router]);
+  }, [isPro, isLifetime, products, router]);
 
   const surfaceBg = p.surface;
   const headline = p.text;
@@ -235,7 +236,7 @@ export default function SettingsTab() {
           {t('settings.sectionFaq')}
         </Text>
         <View style={[styles.faqCard, { backgroundColor: cardBg, borderColor: p.border }]}>
-          {FAQ_ITEMS.map(({ q, a }, idx) => {
+          {FAQ_ITEMS.map(({ q, a, btnKey }, idx) => {
             const isOpen = openFaq === idx;
             const isLast = idx === FAQ_ITEMS.length - 1;
             return (
@@ -257,7 +258,18 @@ export default function SettingsTab() {
                   />
                 </Pressable>
                 {isOpen ? (
-                  <Text style={[styles.faqAnswer, { color: muted }]}>{t(a) as string}</Text>
+                  <View style={styles.faqAnswerWrap}>
+                    <Text style={[styles.faqAnswer, { color: muted }]}>{t(a) as string}</Text>
+                    {btnKey ? (
+                      <Pressable
+                        onPress={() => router.push('/paywall')}
+                        style={[styles.faqBtn, { backgroundColor: colors.sage }]}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.faqBtnText}>{t(btnKey) as string}</Text>
+                      </Pressable>
+                    ) : null}
+                  </View>
                 ) : null}
                 {!isLast ? (
                   <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
@@ -282,7 +294,7 @@ export default function SettingsTab() {
               <Ionicons
                 name="document-text-outline"
                 size={22}
-                color={isLifetime ? colors.sage : p.muted}
+                color={isPro || isLifetime ? colors.sage : p.muted}
               />
               <View style={styles.exportRowText}>
                 <Text style={[styles.exportRowTitle, { color: headline, opacity: exportingPdf ? 0.5 : 1 }]}>
@@ -294,7 +306,7 @@ export default function SettingsTab() {
               </View>
             </View>
             <Ionicons
-              name={isLifetime ? 'chevron-forward' : 'lock-closed-outline'}
+              name={isPro || isLifetime ? 'chevron-forward' : 'lock-closed-outline'}
               size={18}
               color={muted}
             />
@@ -502,16 +514,30 @@ const styles = StyleSheet.create({
   faqChevron: {
     flexShrink: 0,
   },
+  faqAnswerWrap: {
+    paddingHorizontal: 16,
+    paddingBottom: 14,
+    gap: 12,
+  },
   faqAnswer: {
     fontSize: 13,
     lineHeight: 20,
     fontWeight: '400',
-    paddingHorizontal: 16,
-    paddingBottom: 14,
   },
   faqDivider: {
     height: StyleSheet.hairlineWidth,
     marginHorizontal: 16,
+  },
+  faqBtn: {
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    alignSelf: 'flex-start',
+  },
+  faqBtnText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '700',
   },
   exportRow: {
     flexDirection: 'row',

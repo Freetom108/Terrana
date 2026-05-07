@@ -87,7 +87,7 @@
     "sectionFaq": "FAQ",
     "sectionExport": "EXPORTAR",
     "exportCollection": "Exportar colección como PDF",
-    "exportCollectionHint": "Todos los productos en un PDF (Lifetime)",
+    "exportCollectionHint": "Todos los productos en un PDF (Pro & Lifetime)",
     "sectionAbout": "ACERCA DE TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -212,7 +212,7 @@
     "featureAiImport": "Importación IA",
     "featureSharing": "Compartir",
     "featurePdf": "Exportar PDF",
-    "featurePrint": "🖨️ Blends",
+    "featurePrint": "🖨️ Colecciones",
     "featureInventory": "Inventario",
     "sharing": "Comparte con tu comunidad",
     "sharingDesc": "Comparte via WhatsApp, Mail, SMS & todas las apps",
@@ -304,6 +304,9 @@
     "q4": "¿Qué es Restaurar compras?",
     "a4": "Si reinstalaste la app o tienes un nuevo dispositivo, puedes restaurar tus compras de forma gratuita. Toca 'Restaurar compras' en la pantalla de actualización.",
     "q5": "¿Cómo funciona la importación con IA?",
-    "a5": "Copia el texto de una página de producto y pégalo en el área de importación. La IA detecta automáticamente el nombre del producto, categoría, descripción, aplicaciones y etiquetas."
+    "a5": "Copia el texto de una página de producto y pégalo en el área de importación. La IA detecta automáticamente el nombre del producto, categoría, descripción, aplicaciones y etiquetas.",
+    "q6": "¿Dónde puedo encontrar las opciones de mejora?",
+    "a6": "Puedes ver todas las opciones de mejora en la pantalla de Upgrade de Terrana.",
+    "a6Btn": "Ver opciones de mejora →"
   }
 }
