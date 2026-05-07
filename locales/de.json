@@ -259,7 +259,9 @@
     "print": "Drucken",
     "collectionTitle": "Meine Sammlung",
     "collectionDialogTitle": "Meine Sammlung – Terrana",
-    "collectionCount": "Produkte"
+    "collectionCount": "Produkte",
+    "footerShare": "Geteilt via Terrana Pro",
+    "footerPrint": "Gedruckt via Terrana Lifetime"
   },
   "share": {
     "usages": "Anwendungen",

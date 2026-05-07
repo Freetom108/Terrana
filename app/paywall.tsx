@@ -3,6 +3,9 @@ import {
   FREE_BLEND_LIMIT,
   FREE_IMPORT_LIMIT,
   FREE_PRODUCT_LIMIT,
+  PRO_BLEND_LIMIT,
+  PRO_IMPORT_LIMIT,
+  PRO_PRODUCT_LIMIT,
 } from '../constants/limits';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
@@ -38,19 +41,19 @@ const FEATURES: FeatureRow[] = [
   {
     labelKey: 'paywall.featureProducts',
     free: String(FREE_PRODUCT_LIMIT),
-    pro: '∞',
+    pro: String(PRO_PRODUCT_LIMIT),
     lifetime: '∞',
   },
   {
     labelKey: 'paywall.featureBlends',
     free: String(FREE_BLEND_LIMIT),
-    pro: '∞',
+    pro: String(PRO_BLEND_LIMIT),
     lifetime: '∞',
   },
   {
     labelKey: 'paywall.featureAiImport',
     free: String(FREE_IMPORT_LIMIT),
-    pro: '∞',
+    pro: String(PRO_IMPORT_LIMIT),
     lifetime: '∞',
   },
   {
@@ -62,7 +65,7 @@ const FEATURES: FeatureRow[] = [
   {
     labelKey: 'paywall.featurePdf',
     free: false,
-    pro: false,
+    pro: true,
     lifetime: true,
   },
   {

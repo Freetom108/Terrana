@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FREE_PRODUCT_LIMIT } from '../../constants/limits';
+import { FREE_PRODUCT_LIMIT, LIFETIME_LIMIT, PRO_PRODUCT_LIMIT } from '../../constants/limits';
 import type { ProductCategory } from '../../constants/categories';
 import { PRODUCT_CATEGORIES } from '../../constants/categories';
 import { LimitExceededError } from './errors';
@@ -99,7 +99,7 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function saveProduct(
   product: Product,
-  options?: { isPro?: boolean },
+  options?: { isPro?: boolean; isLifetime?: boolean },
 ): Promise<void> {
   const products = await readProducts();
   const normalized: Product = {
@@ -112,8 +112,13 @@ export async function saveProduct(
   if (idx >= 0) {
     products[idx] = normalized;
   } else {
-    if (!options?.isPro && products.length >= FREE_PRODUCT_LIMIT) {
-      throw new LimitExceededError('product', FREE_PRODUCT_LIMIT);
+    const limit = options?.isLifetime
+      ? LIFETIME_LIMIT
+      : options?.isPro
+        ? PRO_PRODUCT_LIMIT
+        : FREE_PRODUCT_LIMIT;
+    if (products.length >= limit) {
+      throw new LimitExceededError('product', limit);
     }
     products.push(normalized);
   }

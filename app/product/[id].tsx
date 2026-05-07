@@ -169,32 +169,31 @@ export default function ProductScreen() {
 
   const handlePdfPrint = useCallback(() => {
     if (!product) return;
-    if (!isLifetime) {
+    if (!isPro && !isLifetime) {
       router.push('/paywall');
       return;
     }
-    Alert.alert(
-      product.name,
-      undefined,
-      [
-        {
-          text: t('pdf.print') as string,
-          onPress: () => void printProduct(product).catch((e) => {
-            const msg = e instanceof Error ? e.message : String(e);
-            Alert.alert('Print', msg);
-          }),
-        },
-        {
-          text: 'PDF',
-          onPress: () => void exportProductAsPDF(product).catch((e) => {
-            const msg = e instanceof Error ? e.message : String(e);
-            Alert.alert('PDF', msg);
-          }),
-        },
-        { text: t('general.cancel') as string, style: 'cancel' },
-      ],
-    );
-  }, [product, isLifetime]);
+    const actions: Parameters<typeof Alert.alert>[2] = [
+      {
+        text: 'PDF',
+        onPress: () => void exportProductAsPDF(product).catch((e) => {
+          const msg = e instanceof Error ? e.message : String(e);
+          Alert.alert('PDF', msg);
+        }),
+      },
+    ];
+    if (isLifetime) {
+      actions.push({
+        text: t('pdf.print') as string,
+        onPress: () => void printProduct(product).catch((e) => {
+          const msg = e instanceof Error ? e.message : String(e);
+          Alert.alert('Print', msg);
+        }),
+      });
+    }
+    actions.push({ text: t('general.cancel') as string, style: 'cancel' });
+    Alert.alert(product.name, undefined, actions);
+  }, [product, isPro, isLifetime]);
 
   const starColor = p.isDark ? colors.sageLight : colors.sageDark;
   const starEmpty = p.muted;

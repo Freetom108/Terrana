@@ -259,7 +259,9 @@
     "print": "Print",
     "collectionTitle": "My Collection",
     "collectionDialogTitle": "My Collection – Terrana",
-    "collectionCount": "products"
+    "collectionCount": "products",
+    "footerShare": "Shared via Terrana Pro",
+    "footerPrint": "Printed via Terrana Lifetime"
   },
   "share": {
     "usages": "Applications",

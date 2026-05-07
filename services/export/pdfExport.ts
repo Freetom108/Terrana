@@ -9,11 +9,22 @@ const PRINT_STYLES = `
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #222;
-    line-height: 1.45;
+    line-height: 1.6;
     max-width: 720px;
     margin: 0 auto;
-    padding: 24px 16px 32px;
+    padding: 40px;
     font-size: 14px;
+  }
+  .doc-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 24px;
+  }
+  .doc-brand {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 700;
+    color: #4A6B4E;
   }
   h1 {
     font-size: 22px;
@@ -30,11 +41,19 @@ const PRINT_STYLES = `
     color: #555;
     margin: 20px 0 8px;
   }
-  p, ul { margin: 0 0 8px; }
-  ul { padding-left: 1.2em; }
+  p, ul, ol { margin: 0 0 8px; }
+  ul, ol { padding-left: 1.2em; }
   li { margin-bottom: 4px; }
   .tags, .muted { color: #444; }
   .notes { white-space: pre-wrap; }
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+    font-size: 11px;
+    color: #7A9E7E;
+    text-align: right;
+  }
   @media print {
     body { padding: 0; max-width: none; }
     a { color: inherit; text-decoration: none; }
@@ -50,7 +69,12 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function wrapDocument(title: string, bodyInner: string): string {
+type PdfMode = 'share' | 'print';
+
+function wrapDocument(title: string, bodyInner: string, mode: PdfMode = 'share'): string {
+  const footerText = mode === 'print'
+    ? (t('pdf.footerPrint') as string)
+    : (t('pdf.footerShare') as string);
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(getLocale())}">
 <head>
@@ -60,7 +84,9 @@ function wrapDocument(title: string, bodyInner: string): string {
   <style>${PRINT_STYLES}</style>
 </head>
 <body>
+<div class="doc-header"><span class="doc-brand">Terrana</span></div>
 ${bodyInner}
+<div class="doc-footer">${escapeHtml(footerText)}</div>
 </body>
 </html>`;
 }
@@ -76,7 +102,7 @@ function formatBlendIsoDate(iso: string): string {
 }
 
 /** Erstellt druckfreundliches HTML für eine Mischung. */
-export function generateBlendHTML(blend: Blend): string {
+export function generateBlendHTML(blend: Blend, mode: PdfMode = 'share'): string {
   const kindLabels: Record<Blend['kind'], string> = {
     mix: t('blends.kindMix') as string,
     combination: t('blends.kindCombination') as string,
@@ -200,10 +226,10 @@ ${typeBody}
   <p>${created}</p>
 `;
 
-  return wrapDocument(blend.name, inner);
+  return wrapDocument(blend.name, inner, mode);
 }
 
-function generateProductHTML(product: Product): string {
+function generateProductHTML(product: Product, mode: PdfMode = 'share'): string {
   const usagesHtml =
     product.usages.length === 0
       ? `<p class="muted">${escapeHtml(t('pdf.productNoUsages') as string)}</p>`
@@ -236,7 +262,7 @@ function generateProductHTML(product: Product): string {
   ${tagsBlock}
 `;
 
-  return wrapDocument(product.name, inner);
+  return wrapDocument(product.name, inner, mode);
 }
 
 async function shareHtmlAsPdf(html: string, dialogTitle: string): Promise<void> {
@@ -269,7 +295,7 @@ async function shareHtmlAsPdf(html: string, dialogTitle: string): Promise<void> 
 export async function exportBlendAsPDF(blend: Blend): Promise<void> {
   try {
     await shareHtmlAsPdf(
-      generateBlendHTML(blend),
+      generateBlendHTML(blend, 'share'),
       t('pdf.blendDialogTitle', { name: blend.name }) as string,
     );
   } catch (e) {
@@ -281,7 +307,7 @@ export async function exportBlendAsPDF(blend: Blend): Promise<void> {
 export async function exportProductAsPDF(product: Product): Promise<void> {
   try {
     await shareHtmlAsPdf(
-      generateProductHTML(product),
+      generateProductHTML(product, 'share'),
       t('pdf.productDialogTitle', { name: product.name }) as string,
     );
   } catch (e) {
@@ -291,22 +317,28 @@ export async function exportProductAsPDF(product: Product): Promise<void> {
 }
 
 export async function printProduct(product: Product): Promise<void> {
-  await Print.printAsync({ html: generateProductHTML(product) });
+  await Print.printAsync({ html: generateProductHTML(product, 'print') });
 }
 
 export async function printBlend(blend: Blend): Promise<void> {
-  await Print.printAsync({ html: generateBlendHTML(blend) });
+  await Print.printAsync({ html: generateBlendHTML(blend, 'print') });
 }
 
 function generateCollectionHTML(products: Product[]): string {
   const locale = getLocale();
   const date = new Date().toLocaleDateString(locale, { dateStyle: 'medium' });
   const title = t('pdf.collectionTitle') as string;
+
+  // Extract only the body content from each product's HTML (strip full doc wrapper)
   const sections = products
     .map(
       (p, i) => `
   ${i > 0 ? '<hr style="margin:32px 0;border:none;border-top:1px solid #ddd" />' : ''}
-  ${generateProductHTML(p).replace(/^[\s\S]*?<body[^>]*>/, '').replace(/<\/body>[\s\S]*$/, '')}
+  ${generateProductHTML(p, 'share')
+    .replace(/^[\s\S]*?<body[^>]*>/, '')
+    .replace(/<div class="doc-header">[\s\S]*?<\/div>/, '')
+    .replace(/<div class="doc-footer">[\s\S]*?<\/div>/, '')
+    .replace(/<\/body>[\s\S]*$/, '')}
 `,
     )
     .join('');
@@ -316,7 +348,7 @@ function generateCollectionHTML(products: Product[]): string {
   <p class="muted">${escapeHtml(date)} · ${products.length} ${escapeHtml(t('pdf.collectionCount') as string)}</p>
   ${sections}
 `;
-  return wrapDocument(title, inner);
+  return wrapDocument(title, inner, 'share');
 }
 
 export async function exportCollectionAsPDF(products: Product[]): Promise<void> {

@@ -228,7 +228,7 @@ export default function ImportTab() {
         createdAt: now,
         updatedAt: now,
       };
-      await saveProduct(savedProduct, { isPro: isPro || isLifetime });
+      await saveProduct(savedProduct, { isPro: isPro || isLifetime, isLifetime });
       resetFlow();
       router.push('/product/' + savedProduct.id);
     } catch (e) {

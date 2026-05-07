@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FREE_BLEND_LIMIT } from '../../constants/limits';
+import { FREE_BLEND_LIMIT, LIFETIME_LIMIT, PRO_BLEND_LIMIT } from '../../constants/limits';
 import { LimitExceededError } from './errors';
 import type {
   Blend,
@@ -401,7 +401,7 @@ export async function getBlendById(id: string): Promise<Blend | null> {
 
 export async function saveBlend(
   blend: Blend,
-  options?: { isPro?: boolean },
+  options?: { isPro?: boolean; isLifetime?: boolean },
 ): Promise<void> {
   const normalized = normalizeStoredBlend(blend);
   const blends = await readBlends();
@@ -409,8 +409,13 @@ export async function saveBlend(
   if (idx >= 0) {
     blends[idx] = normalized;
   } else {
-    if (!options?.isPro && blends.length >= FREE_BLEND_LIMIT) {
-      throw new LimitExceededError('blend', FREE_BLEND_LIMIT);
+    const limit = options?.isLifetime
+      ? LIFETIME_LIMIT
+      : options?.isPro
+        ? PRO_BLEND_LIMIT
+        : FREE_BLEND_LIMIT;
+    if (blends.length >= limit) {
+      throw new LimitExceededError('blend', limit);
     }
     blends.push(normalized);
   }

@@ -2,6 +2,13 @@ export const FREE_PRODUCT_LIMIT = 10;
 export const FREE_BLEND_LIMIT = 5;
 export const FREE_IMPORT_LIMIT = 10;
 
+export const PRO_PRODUCT_LIMIT = 100;
+export const PRO_BLEND_LIMIT = 100;
+export const PRO_IMPORT_LIMIT = 100;
+
+/** Effective unlimited cap for Lifetime users (never reached in normal use). */
+export const LIFETIME_LIMIT = 10_000;
+
 /** Show limit-warning banner when count reaches these thresholds. */
 export const FREE_PRODUCT_WARN = FREE_PRODUCT_LIMIT - 2;  // 8
 export const FREE_BLEND_WARN   = FREE_BLEND_LIMIT - 1;    // 4
@@ -15,11 +22,11 @@ export const PRO_FEATURES = [
   'unlimited_blends',
   'importer',
   'share_whatsapp_mail',
+  'pdf_export',
 ] as const;
 
 export const LIFETIME_FEATURES = [
   ...PRO_FEATURES,
-  'pdf_export',
   'printing',
   'inventory',
   'future_features',

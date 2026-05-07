@@ -234,7 +234,7 @@ export default function NewBlendScreen() {
     }
 
     try {
-      await saveBlend(blend, { isPro: isPro || isLifetime });
+      await saveBlend(blend, { isPro: isPro || isLifetime, isLifetime });
     } catch (e) {
       if (e instanceof LimitExceededError) {
         router.push('/paywall');
