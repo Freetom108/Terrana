@@ -1,6 +1,9 @@
 import { colors } from '../../constants/colors';
+import { usePro } from '../../hooks/usePro';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
+import { exportBlendAsPDF, printBlend } from '../../services/export/pdfExport';
+import { shareBlend } from '../../services/export/shareService';
 import { getBlendById, updateBlend } from '../../services/storage/blends';
 import {
   blendKindLabelKey,
@@ -157,6 +160,7 @@ export default function BlendScreen() {
   const insets = useSafeAreaInsets();
   const palette = useThemePalette();
   const p = palette;
+  const { isPro, isLifetime } = usePro();
 
   const [blend, setBlend] = useState<Blend | null | undefined>(undefined);
   const [editing, setEditing] = useState(false);
@@ -330,6 +334,47 @@ export default function BlendScreen() {
     setDraft({ ...draft, tags: uniqueTrimmedTags([...draft.tags, x]) });
   }, [draft, tagInput]);
 
+  const handleShare = useCallback(() => {
+    if (!blend) return;
+    if (!isPro && !isLifetime) {
+      router.push('/paywall');
+      return;
+    }
+    void shareBlend(blend).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert('Share', msg);
+    });
+  }, [blend, isPro, isLifetime]);
+
+  const handlePdfPrint = useCallback(() => {
+    if (!blend) return;
+    if (!isLifetime) {
+      router.push('/paywall');
+      return;
+    }
+    Alert.alert(
+      blend.name,
+      undefined,
+      [
+        {
+          text: t('pdf.print') as string,
+          onPress: () => void printBlend(blend).catch((e) => {
+            const msg = e instanceof Error ? e.message : String(e);
+            Alert.alert('Print', msg);
+          }),
+        },
+        {
+          text: 'PDF',
+          onPress: () => void exportBlendAsPDF(blend).catch((e) => {
+            const msg = e instanceof Error ? e.message : String(e);
+            Alert.alert('PDF', msg);
+          }),
+        },
+        { text: t('general.cancel') as string, style: 'cancel' },
+      ],
+    );
+  }, [blend, isLifetime]);
+
   if (blend === undefined) {
     return (
       <View style={[styles.centered, { backgroundColor: p.surface }]}>
@@ -421,15 +466,35 @@ export default function BlendScreen() {
               </Pressable>
             </View>
           ) : (
-            <Pressable
-              onPress={enterEdit}
-              accessibilityRole="button"
-              accessibilityLabel={t('blend.edit')}
-              style={styles.iconBtn}
-              hitSlop={12}
-            >
-              <Ionicons name="pencil-outline" size={26} color={colors.white} />
-            </Pressable>
+            <View style={styles.heroActions}>
+              <Pressable
+                onPress={handleShare}
+                accessibilityRole="button"
+                accessibilityLabel="Share"
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="share-outline" size={24} color={colors.white} />
+              </Pressable>
+              <Pressable
+                onPress={handlePdfPrint}
+                accessibilityRole="button"
+                accessibilityLabel="PDF / Print"
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="document-text-outline" size={24} color={colors.white} />
+              </Pressable>
+              <Pressable
+                onPress={enterEdit}
+                accessibilityRole="button"
+                accessibilityLabel={t('blend.edit')}
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="pencil-outline" size={26} color={colors.white} />
+              </Pressable>
+            </View>
           )}
         </View>
 

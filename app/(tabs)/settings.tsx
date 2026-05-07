@@ -4,8 +4,10 @@ import {
   applyThemePreference,
 } from '../../constants/themePreference';
 import { usePro } from '../../hooks/usePro';
+import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { getLocale, setLocale, t } from '../../services/i18n/i18n';
+import { exportCollectionAsPDF } from '../../services/export/pdfExport';
 import {
   getThemePreference,
   setSavedLanguageCode,
@@ -15,6 +17,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useReducer, useState } from 'react';
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -55,8 +58,10 @@ export default function SettingsTab() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isPro, isLifetime, reload } = usePro();
+  const { products, refreshProducts } = useProducts();
   const [, bump] = useReducer((x: number) => x + 1, 0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const [themePref, setThemePrefState] = useState<ThemePreference>('auto');
 
@@ -64,8 +69,29 @@ export default function SettingsTab() {
     useCallback(() => {
       void reload();
       void getThemePreference().then(setThemePrefState);
-    }, [reload]),
+      void refreshProducts();
+    }, [reload, refreshProducts]),
   );
+
+  const handleExportCollection = useCallback(async () => {
+    if (!isLifetime) {
+      router.push('/paywall');
+      return;
+    }
+    if (products.length === 0) {
+      Alert.alert(t('home.emptyProductsTitle') as string, t('home.emptyProductsMessage') as string);
+      return;
+    }
+    setExportingPdf(true);
+    try {
+      await exportCollectionAsPDF(products);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert('PDF', msg);
+    } finally {
+      setExportingPdf(false);
+    }
+  }, [isLifetime, products, router]);
 
   const surfaceBg = p.surface;
   const headline = p.text;
@@ -239,6 +265,40 @@ export default function SettingsTab() {
               </View>
             );
           })}
+        </View>
+
+        {/* ── Export ── */}
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
+          {t('settings.sectionExport')}
+        </Text>
+        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
+          <Pressable
+            style={styles.exportRow}
+            onPress={() => void handleExportCollection()}
+            accessibilityRole="button"
+            disabled={exportingPdf}
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons
+                name="document-text-outline"
+                size={22}
+                color={isLifetime ? colors.sage : p.muted}
+              />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, { color: headline, opacity: exportingPdf ? 0.5 : 1 }]}>
+                  {t('settings.exportCollection') as string}
+                </Text>
+                <Text style={[styles.exportRowHint, { color: muted }]}>
+                  {t('settings.exportCollectionHint') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons
+              name={isLifetime ? 'chevron-forward' : 'lock-closed-outline'}
+              size={18}
+              color={muted}
+            />
+          </Pressable>
         </View>
 
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
@@ -452,5 +512,31 @@ const styles = StyleSheet.create({
   faqDivider: {
     height: StyleSheet.hairlineWidth,
     marginHorizontal: 16,
+  },
+  exportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 12,
+  },
+  exportRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  exportRowText: {
+    flex: 1,
+  },
+  exportRowTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  exportRowHint: {
+    fontSize: 12,
+    fontWeight: '400',
   },
 });

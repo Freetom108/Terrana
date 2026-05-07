@@ -2,13 +2,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { getIsLifetime, getIsPro } from '../services/storage/settings';
 
 export function usePro() {
-  const [isPro, setIsPro] = useState(false);
-  const [isLifetime, setIsLifetime] = useState(false);
+  // TODO: REMOVE BEFORE RELEASE - Test mode only
+  const [isPro, setIsPro] = useState(true);
+  const [isLifetime, setIsLifetime] = useState(true);
 
   const load = useCallback(async () => {
-    const [pro, lifetime] = await Promise.all([getIsPro(), getIsLifetime()]);
-    setIsPro(pro);
-    setIsLifetime(lifetime);
+    // TODO: REMOVE BEFORE RELEASE - Test mode only (restore lines below)
+    setIsPro(true);
+    setIsLifetime(true);
+    // const [pro, lifetime] = await Promise.all([getIsPro(), getIsLifetime()]);
+    // setIsPro(pro);
+    // setIsLifetime(lifetime);
   }, []);
 
   useEffect(() => {

@@ -2,10 +2,10 @@ import { HomeProductCard } from '../../components/home/HomeListCards';
 import { colors } from '../../constants/colors';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
-import { t } from '../../services/i18n/i18n';
+import { subscribeLocale, t } from '../../services/i18n/i18n';
 import type { Product } from '../../types/product';
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -35,6 +35,8 @@ export default function SearchTab() {
   const { products, refreshProducts } = useProducts();
   const [rawQuery, setRawQuery] = useState('');
   const inputRef = useRef<TextInput>(null);
+  const [, redraw] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => subscribeLocale(redraw), []);
 
   useFocusEffect(
     useCallback(() => {

@@ -289,3 +289,44 @@ export async function exportProductAsPDF(product: Product): Promise<void> {
     throw new Error(`PDF export failed: ${msg}`, { cause: e });
   }
 }
+
+export async function printProduct(product: Product): Promise<void> {
+  await Print.printAsync({ html: generateProductHTML(product) });
+}
+
+export async function printBlend(blend: Blend): Promise<void> {
+  await Print.printAsync({ html: generateBlendHTML(blend) });
+}
+
+function generateCollectionHTML(products: Product[]): string {
+  const locale = getLocale();
+  const date = new Date().toLocaleDateString(locale, { dateStyle: 'medium' });
+  const title = t('pdf.collectionTitle') as string;
+  const sections = products
+    .map(
+      (p, i) => `
+  ${i > 0 ? '<hr style="margin:32px 0;border:none;border-top:1px solid #ddd" />' : ''}
+  ${generateProductHTML(p).replace(/^[\s\S]*?<body[^>]*>/, '').replace(/<\/body>[\s\S]*$/, '')}
+`,
+    )
+    .join('');
+
+  const inner = `
+  <h1>${escapeHtml(title)}</h1>
+  <p class="muted">${escapeHtml(date)} · ${products.length} ${escapeHtml(t('pdf.collectionCount') as string)}</p>
+  ${sections}
+`;
+  return wrapDocument(title, inner);
+}
+
+export async function exportCollectionAsPDF(products: Product[]): Promise<void> {
+  try {
+    await shareHtmlAsPdf(
+      generateCollectionHTML(products),
+      t('pdf.collectionDialogTitle') as string,
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`PDF export failed: ${msg}`, { cause: e });
+  }
+}

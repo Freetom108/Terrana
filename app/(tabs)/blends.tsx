@@ -3,11 +3,11 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
 import { useBlends } from '../../hooks/useBlends';
 import { useThemePalette } from '../../hooks/useThemePalette';
-import { t } from '../../services/i18n/i18n';
+import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { BLEND_KINDS, blendKindLabelKey, type Blend, type BlendKind } from '../../types/blend';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -25,6 +25,8 @@ export default function BlendsTab() {
   const insets = useSafeAreaInsets();
   const { blends, refreshBlends } = useBlends();
   const [filter, setFilter] = useState<FilterKey>('all');
+  const [, redraw] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => subscribeLocale(redraw), []);
 
   useFocusEffect(
     useCallback(() => {

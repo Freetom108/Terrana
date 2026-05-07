@@ -7,12 +7,12 @@ import { usePro } from '../../hooks/usePro';
 import type { ThemePalette } from '../../hooks/useThemePalette';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { extractProductFromText } from '../../services/ai/extractor';
-import { t } from '../../services/i18n/i18n';
+import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { LimitExceededError } from '../../services/storage/errors';
 import { saveProduct } from '../../services/storage/products';
 import type { InventoryLevel, Product } from '../../types/product';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -127,10 +127,13 @@ function FieldBlock({
 export default function ImportTab() {
   const palette = useThemePalette();
   const router = useRouter();
+  const [, redraw] = useReducer((n: number) => n + 1, 0);
   const { canImport, importsUsed, incrementImport, refresh } = useImportLimit();
   const { isPro, isLifetime } = usePro();
   const isFreeUser = !isPro && !isLifetime;
   const showImportProgress = isFreeUser && importsUsed >= FREE_IMPORT_WARN;
+
+  useEffect(() => subscribeLocale(redraw), []);
 
   const [sourceText, setSourceText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -363,6 +366,7 @@ export default function ImportTab() {
                     labelKey="import.fieldBrand"
                     value={form.brand}
                     onChangeText={(brand) => setForm((f) => ({ ...f, brand }))}
+                    placeholder="Wikipedia"
                   />
                   <FieldBlock
                     palette={palette}

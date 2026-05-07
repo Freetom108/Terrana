@@ -12,6 +12,9 @@
     "collection": "Collection",
     "blends": "Blends",
     "allProducts": "All products",
+    "selectBtn": "Select",
+    "cancelSelect": "Done",
+    "shareSelected": "Share (%{count})",
     "myBlends": "My blends",
     "inventory": "Inventory",
     "lastUsed": "Last used",
@@ -40,7 +43,7 @@
     "upgradeMessage": "You've used your %{limit} free imports. Upgrade to Pro.",
     "fieldProductName": "Product name",
     "fieldPlaceholderName": "Enter product name...",
-    "fieldBrand": "Brand",
+    "fieldBrand": "Source / Brand",
     "fieldCategory": "Category",
     "fieldDescription": "Short description",
     "fieldUsages": "Uses",
@@ -82,6 +85,9 @@
     "upgradeLifetimeTitle": "Lifetime Member 💎",
     "upgradeLifetimeHint": "Thank you for your support!",
     "sectionFaq": "FAQ",
+    "sectionExport": "EXPORT",
+    "exportCollection": "Export collection as PDF",
+    "exportCollectionHint": "All products in one PDF (Lifetime)",
     "sectionAbout": "ABOUT TERRANA",
     "appNameLabel": "App",
     "appName": "Terrana",
@@ -249,7 +255,18 @@
     "productDescriptionNotes": "Description & Notes",
     "productTags": "Tags",
     "blendDialogTitle": "Blend: %{name}",
-    "productDialogTitle": "Product: %{name}"
+    "productDialogTitle": "Product: %{name}",
+    "print": "Print",
+    "collectionTitle": "My Collection",
+    "collectionDialogTitle": "My Collection – Terrana",
+    "collectionCount": "products"
+  },
+  "share": {
+    "usages": "Applications",
+    "ingredients": "Ingredients",
+    "tags": "Tags",
+    "footer": "— via Terrana",
+    "multiProducts": "%{count} products"
   },
   "limits": {
     "productLimitTitle": "Limit reached",

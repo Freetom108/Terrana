@@ -1,7 +1,10 @@
 import { PRODUCT_CATEGORIES } from '../../constants/categories';
 import { colors } from '../../constants/colors';
+import { usePro } from '../../hooks/usePro';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
+import { exportProductAsPDF, printProduct } from '../../services/export/pdfExport';
+import { shareProduct } from '../../services/export/shareService';
 import { deleteProduct, getProductById, saveProduct } from '../../services/storage/products';
 import type { InventoryLevel, Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -56,6 +59,7 @@ export default function ProductScreen() {
   const insets = useSafeAreaInsets();
   const palette = useThemePalette();
   const p = palette;
+  const { isPro, isLifetime } = usePro();
 
   const [product, setProduct] = useState<Product | null | undefined>(undefined);
   const [editing, setEditing] = useState(false);
@@ -151,6 +155,47 @@ export default function ProductScreen() {
     );
   }, [product]);
 
+  const handleShare = useCallback(() => {
+    if (!product) return;
+    if (!isPro && !isLifetime) {
+      router.push('/paywall');
+      return;
+    }
+    void shareProduct(product).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert('Share', msg);
+    });
+  }, [product, isPro, isLifetime]);
+
+  const handlePdfPrint = useCallback(() => {
+    if (!product) return;
+    if (!isLifetime) {
+      router.push('/paywall');
+      return;
+    }
+    Alert.alert(
+      product.name,
+      undefined,
+      [
+        {
+          text: t('pdf.print') as string,
+          onPress: () => void printProduct(product).catch((e) => {
+            const msg = e instanceof Error ? e.message : String(e);
+            Alert.alert('Print', msg);
+          }),
+        },
+        {
+          text: 'PDF',
+          onPress: () => void exportProductAsPDF(product).catch((e) => {
+            const msg = e instanceof Error ? e.message : String(e);
+            Alert.alert('PDF', msg);
+          }),
+        },
+        { text: t('general.cancel') as string, style: 'cancel' },
+      ],
+    );
+  }, [product, isLifetime]);
+
   const starColor = p.isDark ? colors.sageLight : colors.sageDark;
   const starEmpty = p.muted;
 
@@ -229,6 +274,24 @@ export default function ProductScreen() {
             </View>
           ) : (
             <View style={styles.heroActions}>
+              <Pressable
+                onPress={handleShare}
+                accessibilityRole="button"
+                accessibilityLabel="Share"
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="share-outline" size={24} color={colors.white} />
+              </Pressable>
+              <Pressable
+                onPress={handlePdfPrint}
+                accessibilityRole="button"
+                accessibilityLabel="PDF / Print"
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="document-text-outline" size={24} color={colors.white} />
+              </Pressable>
               <Pressable
                 onPress={handleDelete}
                 accessibilityRole="button"
