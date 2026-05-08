@@ -8,6 +8,7 @@ import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { getLocale, setLocale, t } from '../../services/i18n/i18n';
 import { exportCollectionAsPDF } from '../../services/export/pdfExport';
+import { createBackup, restoreBackup } from '../../services/storage/backup';
 import {
   getThemePreference,
   setSavedLanguageCode,
@@ -33,7 +34,6 @@ const APP_VERSION = '1.0.0';
 
 const FAQ_ITEMS = [
   { q: 'faq.q1', a: 'faq.a1', btnKey: undefined },
-  { q: 'faq.q2', a: 'faq.a2', btnKey: undefined },
   { q: 'faq.q3', a: 'faq.a3', btnKey: undefined },
   { q: 'faq.q4', a: 'faq.a4', btnKey: undefined },
   { q: 'faq.q5', a: 'faq.a5', btnKey: undefined },
@@ -63,6 +63,8 @@ export default function SettingsTab() {
   const [, bump] = useReducer((x: number) => x + 1, 0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [exportingPdf, setExportingPdf] = useState(false);
+  const [backingUp, setBackingUp] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   const [themePref, setThemePrefState] = useState<ThemePreference>('auto');
 
@@ -93,6 +95,33 @@ export default function SettingsTab() {
       setExportingPdf(false);
     }
   }, [isPro, isLifetime, products, router]);
+
+  const handleBackup = useCallback(async () => {
+    setBackingUp(true);
+    try {
+      await createBackup();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert(t('backup.errorTitle') as string, msg);
+    } finally {
+      setBackingUp(false);
+    }
+  }, []);
+
+  const handleRestore = useCallback(async () => {
+    setRestoring(true);
+    try {
+      const completed = await restoreBackup();
+      if (completed) {
+        router.replace('/(tabs)');
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert(t('backup.errorTitle') as string, msg);
+    } finally {
+      setRestoring(false);
+    }
+  }, [router]);
 
   const surfaceBg = p.surface;
   const headline = p.text;
@@ -311,6 +340,79 @@ export default function SettingsTab() {
               color={muted}
             />
           </Pressable>
+        </View>
+
+        {/* ── Backup & Restore ── */}
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
+          {t('settings.sectionBackup')}
+        </Text>
+        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
+          {isLifetime ? (
+            <>
+              {/* Backup */}
+              <Pressable
+                style={styles.exportRow}
+                onPress={() => void handleBackup()}
+                accessibilityRole="button"
+                disabled={backingUp}
+              >
+                <View style={styles.exportRowLeft}>
+                  <Ionicons name="cloud-upload-outline" size={22} color={colors.sageDark} />
+                  <View style={styles.exportRowText}>
+                    <Text style={[styles.exportRowTitle, { color: headline, opacity: backingUp ? 0.5 : 1 }]}>
+                      {t('settings.backupCreate') as string}
+                    </Text>
+                    <Text style={[styles.exportRowHint, { color: muted }]}>
+                      {t('settings.backupCreateHint') as string}
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={muted} />
+              </Pressable>
+
+              <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+
+              {/* Restore */}
+              <Pressable
+                style={styles.exportRow}
+                onPress={() => void handleRestore()}
+                accessibilityRole="button"
+                disabled={restoring}
+              >
+                <View style={styles.exportRowLeft}>
+                  <Ionicons name="cloud-download-outline" size={22} color={colors.sageDark} />
+                  <View style={styles.exportRowText}>
+                    <Text style={[styles.exportRowTitle, { color: headline, opacity: restoring ? 0.5 : 1 }]}>
+                      {t('settings.backupRestore') as string}
+                    </Text>
+                    <Text style={[styles.exportRowHint, { color: muted }]}>
+                      {t('settings.backupRestoreHint') as string}
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={muted} />
+              </Pressable>
+            </>
+          ) : (
+            <Pressable
+              style={styles.exportRow}
+              onPress={() => router.push('/paywall')}
+              accessibilityRole="button"
+            >
+              <View style={styles.exportRowLeft}>
+                <Ionicons name="lock-closed-outline" size={22} color={muted} />
+                <View style={styles.exportRowText}>
+                  <Text style={[styles.exportRowTitle, { color: headline }]}>
+                    {t('settings.backupCreate') as string}
+                  </Text>
+                  <Text style={[styles.exportRowHint, { color: muted }]}>
+                    {t('settings.backupLockedHint') as string}
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={muted} />
+            </Pressable>
+          )}
         </View>
 
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>

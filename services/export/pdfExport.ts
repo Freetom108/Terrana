@@ -6,22 +6,23 @@ import type { Product } from '../../types/product';
 
 const PRINT_STYLES = `
   * { box-sizing: border-box; }
+  @page { margin: 24px; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #222;
     line-height: 1.6;
     max-width: 720px;
     margin: 0 auto;
-    padding: 40px;
+    padding: 24px;
     font-size: 14px;
   }
   .doc-header {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
   .doc-brand {
-    font-size: 14px;
+    font-size: 36px;
     font-style: italic;
     font-weight: 700;
     color: #4A6B4E;
@@ -47,15 +48,15 @@ const PRINT_STYLES = `
   .tags, .muted { color: #444; }
   .notes { white-space: pre-wrap; }
   .doc-footer {
-    margin-top: 40px;
+    margin-top: 36px;
     padding-top: 12px;
     border-top: 1px solid #ddd;
-    font-size: 11px;
+    font-size: 20px;
     color: #7A9E7E;
     text-align: right;
   }
   @media print {
-    body { padding: 0; max-width: none; }
+    body { max-width: none; }
     a { color: inherit; text-decoration: none; }
   }
 `;

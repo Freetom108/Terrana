@@ -42,19 +42,19 @@ const FEATURES: FeatureRow[] = [
     labelKey: 'paywall.featureProducts',
     free: String(FREE_PRODUCT_LIMIT),
     pro: String(PRO_PRODUCT_LIMIT),
-    lifetime: '∞',
+    lifetime: '1.000',
   },
   {
     labelKey: 'paywall.featureBlends',
     free: String(FREE_BLEND_LIMIT),
     pro: String(PRO_BLEND_LIMIT),
-    lifetime: '∞',
+    lifetime: '1.000',
   },
   {
     labelKey: 'paywall.featureAiImport',
     free: String(FREE_IMPORT_LIMIT),
     pro: String(PRO_IMPORT_LIMIT),
-    lifetime: '∞',
+    lifetime: '1.000',
   },
   {
     labelKey: 'paywall.featureSharing',
@@ -76,6 +76,12 @@ const FEATURES: FeatureRow[] = [
   },
   {
     labelKey: 'paywall.featureInventory',
+    free: false,
+    pro: false,
+    lifetime: true,
+  },
+  {
+    labelKey: 'paywall.featureBackup',
     free: false,
     pro: false,
     lifetime: true,
@@ -210,6 +216,11 @@ export default function PaywallScreen() {
             </View>
           ))}
         </View>
+
+        {/* ── Backup tagline ── */}
+        <Text style={[styles.backupTagline, { color: p.muted }]}>
+          {t('paywall.backupTagline') as string}
+        </Text>
 
         {/* ── Sharing highlight card ── */}
         <View
@@ -427,6 +438,15 @@ const styles = StyleSheet.create({
     color: colors.sageDark,
   },
 
+  backupTagline: {
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: -4,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+  },
+
   /* Sharing card */
   sharingCard: {
     borderRadius: 16,
@@ -535,7 +555,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
   },
-
   /* Footer */
   footer: {
     alignItems: 'center',
