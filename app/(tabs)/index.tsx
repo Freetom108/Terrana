@@ -12,18 +12,23 @@ import { usePro } from '../../hooks/usePro';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
-import { shareProducts } from '../../services/export/shareService';
 import type { Product } from '../../types/product';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LAST_USED_LIMIT = 3;
-const ALL_PRODUCTS_LIMIT = 5;
 const BLENDS_LIMIT = 3;
+
+function getGreetingKey(): string {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 11) return 'home.greetingMorning';
+  if (h >= 11 && h < 17) return 'home.greetingAfternoon';
+  if (h >= 17 && h < 22) return 'home.greetingEvening';
+  return 'home.greetingNight';
+}
 function sortByUpdatedDesc(a: Product, b: Product): number {
   const ta = Date.parse(a.updatedAt || a.createdAt);
   const tb = Date.parse(b.updatedAt || b.createdAt);
@@ -53,47 +58,30 @@ export default function HomeTab() {
     }, [refreshProducts, refreshBlends, reloadPro]),
   );
 
+  const [greetingKey, setGreetingKey] = useState(getGreetingKey);
+
+  useFocusEffect(
+    useCallback(() => {
+      setGreetingKey(getGreetingKey());
+    }, []),
+  );
+
   const isFreeUser = !isPro && !isLifetime;
-
-  const [selectMode, setSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-
-  const toggleSelectMode = useCallback(() => {
-    if (!isPro && !isLifetime) {
-      router.push('/paywall');
-      return;
-    }
-    setSelectMode((prev) => {
-      if (prev) setSelectedIds(new Set());
-      return !prev;
-    });
-  }, [isPro, isLifetime, router]);
-
-  const toggleSelected = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const handleShareSelected = useCallback(() => {
-    const toShare = products.filter((p) => selectedIds.has(p.id));
-    if (toShare.length === 0) return;
-    void shareProducts(toShare).catch((e) => {
-      const msg = e instanceof Error ? e.message : String(e);
-      Alert.alert('Share', msg);
-    });
-  }, [products, selectedIds]);
 
   const productCount = products.length;
   const blendCount = blends.length;
 
-  const statsSubtitle = t('home.statsSubtitle', {
-    productCount,
-    blendCount,
-  });
+  const statsSubtitle = useMemo(() => {
+    const productLabel =
+      productCount === 1
+        ? (t('home.statProduct') as string)
+        : (t('home.statProducts', { count: productCount }) as string);
+    const blendLabel =
+      blendCount === 1
+        ? (t('home.statBlend') as string)
+        : (t('home.statBlends', { count: blendCount }) as string);
+    return `${productLabel} · ${blendLabel}`;
+  }, [productCount, blendCount]);
 
   const byUpdated = useMemo(() => [...products].sort(sortByUpdatedDesc), [products]);
   const byName = useMemo(() => [...products].sort(sortByName), [products]);
@@ -109,11 +97,9 @@ export default function HomeTab() {
   }, [products, byUpdated]);
 
   const recentlyUsedPreview = recentlyUsed.slice(0, LAST_USED_LIMIT);
-  const productsByNamePreview = byName.slice(0, ALL_PRODUCTS_LIMIT);
   const blendsPreview = blends.slice(0, BLENDS_LIMIT);
 
   const showMoreRecentlyUsed = recentlyUsed.length > LAST_USED_LIMIT;
-  const showMoreAllProducts = byName.length > ALL_PRODUCTS_LIMIT;
   const showMoreBlends = blends.length > BLENDS_LIMIT;
 
   const showProductEmpty = productCount === 0;
@@ -127,7 +113,7 @@ export default function HomeTab() {
         end={{ x: 0, y: 1 }}
         style={[styles.header, { paddingTop: insets.top + 20 }]}
       >
-        <Text style={styles.greeting}>{t('home.greetingMorning')}</Text>
+        <Text style={styles.greeting}>{t(greetingKey)}</Text>
         <Text style={styles.statsLine}>{statsSubtitle}</Text>
 
         <Link href="/search" asChild>
@@ -176,25 +162,6 @@ export default function HomeTab() {
             <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
               {t('home.allProducts')}
             </Text>
-            {!showProductEmpty && showMoreAllProducts && !selectMode ? (
-              <Link href="/all-products" asChild>
-                <Pressable hitSlop={8} accessibilityRole="link">
-                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>{t('home.viewAll')}</Text>
-                </Pressable>
-              </Link>
-            ) : null}
-            {!showProductEmpty ? (
-              <Pressable
-                onPress={toggleSelectMode}
-                hitSlop={8}
-                accessibilityRole="button"
-                style={selectMode ? styles.selectDoneBtn : styles.selectBtn}
-              >
-                <Text style={selectMode ? styles.selectDoneBtnText : [styles.selectBtnText, { color: p.secondaryBtnLabel }]}>
-                  {selectMode ? t('home.cancelSelect') : t('home.selectBtn')}
-                </Text>
-              </Pressable>
-            ) : null}
           </View>
           {showProductEmpty ? (
             <EmptyState
@@ -202,46 +169,9 @@ export default function HomeTab() {
               message={t('home.emptyProductsMessage')}
               emoji="📦"
             />
-          ) : selectMode ? (
-            <View style={styles.productStack}>
-              {byName.map((prod) => {
-                const selected = selectedIds.has(prod.id);
-                return (
-                  <Pressable
-                    key={`sel-${prod.id}`}
-                    onPress={() => toggleSelected(prod.id)}
-                    style={[
-                      styles.selectableCard,
-                      {
-                        backgroundColor: selected
-                          ? (p.isDark ? '#1E3320' : '#EAF4EC')
-                          : p.card,
-                        borderColor: selected ? colors.sage : p.border,
-                      },
-                    ]}
-                    accessibilityRole="checkbox"
-                    accessibilityState={{ checked: selected }}
-                  >
-                    <Ionicons
-                      name={selected ? 'checkbox' : 'square-outline'}
-                      size={22}
-                      color={selected ? colors.sage : p.muted}
-                    />
-                    <View style={styles.selectableContent}>
-                      <Text style={[styles.selectableName, { color: p.text }]} numberOfLines={1}>
-                        {prod.name}
-                      </Text>
-                      <Text style={[styles.selectableMeta, { color: p.muted }]} numberOfLines={1}>
-                        {prod.brand ? `${prod.brand} · ` : ''}{prod.category}
-                      </Text>
-                    </View>
-                  </Pressable>
-                );
-              })}
-            </View>
           ) : (
             <View style={styles.productStack}>
-              {productsByNamePreview.map((prod) => (
+              {byName.map((prod) => (
                 <HomeProductCard key={`all-${prod.id}`} product={prod} palette={palette} />
               ))}
             </View>
@@ -310,29 +240,6 @@ export default function HomeTab() {
         </View>
       </ScrollView>
 
-      {selectMode && selectedIds.size > 0 ? (
-        <View
-          style={[
-            styles.shareBar,
-            {
-              backgroundColor: p.card,
-              borderColor: p.border,
-              paddingBottom: insets.bottom + 8,
-            },
-          ]}
-        >
-          <Pressable
-            onPress={handleShareSelected}
-            style={[styles.shareBarBtn, { backgroundColor: colors.sage }]}
-            accessibilityRole="button"
-          >
-            <Ionicons name="share-outline" size={18} color={colors.white} />
-            <Text style={styles.shareBarBtnText}>
-              {t('home.shareSelected', { count: selectedIds.size }) as string}
-            </Text>
-          </Pressable>
-        </View>
-      ) : null}
     </View>
   );
 }
@@ -427,63 +334,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     flexShrink: 0,
-  },
-  selectBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  selectBtnText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  selectDoneBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: colors.sage,
-  },
-  selectDoneBtnText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  selectableCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-  },
-  selectableContent: {
-    flex: 1,
-  },
-  selectableName: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  selectableMeta: {
-    fontSize: 13,
-  },
-  shareBar: {
-    borderTopWidth: 1,
-    paddingTop: 12,
-    paddingHorizontal: 20,
-  },
-  shareBarBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: 14,
-    paddingVertical: 14,
-  },
-  shareBarBtnText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '700',
   },
 });

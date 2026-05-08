@@ -8,7 +8,14 @@
   "home": {
     "greeting": "Bonjour",
     "greetingMorning": "Bonjour 🌿",
+    "greetingAfternoon": "Bon après-midi 🌿",
+    "greetingEvening": "Bonsoir 🌿",
+    "greetingNight": "Bonne nuit 🌙",
     "statsSubtitle": "%{productCount} produits · %{blendCount} mélanges",
+    "statProduct": "1 produit",
+    "statProducts": "%{count} produits",
+    "statBlend": "1 mélange",
+    "statBlends": "%{count} mélanges",
     "collection": "Collection",
     "blends": "Mélanges",
     "allProducts": "Tous les produits",
@@ -155,7 +162,10 @@
     "notFoundTitle": "Mélange introuvable",
     "notFoundHint": "Revenez en arrière et réessayez.",
     "ingredients": "Ingrédients",
-    "edit": "Modifier le blend"
+    "edit": "Modifier le blend",
+    "deleteTitle": "Supprimer le mélange",
+    "deleteMessage": "Voulez-vous vraiment supprimer \"%{name}\" ? Cette action est irréversible.",
+    "deleteConfirm": "Supprimer"
   },
   "blendNew": {
     "screenTitle": "Nouveau blend",

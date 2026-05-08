@@ -8,7 +8,14 @@
   "home": {
     "greeting": "Guten Tag",
     "greetingMorning": "Guten Morgen 🌿",
+    "greetingAfternoon": "Guten Tag 🌿",
+    "greetingEvening": "Guten Abend 🌿",
+    "greetingNight": "Gute Nacht 🌙",
     "statsSubtitle": "%{productCount} Produkte · %{blendCount} Mischungen",
+    "statProduct": "1 Produkt",
+    "statProducts": "%{count} Produkte",
+    "statBlend": "1 Mischung",
+    "statBlends": "%{count} Mischungen",
     "collection": "Sammlung",
     "blends": "Mischungen",
     "allProducts": "Alle Produkte",
@@ -155,7 +162,10 @@
     "notFoundTitle": "Mischung nicht gefunden",
     "notFoundHint": "Zurück und erneut versuchen.",
     "ingredients": "Zutaten",
-    "edit": "Blend bearbeiten"
+    "edit": "Blend bearbeiten",
+    "deleteTitle": "Mischung löschen",
+    "deleteMessage": "Möchtest du \"%{name}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteConfirm": "Löschen"
   },
   "blendNew": {
     "screenTitle": "Neuer Blend",

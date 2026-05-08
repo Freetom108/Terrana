@@ -4,6 +4,7 @@ import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
 import type { Product } from '../../types/product';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
@@ -95,9 +96,19 @@ export default function SearchTab() {
             onChangeText={setRawQuery}
             autoCorrect={false}
             autoCapitalize="none"
-            clearButtonMode="while-editing"
             returnKeyType="search"
           />
+          {rawQuery.length > 0 && (
+            <Pressable
+              onPress={() => {
+                setRawQuery('');
+                inputRef.current?.focus();
+              }}
+              hitSlop={8}
+            >
+              <Ionicons name="close-circle" size={18} color="#6B6B6B" />
+            </Pressable>
+          )}
         </View>
       </View>
 

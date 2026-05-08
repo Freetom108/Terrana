@@ -25,6 +25,8 @@ const ICON_ROUTE_ICONS = {
 const ICON_SIZE = 24;
 const ICON_ROW_MIN_HEIGHT = 28;
 
+const ICON_ONLY_ROUTES = new Set(['index']);
+
 export function IconTabBar(props: BottomTabBarProps) {
   const { state, navigation } = props;
   const insets = useSafeAreaInsets();
@@ -86,18 +88,20 @@ export function IconTabBar(props: BottomTabBarProps) {
             <View style={styles.iconSlot}>
               <Ionicons name={iconName} size={ICON_SIZE} color={iconColor} />
             </View>
-            <Text
-              style={[
-                styles.label,
-                { color: focused ? p.tabLabelActive : p.tabLabelInactive },
-              ]}
-              numberOfLines={2}
-              adjustsFontSizeToFit
-              minimumFontScale={0.82}
-              maxFontSizeMultiplier={1.12}
-            >
-              {label}
-            </Text>
+            {!ICON_ONLY_ROUTES.has(route.name) ? (
+              <Text
+                style={[
+                  styles.label,
+                  { color: focused ? p.tabLabelActive : p.tabLabelInactive },
+                ]}
+                numberOfLines={2}
+                adjustsFontSizeToFit
+                minimumFontScale={0.82}
+                maxFontSizeMultiplier={1.12}
+              >
+                {label}
+              </Text>
+            ) : null}
           </Pressable>
         );
       })}

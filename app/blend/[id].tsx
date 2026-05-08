@@ -4,7 +4,7 @@ import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
 import { exportBlendAsPDF, printBlend } from '../../services/export/pdfExport';
 import { shareBlend } from '../../services/export/shareService';
-import { getBlendById, updateBlend } from '../../services/storage/blends';
+import { deleteBlend, getBlendById, updateBlend } from '../../services/storage/blends';
 import {
   blendKindLabelKey,
   cloneBlend,
@@ -333,6 +333,26 @@ export default function BlendScreen() {
     if (!x || !draft) return;
     setDraft({ ...draft, tags: uniqueTrimmedTags([...draft.tags, x]) });
   }, [draft, tagInput]);
+
+  const handleDelete = useCallback(() => {
+    if (!blend) return;
+    Alert.alert(
+      t('blend.deleteTitle') as string,
+      t('blend.deleteMessage', { name: blend.name }) as string,
+      [
+        { text: t('general.cancel') as string, style: 'cancel' },
+        {
+          text: t('blend.deleteConfirm') as string,
+          style: 'destructive',
+          onPress: () => {
+            void deleteBlend(blend.id).then(() => {
+              router.replace('/(tabs)');
+            });
+          },
+        },
+      ],
+    );
+  }, [blend]);
 
   const handleShare = useCallback(() => {
     if (!blend) return;
@@ -1045,6 +1065,16 @@ export default function BlendScreen() {
         <Section palette={palette} title={t('blends.detailCreatedHeading')}>
           <Text style={[styles.body, { color: p.text }]}>{formatLocalizedDate(display.createdAt)}</Text>
         </Section>
+
+        <Pressable
+          onPress={handleDelete}
+          style={({ pressed }) => [styles.deleteBtn, pressed && { opacity: 0.75 }]}
+          accessibilityRole="button"
+          accessibilityLabel={t('blend.deleteTitle') as string}
+        >
+          <Ionicons name="trash-outline" size={18} color={colors.white} />
+          <Text style={styles.deleteBtnText}>{t('blend.deleteTitle')}</Text>
+        </Pressable>
       </ScrollView>
     </View>
   );
@@ -1368,5 +1398,22 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 14,
     fontWeight: '600',
+  },
+  deleteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 32,
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: '#C0392B',
+  },
+  deleteBtnText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

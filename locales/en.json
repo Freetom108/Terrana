@@ -8,7 +8,14 @@
   "home": {
     "greeting": "Hello",
     "greetingMorning": "Good morning 🌿",
+    "greetingAfternoon": "Good afternoon 🌿",
+    "greetingEvening": "Good evening 🌿",
+    "greetingNight": "Good night 🌙",
     "statsSubtitle": "%{productCount} products · %{blendCount} blends",
+    "statProduct": "1 product",
+    "statProducts": "%{count} products",
+    "statBlend": "1 blend",
+    "statBlends": "%{count} blends",
     "collection": "Collection",
     "blends": "Blends",
     "allProducts": "All products",
@@ -155,7 +162,10 @@
     "notFoundTitle": "Blend not found",
     "notFoundHint": "Go back and try again.",
     "ingredients": "Ingredients",
-    "edit": "Edit blend"
+    "edit": "Edit blend",
+    "deleteTitle": "Delete blend",
+    "deleteMessage": "Do you really want to delete \"%{name}\"? This cannot be undone.",
+    "deleteConfirm": "Delete"
   },
   "blendNew": {
     "screenTitle": "New blend",
