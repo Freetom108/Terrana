@@ -154,7 +154,8 @@
     "noMatchesTitle": "Nothing in this category",
     "noMatchesMessage": "Try another type tab, or tap All.",
     "detailTypeHeading": "Recipe type",
-    "heroSubtitleMix": "%{count} bottle lines · drops recorded",
+    "heroSubtitleMixOne": "1 ingredient",
+    "heroSubtitleMixOther": "%{count} ingredients",
     "heroSubtitleCombo": "%{count} products in parallel routine",
     "heroSubtitleProtocol": "%{count} steps in timing order",
     "detailMixCarrierHeading": "Carrier / base oil",
@@ -247,8 +248,12 @@
     "a11yBack": "Back",
     "pickFromCollection": "From collection",
     "pickerTitle": "Select product",
+    "pickerTitleCarrierOil": "Carrier / base oils",
     "pickerSearch": "Search…",
-    "pickerEmpty": "No products saved yet"
+    "pickCarrierOilHint": "Type a name or tap ⊕ to pick a carrier oil from your collection.",
+    "pickerEmpty": "No products saved yet",
+    "pickerEmptyCarrier": "No carrier oils in your collection — type the name manually.",
+    "pickerNoResults": "No matching products."
   },
   "blendEdit": {
     "readOnlyHint": "Tap the pencil to edit."

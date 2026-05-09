@@ -1,26 +1,32 @@
+import { categoryLabelKey } from '../../constants/categories';
 import { colors } from '../../constants/colors';
 import { usePro } from '../../hooks/usePro';
+import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
-import { t } from '../../services/i18n/i18n';
+import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { exportBlendAsPDF, printBlend } from '../../services/export/pdfExport';
 import { shareBlend } from '../../services/export/shareService';
 import { deleteBlend, getBlendById, updateBlend } from '../../services/storage/blends';
 import {
   blendKindLabelKey,
+  blendStructuredItemCount,
   cloneBlend,
   deriveDropsFromQuantityLabel,
   type Blend,
   type MixDropletLine,
   type ProtocolTiming,
 } from '../../types/blend';
+import type { Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -87,10 +93,12 @@ function mixBaseOilText(blend: Blend): string | null {
 
 function heroSubtitleForBlend(blend: Blend): string {
   switch (blend.kind) {
-    case 'mix':
-      return t('blends.heroSubtitleMix', {
-        count: blend.mixRecipe?.droplets?.length ?? 0,
+    case 'mix': {
+      const c = blendStructuredItemCount(blend);
+      return t(c === 1 ? 'blends.heroSubtitleMixOne' : 'blends.heroSubtitleMixOther', {
+        count: c,
       }) as string;
+    }
     case 'combination':
       return t('blends.heroSubtitleCombo', {
         count: blend.combinationSlots?.length ?? 0,
@@ -121,6 +129,15 @@ function parsePositiveNumber(raw: string): number | undefined {
   const n = Number(String(raw).replace(',', '.').trim());
   if (!Number.isFinite(n) || n < 0) return undefined;
   return n;
+}
+
+function pickerProductMatchesQuery(product: Product, q: string): boolean {
+  if (product.name.toLowerCase().includes(q)) return true;
+  if (product.brand.toLowerCase().includes(q)) return true;
+  const catLabel = String(t(categoryLabelKey(product.category))).toLowerCase();
+  if (catLabel.includes(q)) return true;
+  if (product.category.toLowerCase().includes(q)) return true;
+  return false;
 }
 
 /** Working copy for the editor with non-empty list rows where needed. */
@@ -161,8 +178,15 @@ export default function BlendScreen() {
   const palette = useThemePalette();
   const p = palette;
   const { isPro, isLifetime } = usePro();
+  const { products } = useProducts();
+
+  const [, redrawLocale] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => subscribeLocale(redrawLocale), []);
 
   const [blend, setBlend] = useState<Blend | null | undefined>(undefined);
+
+  const [carrierPickerOpen, setCarrierPickerOpen] = useState(false);
+  const [pickerSearch, setPickerSearch] = useState('');
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Blend | null>(null);
   const [tagInput, setTagInput] = useState('');
@@ -176,6 +200,8 @@ export default function BlendScreen() {
     setTagInput('');
     setBaseOilAmountStr('');
     setTotalVolAmtStr('');
+    setCarrierPickerOpen(false);
+    setPickerSearch('');
   }, [blendId]);
 
   useFocusEffect(
@@ -209,6 +235,8 @@ export default function BlendScreen() {
     const tv = d.mixRecipe?.totalVolumeAmount;
     setTotalVolAmtStr(tv !== undefined && Number.isFinite(tv) ? String(tv) : '');
     setTagInput('');
+    setCarrierPickerOpen(false);
+    setPickerSearch('');
     setEditing(true);
   }, [blend]);
 
@@ -218,6 +246,55 @@ export default function BlendScreen() {
     setTagInput('');
     setBaseOilAmountStr('');
     setTotalVolAmtStr('');
+    setCarrierPickerOpen(false);
+    setPickerSearch('');
+  }, []);
+
+  const carrierOilCount = useMemo(
+    () => products.filter((x) => x.category === 'carrierOil').length,
+    [products],
+  );
+
+  const carrierPickerPool = useMemo(
+    () => (carrierPickerOpen ? products.filter((x) => x.category === 'carrierOil') : []),
+    [carrierPickerOpen, products],
+  );
+
+  const filteredCarrierPickerProducts = useMemo(() => {
+    const q = pickerSearch.trim().toLowerCase();
+    if (!q) return carrierPickerPool;
+    return carrierPickerPool.filter((prod) => pickerProductMatchesQuery(prod, q));
+  }, [carrierPickerPool, pickerSearch, redrawLocale]);
+
+  const carrierPickerEmptyMessage = useMemo(() => {
+    if (!carrierPickerOpen) return '';
+    if (carrierPickerPool.length === 0) return String(t('blendNew.pickerEmptyCarrier'));
+    return String(t('blendNew.pickerNoResults'));
+  }, [carrierPickerOpen, carrierPickerPool.length]);
+
+  const openCarrierPicker = useCallback(() => {
+    setPickerSearch('');
+    setCarrierPickerOpen(true);
+  }, []);
+
+  const selectCarrierProduct = useCallback((picked: Product) => {
+    setDraft((prev) => {
+      if (!prev || prev.kind !== 'mix' || !prev.mixRecipe) return prev;
+      return {
+        ...prev,
+        mixRecipe: {
+          ...prev.mixRecipe,
+          baseOil: { ...(prev.mixRecipe.baseOil ?? {}), name: picked.name },
+        },
+      };
+    });
+    setCarrierPickerOpen(false);
+    setPickerSearch('');
+  }, []);
+
+  const closeCarrierPicker = useCallback(() => {
+    setCarrierPickerOpen(false);
+    setPickerSearch('');
   }, []);
 
   const commitSave = useCallback(async () => {
@@ -325,6 +402,8 @@ export default function BlendScreen() {
     setTagInput('');
     setBaseOilAmountStr('');
     setTotalVolAmtStr('');
+    setCarrierPickerOpen(false);
+    setPickerSearch('');
   }, [draft, baseOilAmountStr, totalVolAmtStr]);
 
   const addTagToDraft = useCallback(() => {
@@ -444,7 +523,8 @@ export default function BlendScreen() {
       : null;
 
   return (
-    <View style={[styles.root, { backgroundColor: p.surface }]}>
+    <>
+      <View style={[styles.root, { backgroundColor: p.surface }]}>
       <LinearGradient
         colors={[colors.sageDark, colors.sage]}
         start={{ x: 0, y: 0 }}
@@ -586,24 +666,41 @@ export default function BlendScreen() {
             <Section palette={palette} title={t('blends.detailMixCarrierHeading')}>
               {editing && draft && draft.kind === 'mix' && draft.mixRecipe ? (
                 <>
-                  <TextInput
-                    value={draft.mixRecipe.baseOil?.name ?? ''}
-                    onChangeText={(txt) =>
-                      setDraft({
-                        ...draft,
-                        mixRecipe: {
-                          ...draft.mixRecipe!,
-                          baseOil: { ...(draft.mixRecipe!.baseOil ?? {}), name: txt },
-                        },
-                      })
-                    }
-                    placeholder={t('blendNew.fieldBaseOilName') as string}
-                    placeholderTextColor={p.placeholderColor}
-                    style={[
-                      styles.inputSingle,
-                      { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-                    ]}
-                  />
+                  <View style={[styles.editCard, { borderColor: p.border, backgroundColor: p.card }]}>
+                    <View style={styles.pickRow}>
+                      <TextInput
+                        value={draft.mixRecipe.baseOil?.name ?? ''}
+                        onChangeText={(txt) =>
+                          setDraft({
+                            ...draft,
+                            mixRecipe: {
+                              ...draft.mixRecipe!,
+                              baseOil: { ...(draft.mixRecipe!.baseOil ?? {}), name: txt },
+                            },
+                          })
+                        }
+                        placeholder={t('blendNew.fieldBaseOilName') as string}
+                        placeholderTextColor={p.placeholderColor}
+                        style={[styles.inputInCard, styles.pickInput, { color: p.text }]}
+                      />
+                      {carrierOilCount > 0 ? (
+                        <Pressable
+                          onPress={openCarrierPicker}
+                          style={styles.pickBtn}
+                          accessibilityRole="button"
+                          accessibilityLabel={t('blendNew.pickFromCollection') as string}
+                          hitSlop={8}
+                        >
+                          <Ionicons name="add-circle-outline" size={24} color={colors.sage} />
+                        </Pressable>
+                      ) : null}
+                    </View>
+                    {carrierOilCount > 0 ? (
+                      <Text style={[styles.pickHint, { color: p.muted }]}>
+                        {t('blendNew.pickCarrierOilHint')}
+                      </Text>
+                    ) : null}
+                  </View>
                   <View style={styles.rowTwo}>
                     <TextInput
                       value={baseOilAmountStr}
@@ -1077,6 +1174,71 @@ export default function BlendScreen() {
 
       </ScrollView>
     </View>
+
+      <Modal
+        visible={carrierPickerOpen}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={closeCarrierPicker}
+      >
+        <View style={[styles.pickerRoot, { backgroundColor: p.surface }]}>
+          <View style={[styles.pickerHeader, { borderBottomColor: p.border }]}>
+            <Text style={[styles.pickerTitle, { color: p.text }]}>
+              {t('blendNew.pickerTitleCarrierOil') as string}
+            </Text>
+            <Pressable onPress={closeCarrierPicker} hitSlop={12} accessibilityRole="button">
+              <Ionicons name="close" size={24} color={p.secondaryBtnLabel} />
+            </Pressable>
+          </View>
+
+          <View style={[styles.pickerSearchWrap, { borderBottomColor: p.border }]}>
+            <Ionicons name="search-outline" size={18} color={p.muted} style={{ marginRight: 8 }} />
+            <TextInput
+              value={pickerSearch}
+              onChangeText={setPickerSearch}
+              placeholder={t('blendNew.pickerSearch') as string}
+              placeholderTextColor={p.placeholderColor}
+              style={[styles.pickerSearchInput, { color: p.text }]}
+              autoFocus
+              clearButtonMode="while-editing"
+            />
+          </View>
+
+          {filteredCarrierPickerProducts.length === 0 ? (
+            <View style={styles.pickerEmpty}>
+              <Text style={[styles.pickerEmptyText, { color: p.muted }]}>{carrierPickerEmptyMessage}</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredCarrierPickerProducts}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+              keyboardShouldPersistTaps="handled"
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => selectCarrierProduct(item)}
+                  style={({ pressed }) => [
+                    styles.pickerItem,
+                    { borderBottomColor: p.border },
+                    pressed && { backgroundColor: p.card },
+                  ]}
+                  accessibilityRole="button"
+                >
+                  <Text style={[styles.pickerItemName, { color: p.text }]} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  {item.brand ? (
+                    <Text style={[styles.pickerItemSub, { color: p.muted }]} numberOfLines={1}>
+                      {item.brand}
+                    </Text>
+                  ) : null}
+                </Pressable>
+              )}
+            />
+          )}
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -1193,6 +1355,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
   },
+  pickRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  pickInput: { flex: 1 },
+  pickBtn: { padding: 4 },
+  pickHint: { fontSize: 11, marginTop: 2, fontStyle: 'italic' },
   addOutline: {
     alignSelf: 'flex-start',
     borderWidth: 1,
@@ -1399,4 +1565,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  pickerRoot: { flex: 1 },
+  pickerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  pickerTitle: { fontSize: 18, fontWeight: '700' },
+  pickerSearchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  pickerSearchInput: { flex: 1, fontSize: 16 },
+  pickerEmpty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+  pickerEmptyText: { fontSize: 15, textAlign: 'center' },
+  pickerItem: {
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  pickerItemName: { fontSize: 16, fontWeight: '600' },
+  pickerItemSub: { fontSize: 13, marginTop: 2 },
 });

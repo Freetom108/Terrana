@@ -11,7 +11,8 @@ blends.emptyMessage
 blends.noMatchesTitle
 blends.noMatchesMessage
 blends.detailTypeHeading
-blends.heroSubtitleMix
+blends.heroSubtitleMixOne
+blends.heroSubtitleMixOther
 blends.heroSubtitleCombo
 blends.heroSubtitleProtocol
 blends.detailMixCarrierHeading

@@ -85,14 +85,21 @@ export function HomeBlendCard({ blend, palette }: { blend: Blend; palette: Theme
           {t(blendKindLabelKey(blend.kind))}
         </Text>
         <Text style={[styles.meta, { color: p.muted }]} numberOfLines={2}>
-          {t(
-            blend.kind === 'mix'
-              ? 'blends.heroSubtitleMix'
-              : blend.kind === 'combination'
-                ? 'blends.heroSubtitleCombo'
-                : 'blends.heroSubtitleProtocol',
-            { count: blendStructuredItemCount(blend) },
-          )}
+          {blend.kind === 'mix'
+            ? (() => {
+                const c = blendStructuredItemCount(blend);
+                return t(
+                  c === 1 ? 'blends.heroSubtitleMixOne' : 'blends.heroSubtitleMixOther',
+                  { count: c },
+                );
+              })()
+            : blend.kind === 'combination'
+              ? t('blends.heroSubtitleCombo', {
+                  count: blendStructuredItemCount(blend),
+                })
+              : t('blends.heroSubtitleProtocol', {
+                  count: blendStructuredItemCount(blend),
+                })}
         </Text>
       </Pressable>
     </Link>

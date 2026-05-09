@@ -154,7 +154,8 @@
     "noMatchesTitle": "No hay resultados aquí",
     "noMatchesMessage": "Prueba otro tipo o vuelve a «Todos».",
     "detailTypeHeading": "Tipo de receta",
-    "heroSubtitleMix": "%{count} líneas con cuentagotas registrados",
+    "heroSubtitleMixOne": "1 ingrediente",
+    "heroSubtitleMixOther": "%{count} ingredientes",
     "heroSubtitleCombo": "%{count} productos en paralelo",
     "heroSubtitleProtocol": "%{count} pasos en orden cronológico",
     "detailMixCarrierHeading": "Aceite base / transportador",
@@ -247,8 +248,12 @@
     "a11yBack": "Atrás",
     "pickFromCollection": "De la colección",
     "pickerTitle": "Seleccionar producto",
+    "pickerTitleCarrierOil": "Aceite portador / base",
     "pickerSearch": "Buscar…",
-    "pickerEmpty": "No hay productos guardados"
+    "pickCarrierOilHint": "Escribe un nombre o toca ⊕ para elegir un aceite portador de tu colección.",
+    "pickerEmpty": "No hay productos guardados",
+    "pickerEmptyCarrier": "No hay aceites portadores en la colección — escribe el nombre a mano.",
+    "pickerNoResults": "No hay productos coincidentes."
   },
   "blendEdit": {
     "readOnlyHint": "Toca el lápiz para editar."

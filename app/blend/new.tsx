@@ -77,7 +77,8 @@ function uniqueTrimmedTags(tags: string[]): string[] {
 type PickerTarget =
   | { kind: 'mix'; idx: number }
   | { kind: 'combo'; idx: number }
-  | { kind: 'proto'; idx: number };
+  | { kind: 'proto'; idx: number }
+  | { kind: 'baseOil' };
 
 function pickerProductMatchesQuery(product: Product, q: string): boolean {
   if (product.name.toLowerCase().includes(q)) return true;
@@ -141,11 +142,34 @@ export default function NewBlendScreen() {
     setProtoRows([{ productName: '', timing: 'morning', stepNote: '' }]);
   }, []);
 
+  const carrierOilCount = useMemo(
+    () => products.filter((x) => x.category === 'carrierOil').length,
+    [products],
+  );
+
+  const pickerPool = useMemo(() => {
+    if (!pickerTarget) return [];
+    if (pickerTarget.kind === 'baseOil') {
+      return products.filter((x) => x.category === 'carrierOil');
+    }
+    return products;
+  }, [pickerTarget, products]);
+
   const filteredPickerProducts = useMemo(() => {
     const q = pickerSearch.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter((prod) => pickerProductMatchesQuery(prod, q));
-  }, [products, pickerSearch, redrawLocale]);
+    if (!q) return pickerPool;
+    return pickerPool.filter((prod) => pickerProductMatchesQuery(prod, q));
+  }, [pickerPool, pickerSearch, redrawLocale]);
+
+  const pickerEmptyMessage = useMemo(() => {
+    if (!pickerTarget) return '';
+    if (pickerPool.length === 0) {
+      return pickerTarget.kind === 'baseOil'
+        ? String(t('blendNew.pickerEmptyCarrier'))
+        : String(t('blendNew.pickerEmpty'));
+    }
+    return String(t('blendNew.pickerNoResults'));
+  }, [pickerTarget, pickerPool.length]);
 
   const openPicker = useCallback((target: PickerTarget) => {
     setPickerSearch('');
@@ -161,13 +185,15 @@ export default function NewBlendScreen() {
     (product: Product) => {
       if (!pickerTarget) return;
       const name = product.name;
-      if (pickerTarget.kind === 'mix') {
+      if (pickerTarget.kind === 'baseOil') {
+        setBaseOilName(name);
+      } else if (pickerTarget.kind === 'mix') {
         const idx = pickerTarget.idx;
         setMixRows((prev) => prev.map((r, i) => (i === idx ? { ...r, productName: name } : r)));
       } else if (pickerTarget.kind === 'combo') {
         const idx = pickerTarget.idx;
         setComboRows((prev) => prev.map((r, i) => (i === idx ? { ...r, productName: name } : r)));
-      } else {
+      } else if (pickerTarget.kind === 'proto') {
         const idx = pickerTarget.idx;
         setProtoRows((prev) => prev.map((r, i) => (i === idx ? { ...r, productName: name } : r)));
       }
@@ -406,15 +432,33 @@ export default function NewBlendScreen() {
             />
 
             {kind === 'mix' ? (
-              <>
+                <>
                 <FieldLabel text={t('blends.detailMixCarrierHeading') as string} muted={p.muted} />
-                <TextInput
-                  value={baseOilName}
-                  onChangeText={setBaseOilName}
-                  placeholder={t('blendNew.fieldBaseOilName') as string}
-                  placeholderTextColor={p.placeholderColor}
-                  style={[styles.input, { backgroundColor: p.inputBg, borderColor: p.border, color: p.text }]}
-                />
+                <View style={[styles.ingredientCard, { borderColor: p.border, backgroundColor: p.card }]}>
+                  <View style={styles.pickRow}>
+                    <TextInput
+                      value={baseOilName}
+                      onChangeText={setBaseOilName}
+                      placeholder={t('blendNew.fieldBaseOilName') as string}
+                      placeholderTextColor={p.placeholderColor}
+                      style={[styles.inputInCard, styles.pickInput, { color: p.text }]}
+                    />
+                    {carrierOilCount > 0 ? (
+                      <Pressable
+                        onPress={() => openPicker({ kind: 'baseOil' })}
+                        style={styles.pickBtn}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('blendNew.pickFromCollection') as string}
+                        hitSlop={8}
+                      >
+                        <Ionicons name="add-circle-outline" size={24} color={colors.sage} />
+                      </Pressable>
+                    ) : null}
+                  </View>
+                  {carrierOilCount > 0 ? (
+                    <Text style={[styles.pickHint, { color: p.muted }]}>{t('blendNew.pickCarrierOilHint')}</Text>
+                  ) : null}
+                </View>
                 <View style={styles.rowTwo}>
                   <TextInput
                     value={baseOilAmount}
@@ -782,7 +826,11 @@ export default function NewBlendScreen() {
       >
         <View style={[styles.pickerRoot, { backgroundColor: p.surface }]}>
           <View style={[styles.pickerHeader, { borderBottomColor: p.border }]}>
-            <Text style={[styles.pickerTitle, { color: p.text }]}>{t('blendNew.pickerTitle')}</Text>
+            <Text style={[styles.pickerTitle, { color: p.text }]}>
+              {pickerTarget?.kind === 'baseOil'
+                ? (t('blendNew.pickerTitleCarrierOil') as string)
+                : (t('blendNew.pickerTitle') as string)}
+            </Text>
             <Pressable onPress={closePicker} hitSlop={12} accessibilityRole="button">
               <Ionicons name="close" size={24} color={p.secondaryBtnLabel} />
             </Pressable>
@@ -804,7 +852,7 @@ export default function NewBlendScreen() {
           {filteredPickerProducts.length === 0 ? (
             <View style={styles.pickerEmpty}>
               <Text style={[styles.pickerEmptyText, { color: p.muted }]}>
-                {t('blendNew.pickerEmpty')}
+                {pickerEmptyMessage}
               </Text>
             </View>
           ) : (

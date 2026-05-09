@@ -154,7 +154,8 @@
     "noMatchesTitle": "Rien dans cette catégorie",
     "noMatchesMessage": "Essayez un autre type ou rechargez « Tout ».",
     "detailTypeHeading": "Type de recette",
-    "heroSubtitleMix": "%{count} lignes avec gouttes comptées",
+    "heroSubtitleMixOne": "1 ingrédient",
+    "heroSubtitleMixOther": "%{count} ingrédients",
     "heroSubtitleCombo": "%{count} produits en parallèle",
     "heroSubtitleProtocol": "%{count} étapes dans l’ordre",
     "detailMixCarrierHeading": "Huile de base",
@@ -247,8 +248,12 @@
     "a11yBack": "Retour",
     "pickFromCollection": "De la collection",
     "pickerTitle": "Sélectionner un produit",
+    "pickerTitleCarrierOil": "Huile porteuse / de base",
     "pickerSearch": "Rechercher…",
-    "pickerEmpty": "Aucun produit enregistré"
+    "pickCarrierOilHint": "Saisis un nom ou appuie ⊕ pour choisir une huile porteuse dans ta collection.",
+    "pickerEmpty": "Aucun produit enregistré",
+    "pickerEmptyCarrier": "Aucune huile porteuse enregistrée — saisis le nom à la main.",
+    "pickerNoResults": "Aucun produit correspondant."
   },
   "blendEdit": {
     "readOnlyHint": "Touchez le crayon pour modifier."

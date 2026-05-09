@@ -154,7 +154,8 @@
     "noMatchesTitle": "Nichts in dieser Kategorie",
     "noMatchesMessage": "Wähle einen anderen Typ oder wieder «Alle».",
     "detailTypeHeading": "Rezepttyp",
-    "heroSubtitleMix": "%{count} Zeilen mit Tropfenangabe",
+    "heroSubtitleMixOne": "1 Zutat",
+    "heroSubtitleMixOther": "%{count} Zutaten",
     "heroSubtitleCombo": "%{count} Produkte parallel",
     "heroSubtitleProtocol": "%{count} chronologische Schritte",
     "detailMixCarrierHeading": "Basisöl / Trägeröl",
@@ -247,8 +248,12 @@
     "a11yBack": "Zurück",
     "pickFromCollection": "Aus Sammlung",
     "pickerTitle": "Produkt auswählen",
+    "pickerTitleCarrierOil": "Träger- / Basisöl",
     "pickerSearch": "Suchen…",
-    "pickerEmpty": "Noch keine Produkte gespeichert"
+    "pickCarrierOilHint": "Namen eingeben oder ⊕ tippen für ein Trägeröl aus deiner Sammlung.",
+    "pickerEmpty": "Noch keine Produkte gespeichert",
+    "pickerEmptyCarrier": "Noch kein Trägeröl in der Sammlung — Name manuell eintragen.",
+    "pickerNoResults": "Keine passenden Produkte."
   },
   "blendEdit": {
     "readOnlyHint": "Zum Bearbeiten auf den Stift tippen."
