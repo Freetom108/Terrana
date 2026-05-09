@@ -57,6 +57,7 @@ function normalizeProduct(raw: Record<string, unknown>): Product {
       : [],
     rating: clampRating(raw.rating),
     inventory: normalizeInventory(raw.inventory),
+    isFavorite: raw.isFavorite === true,
     lastUsed,
     createdAt: String(raw.createdAt ?? new Date().toISOString()),
     updatedAt: String(raw.updatedAt ?? new Date().toISOString()),
@@ -128,4 +129,14 @@ export async function saveProduct(
 export async function deleteProduct(id: string): Promise<void> {
   const products = await readProducts();
   await writeProducts(products.filter((p) => p.id !== id));
+}
+
+export async function toggleFavorite(id: string): Promise<boolean> {
+  const products = await readProducts();
+  const idx = products.findIndex((p) => p.id === id);
+  if (idx < 0) return false;
+  const next = !products[idx]!.isFavorite;
+  products[idx] = { ...products[idx]!, isFavorite: next };
+  await writeProducts(products);
+  return next;
 }

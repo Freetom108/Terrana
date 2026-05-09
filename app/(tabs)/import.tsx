@@ -253,7 +253,7 @@ export default function ImportTab() {
           showsVerticalScrollIndicator={false}
         >
           <Text style={[styles.title, { color: palette.text }]}>{t('import.screenTitle')}</Text>
-          <Text style={[styles.subtitle, { color: palette.muted }]}>{t('import.screenSubtitle')}</Text>
+          <Text style={[styles.pasteTip, { color: colors.mid }]}>{t('import.pasteTip')}</Text>
 
           {/* Import progress bar for free users near limit */}
           {showImportProgress && (
@@ -315,14 +315,13 @@ export default function ImportTab() {
                 style={[
                   styles.sourceInput,
                   {
-                    minHeight: 150,
+                    minHeight: 220,
                     backgroundColor: palette.card,
                     borderColor: palette.border,
                     color: palette.text,
                   },
                 ]}
               />
-              <Text style={[styles.pasteTip, { color: palette.muted }]}>{t('import.pasteTip')}</Text>
 
               {error ? (
                 <View style={styles.errorBanner} accessibilityRole="alert">
@@ -512,11 +511,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 6,
   },
-  subtitle: {
-    fontSize: 15,
-    marginBottom: 20,
-    lineHeight: 22,
-  },
   sourceInput: {
     borderRadius: 14,
     borderWidth: 1,
@@ -526,10 +520,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   pasteTip: {
-    fontSize: 13,
-    lineHeight: 19,
-    marginBottom: 14,
-    opacity: 0.9,
+    fontSize: 14,
+    lineHeight: 21,
+    marginTop: 4,
+    marginBottom: 20,
   },
   errorBanner: {
     borderLeftWidth: 4,

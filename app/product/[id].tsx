@@ -1,11 +1,11 @@
-import { PRODUCT_CATEGORIES } from '../../constants/categories';
+import { categoryLabelKey, PRODUCT_CATEGORIES } from '../../constants/categories';
 import { colors } from '../../constants/colors';
 import { usePro } from '../../hooks/usePro';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
 import { exportProductAsPDF, printProduct } from '../../services/export/pdfExport';
 import { shareProduct } from '../../services/export/shareService';
-import { deleteProduct, getProductById, saveProduct } from '../../services/storage/products';
+import { deleteProduct, getProductById, saveProduct, toggleFavorite } from '../../services/storage/products';
 import type { InventoryLevel, Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -195,6 +195,12 @@ export default function ProductScreen() {
     Alert.alert(product.name, undefined, actions);
   }, [product, isPro, isLifetime]);
 
+  const handleToggleFavorite = useCallback(async () => {
+    if (!product) return;
+    const next = await toggleFavorite(product.id);
+    setProduct((prev) => prev ? { ...prev, isFavorite: next } : prev);
+  }, [product]);
+
   const starColor = p.isDark ? colors.sageLight : colors.sageDark;
   const starEmpty = p.muted;
 
@@ -274,6 +280,19 @@ export default function ProductScreen() {
           ) : (
             <View style={styles.heroActions}>
               <Pressable
+                onPress={() => void handleToggleFavorite()}
+                accessibilityRole="button"
+                accessibilityLabel={product.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons
+                  name={product.isFavorite ? 'star' : 'star-outline'}
+                  size={24}
+                  color={product.isFavorite ? '#FFD700' : colors.white}
+                />
+              </Pressable>
+              <Pressable
                 onPress={handleShare}
                 accessibilityRole="button"
                 accessibilityLabel="Share"
@@ -343,7 +362,7 @@ export default function ProductScreen() {
                     accessibilityState={{ selected: sel }}
                   >
                     <Text style={sel ? styles.categoryChipTextSel : styles.categoryChipTextIdle}>
-                      {cat}
+                      {t(categoryLabelKey(cat)) as string}
                     </Text>
                   </Pressable>
                 );
@@ -355,7 +374,7 @@ export default function ProductScreen() {
             <Text style={styles.heroTitle} numberOfLines={3}>
               {display.name}
             </Text>
-            <Text style={styles.heroCategory}>{display.category}</Text>
+            <Text style={styles.heroCategory}>{t(categoryLabelKey(display.category)) as string}</Text>
           </>
         )}
       </LinearGradient>

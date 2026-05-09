@@ -1,4 +1,12 @@
 {
+  "categories": {
+    "essentialOil": "Huile Essentielle",
+    "supplement":   "Complément",
+    "herbTea":      "Herbe & Thé",
+    "care":         "Soin",
+    "blend":        "Mélange",
+    "other":        "Autre"
+  },
   "onboarding": {
     "title": "Organisez votre collection",
     "subtitle": "Tout ce qui compte pour vous en un seul endroit",
@@ -39,7 +47,7 @@
     "screenSubtitle": "Collez le texte depuis votre source",
     "pastePlaceholder": "Collez le texte ici…",
     "placeholder": "Collez le texte ici…",
-    "detect": "Détecter ✨",
+    "detect": "Importer",
     "button": "Détecter ✨",
     "detecting": "Reconnaissance des données…",
     "resultTitle": "Vérifier",
@@ -62,16 +70,14 @@
     "inventoryMedium": "🟡 Moitié",
     "inventoryLow": "🔴 Presque vide",
     "inventoryEmpty": "⬜ Vide",
-    "pasteTip": "💡 Astuce : pour de meilleurs résultats, collez uniquement la description du produit."
+    "pasteTip": "Copiez les sections de texte appropriées d'un site web, collez-les dans la zone d'importation et appuyez sur 'Importer'. Plus le texte est pertinent, mieux l'IA reconnaît toutes les informations et les saisit automatiquement dans les champs correspondants."
   },
   "settings": {
     "title": "Paramètres",
     "language": "Langue",
     "pro": "Pro",
     "lifetime": "À vie",
-    "tipsTitle": "Conseils & Aide",
-    "importTipTitle": "Comment obtenir les meilleurs résultats",
-    "importTipBody": "Copiez uniquement la description du produit - pas la page entière.",
+
     "sectionAppearance": "AFFICHAGE",
     "appearanceLabel": "Apparence",
     "themeLight": "Clair",
@@ -112,10 +118,16 @@
   },
   "tabs": {
     "home": "Collection",
-    "search": "Recherche",
+    "favorites": "Favoris",
     "import": "Importer",
     "blends": "Mes Blends",
     "settings": "Réglages"
+  },
+  "favorites": {
+    "screenTitle": "Favoris",
+    "emptyTitle": "Aucun favori pour l'instant",
+    "emptyHint": "Appuie sur l'étoile d'un produit pour l'ajouter à tes favoris.",
+    "addProducts": "Parcourir les produits"
   },
   "blends": {
     "screenSubtitle": "Des recettes comme mélanges, stacks ou protocoles étapes par étapes.",
@@ -235,9 +247,9 @@
     "featureAiImport": "Import IA",
     "featureSharing": "Partage",
     "featurePdf": "Export PDF",
-    "featurePrint": "🖨️ Collections",
+    "featurePrint": "🖨️ Collection",
     "featureInventory": "Inventaire",
-    "featureBackup": "Sauvegarde & Restauration",
+    "featureBackup": "Backup & Restore",
     "backupTagline": "Ta collection est en sécurité – même sur un nouvel appareil.",
     "sharing": "Partagez avec votre communauté",
     "sharingDesc": "Partage via WhatsApp, Mail, SMS & toutes les apps",
@@ -335,9 +347,11 @@
     "q4": "Qu'est-ce que Restaurer les achats ?",
     "a4": "Si vous avez réinstallé l'app ou avez un nouvel appareil, vous pouvez restaurer vos achats gratuitement. Appuyez sur 'Restaurer les achats' dans l'écran de mise à niveau.",
     "q5": "Comment fonctionne l'import IA ?",
-    "a5": "Copiez le texte d'une page produit et collez-le dans la zone d'import. L'IA détecte automatiquement le nom du produit, la catégorie, la description, les applications et les tags.",
+    "a5": "Copiez les sections de texte appropriées d'un site web, collez-les dans la zone d'importation et appuyez sur 'Importer'. Plus le texte est pertinent, mieux l'IA reconnaît toutes les informations et les saisit automatiquement dans les champs correspondants.",
     "q6": "Où puis-je trouver les options d'upgrade ?",
     "a6": "Vous trouverez toutes les options de mise à niveau dans l'écran Upgrade de Terrana.",
-    "a6Btn": "Voir les options d'upgrade →"
+    "a6Btn": "Voir les options d'upgrade →",
+    "q7": "Qu'est-ce que Backup & Restore ?",
+    "a7": "Avec Backup & Restore, tu peux exporter toute ta collection – tous les produits, mélanges et paramètres – sous forme de fichier et la stocker en sécurité. Sur un nouvel appareil ou après une réinstallation, tu restaures tout d'un seul tap. Backup & Restore est une fonctionnalité exclusive Lifetime."
   }
 }

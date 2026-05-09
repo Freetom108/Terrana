@@ -1,4 +1,5 @@
 import { Share } from 'react-native';
+import { categoryLabelKey } from '../../constants/categories';
 import { t } from '../i18n/i18n';
 import type { Blend } from '../../types/blend';
 import type { Product } from '../../types/product';
@@ -6,7 +7,7 @@ import type { Product } from '../../types/product';
 function formatProduct(product: Product): string {
   const lines: string[] = [];
   lines.push(`🌿 ${product.name}`);
-  const meta = [product.category, product.brand.trim()].filter(Boolean).join(' · ');
+  const meta = [(t(categoryLabelKey(product.category)) as string), product.brand.trim()].filter(Boolean).join(' · ');
   if (meta) lines.push(meta);
   if (product.usages.length > 0) {
     lines.push('');

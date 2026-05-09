@@ -1,4 +1,12 @@
 {
+  "categories": {
+    "essentialOil": "Essential Oil",
+    "supplement":   "Supplement",
+    "herbTea":      "Herb & Tea",
+    "care":         "Care",
+    "blend":        "Blend",
+    "other":        "Other"
+  },
   "onboarding": {
     "title": "Organize your collection",
     "subtitle": "Everything that matters to you in one place",
@@ -39,8 +47,8 @@
     "screenSubtitle": "Paste text from your source",
     "pastePlaceholder": "Paste text here…",
     "placeholder": "Paste text here…",
-    "detect": "Detect ✨",
-    "button": "Detect ✨",
+    "detect": "Import",
+    "button": "Import",
     "detecting": "Recognising data…",
     "resultTitle": "Review",
     "save": "Save",
@@ -62,16 +70,14 @@
     "inventoryMedium": "🟡 Half",
     "inventoryLow": "🔴 Nearly empty",
     "inventoryEmpty": "⬜ Empty",
-    "pasteTip": "💡 Tip: For best results, paste only the product description."
+    "pasteTip": "Copy the relevant text sections from a website, paste them into the Import area and tap 'Import'. The more relevant text you provide, the better the AI recognizes all information and automatically fills in the corresponding fields."
   },
   "settings": {
     "title": "Settings",
     "language": "Language",
     "pro": "Pro",
     "lifetime": "Lifetime",
-    "tipsTitle": "Tips & Help",
-    "importTipTitle": "How to get the best import results",
-    "importTipBody": "Copy only the product description from a website - not the entire page. The AI will automatically ignore irrelevant content, but a focused text gives the best results.",
+
     "sectionAppearance": "DISPLAY",
     "appearanceLabel": "Appearance",
     "themeLight": "Light",
@@ -112,10 +118,16 @@
   },
   "tabs": {
     "home": "Collection",
-    "search": "Search",
+    "favorites": "Favorites",
     "import": "Import",
     "blends": "My Blends",
     "settings": "Settings"
+  },
+  "favorites": {
+    "screenTitle": "Favorites",
+    "emptyTitle": "No favorites yet",
+    "emptyHint": "Tap the star on any product to add it to your favorites.",
+    "addProducts": "Browse products"
   },
   "blends": {
     "screenSubtitle": "Recipes as mixes, combinations, or step-by-step protocols.",
@@ -235,9 +247,9 @@
     "featureAiImport": "AI Import",
     "featureSharing": "Sharing",
     "featurePdf": "PDF Export",
-    "featurePrint": "🖨️ Collections",
+    "featurePrint": "🖨️ Collection",
     "featureInventory": "Inventory",
-    "featureBackup": "Backup & Recovery",
+    "featureBackup": "Backup & Restore",
     "backupTagline": "Your collection is safe – even on a new device.",
     "sharing": "Share with your community",
     "sharingDesc": "Share via WhatsApp, Mail, SMS & all apps",
@@ -335,9 +347,11 @@
     "q4": "What is Restore Purchases?",
     "a4": "If you reinstalled the app or have a new device, you can restore your purchases for free. Tap 'Restore Purchases' in the upgrade screen.",
     "q5": "How does the AI import work?",
-    "a5": "Copy the text from a product page and paste it into the import area. The AI automatically detects product name, category, description, applications and tags.",
+    "a5": "Copy the relevant text sections from a website, paste them into the Import area and tap 'Import'. The more relevant text you provide, the better the AI recognizes all information and automatically fills in the corresponding fields.",
     "q6": "Where can I find the upgrade options?",
     "a6": "You can view all upgrade options in the Terrana upgrade screen.",
-    "a6Btn": "View upgrade options →"
+    "a6Btn": "View upgrade options →",
+    "q7": "What is Backup & Restore?",
+    "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature."
   }
 }

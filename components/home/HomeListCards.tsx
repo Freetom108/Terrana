@@ -1,35 +1,65 @@
+import { categoryLabelKey } from '../../constants/categories';
 import { colors } from '../../constants/colors';
 import type { ThemePalette } from '../../hooks/useThemePalette';
 import { t } from '../../services/i18n/i18n';
 import { blendKindLabelKey, blendStructuredItemCount, type Blend } from '../../types/blend';
 import type { Product } from '../../types/product';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-export function HomeProductCard({ product, palette }: { product: Product; palette: ThemePalette }) {
+export function HomeProductCard({
+  product,
+  palette,
+  onToggleFavorite,
+}: {
+  product: Product;
+  palette: ThemePalette;
+  onToggleFavorite?: (id: string) => void;
+}) {
   const p = palette;
+  const starColor = product.isFavorite
+    ? (p.isDark ? colors.sageLight : colors.sageDark)
+    : p.muted;
   return (
-    <Link href={`/product/${product.id}`} asChild>
-      <Pressable
-        style={({ pressed }) => [
-          styles.card,
-          {
-            backgroundColor: p.card,
-            borderColor: p.border,
-            shadowOpacity: p.isDark ? 0.25 : 0.05,
-          },
-          pressed && styles.cardPressed,
-        ]}
-      >
-        <Text style={[styles.name, { color: p.text }]} numberOfLines={2}>
-          {product.name}
-        </Text>
-        <Text style={[styles.meta, { color: p.muted }]} numberOfLines={1}>
-          {product.brand ? `${product.brand} · ` : ''}
-          {product.category}
-        </Text>
-      </Pressable>
-    </Link>
+    <View style={styles.cardWrapper}>
+      <Link href={`/product/${product.id}`} asChild>
+        <Pressable
+          style={({ pressed }) => [
+            styles.card,
+            {
+              backgroundColor: p.card,
+              borderColor: p.border,
+              shadowOpacity: p.isDark ? 0.25 : 0.05,
+            },
+            pressed && styles.cardPressed,
+          ]}
+        >
+          <Text style={[styles.name, { color: p.text }]} numberOfLines={2}>
+            {product.name}
+          </Text>
+          <Text style={[styles.meta, { color: p.muted }]} numberOfLines={1}>
+            {product.brand ? `${product.brand} · ` : ''}
+            {t(categoryLabelKey(product.category)) as string}
+          </Text>
+        </Pressable>
+      </Link>
+      {onToggleFavorite != null && (
+        <Pressable
+          style={styles.starBtn}
+          onPress={() => onToggleFavorite(product.id)}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel={product.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <Ionicons
+            name={product.isFavorite ? 'star' : 'star-outline'}
+            size={18}
+            color={starColor}
+          />
+        </Pressable>
+      )}
+    </View>
   );
 }
 
@@ -70,6 +100,14 @@ export function HomeBlendCard({ blend, palette }: { blend: Blend; palette: Theme
 }
 
 const styles = StyleSheet.create({
+  cardWrapper: {
+    position: 'relative',
+  },
+  starBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 12,
+  },
   card: {
     borderRadius: 14,
     borderWidth: 1,

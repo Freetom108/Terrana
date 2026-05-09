@@ -16,6 +16,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function stripHash(raw: string): string {
   return raw.startsWith('#') ? raw.slice(1).trimStart() : raw;
@@ -82,7 +83,7 @@ export default function SearchTab() {
   const isEmpty = rawQuery.trim() === '';
 
   return (
-    <View style={[styles.root, { backgroundColor: p.surface }]}>
+    <SafeAreaView style={[styles.root, { backgroundColor: p.surface }]} edges={['top']}>
       {/* Search bar */}
       <View style={[styles.searchRow, { borderBottomColor: p.subtleBorder }]}>
         <View style={[styles.inputWrap, { backgroundColor: p.inputBg, borderColor: p.border }]}>
@@ -112,18 +113,20 @@ export default function SearchTab() {
         </View>
       </View>
 
+      {/* Hint: fixed directly below search bar when idle */}
+      {isEmpty && (
+        <View style={styles.emptyHint}>
+          <Text style={styles.emptyIcon}>🌿</Text>
+          <Text style={[styles.emptyText, { color: p.muted }]}>{t('search.empty')}</Text>
+        </View>
+      )}
+
       {/* Body */}
       {isEmpty ? (
         <ScrollView
           contentContainerStyle={styles.emptyScroll}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Empty state hint */}
-          <View style={styles.emptyHint}>
-            <Text style={styles.emptyIcon}>🌿</Text>
-            <Text style={[styles.emptyText, { color: p.muted }]}>{t('search.empty')}</Text>
-          </View>
-
           {/* Popular tags */}
           {popularTags.length > 0 && (
             <View style={styles.tagsSection}>
@@ -166,7 +169,7 @@ export default function SearchTab() {
           ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -200,12 +203,14 @@ const styles = StyleSheet.create({
   /* Empty state */
   emptyScroll: {
     paddingHorizontal: 16,
-    paddingTop: 32,
+    paddingTop: 24,
     paddingBottom: 40,
   },
   emptyHint: {
     alignItems: 'center',
-    marginBottom: 36,
+    paddingHorizontal: 16,
+    paddingTop: 28,
+    paddingBottom: 20,
     gap: 10,
   },
   emptyIcon: {

@@ -1,4 +1,12 @@
 {
+  "categories": {
+    "essentialOil": "Aceite Esencial",
+    "supplement":   "Suplemento",
+    "herbTea":      "Hierba & Té",
+    "care":         "Cuidado",
+    "blend":        "Mezcla",
+    "other":        "Otro"
+  },
   "onboarding": {
     "title": "Organiza tu colección",
     "subtitle": "Todo lo que te importa en un solo lugar",
@@ -39,8 +47,8 @@
     "screenSubtitle": "Pega el texto desde tu fuente",
     "pastePlaceholder": "Pega el texto aquí…",
     "placeholder": "Pega el texto aquí…",
-    "detect": "Detectar ✨",
-    "button": "Detectar ✨",
+    "detect": "Importar",
+    "button": "Importar",
     "detecting": "Reconociendo datos…",
     "resultTitle": "Revisar",
     "save": "Guardar",
@@ -62,16 +70,14 @@
     "inventoryMedium": "🟡 Medio",
     "inventoryLow": "🔴 Casi vacío",
     "inventoryEmpty": "⬜ Vacío",
-    "pasteTip": "💡 Consejo: para mejores resultados, pega solo la descripción del producto."
+    "pasteTip": "Copia las secciones de texto relevantes de un sitio web, pégalas en el área de importación y pulsa 'Importar'. Cuanto más texto relevante proporciones, mejor reconocerá la IA toda la información y la introducirá automáticamente en los campos correspondientes."
   },
   "settings": {
     "title": "Configuración",
     "language": "Idioma",
     "pro": "Pro",
     "lifetime": "De por vida",
-    "tipsTitle": "Consejos & Ayuda",
-    "importTipTitle": "Cómo obtener los mejores resultados",
-    "importTipBody": "Copia solo la descripción del producto, no toda la página.",
+
     "sectionAppearance": "APARIENCIA",
     "appearanceLabel": "Aspecto visual",
     "themeLight": "Claro",
@@ -112,10 +118,16 @@
   },
   "tabs": {
     "home": "Colección",
-    "search": "Buscar",
+    "favorites": "Favoritos",
     "import": "Importar",
     "blends": "Mis Blends",
     "settings": "Ajustes"
+  },
+  "favorites": {
+    "screenTitle": "Favoritos",
+    "emptyTitle": "Aún no hay favoritos",
+    "emptyHint": "Toca la estrella de cualquier producto para añadirlo a tus favoritos.",
+    "addProducts": "Explorar productos"
   },
   "blends": {
     "screenSubtitle": "Recetas como mix, combinación o protocolo paso a paso.",
@@ -235,9 +247,9 @@
     "featureAiImport": "Importación IA",
     "featureSharing": "Compartir",
     "featurePdf": "Exportar PDF",
-    "featurePrint": "🖨️ Colecciones",
+    "featurePrint": "🖨️ Colección",
     "featureInventory": "Inventario",
-    "featureBackup": "Copia de seguridad & Restauración",
+    "featureBackup": "Backup & Restore",
     "backupTagline": "Tu colección está segura – incluso en un dispositivo nuevo.",
     "sharing": "Comparte con tu comunidad",
     "sharingDesc": "Comparte via WhatsApp, Mail, SMS & todas las apps",
@@ -335,9 +347,11 @@
     "q4": "¿Qué es Restaurar compras?",
     "a4": "Si reinstalaste la app o tienes un nuevo dispositivo, puedes restaurar tus compras de forma gratuita. Toca 'Restaurar compras' en la pantalla de actualización.",
     "q5": "¿Cómo funciona la importación con IA?",
-    "a5": "Copia el texto de una página de producto y pégalo en el área de importación. La IA detecta automáticamente el nombre del producto, categoría, descripción, aplicaciones y etiquetas.",
+    "a5": "Copia las secciones de texto relevantes de un sitio web, pégalas en el área de importación y pulsa 'Importar'. Cuanto más texto relevante proporciones, mejor reconocerá la IA toda la información y la introducirá automáticamente en los campos correspondientes.",
     "q6": "¿Dónde puedo encontrar las opciones de mejora?",
     "a6": "Puedes ver todas las opciones de mejora en la pantalla de Upgrade de Terrana.",
-    "a6Btn": "Ver opciones de mejora →"
+    "a6Btn": "Ver opciones de mejora →",
+    "q7": "¿Qué es Backup & Restore?",
+    "a7": "Con Backup & Restore puedes exportar toda tu colección – todos los productos, mezclas y ajustes – como archivo y guardarlo de forma segura. En un nuevo dispositivo o tras una reinstalación, restauras todo con un solo toque. Backup & Restore es una función exclusiva Lifetime."
   }
 }

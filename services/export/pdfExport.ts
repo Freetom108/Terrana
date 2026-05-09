@@ -1,5 +1,6 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { categoryLabelKey } from '../../constants/categories';
 import { getLocale, t } from '../../services/i18n/i18n';
 import type { Blend } from '../../types/blend';
 import type { Product } from '../../types/product';
@@ -254,7 +255,7 @@ function generateProductHTML(product: Product, mode: PdfMode = 'share'): string 
   const inner = `
   <h1>${escapeHtml(product.name)}</h1>
   ${brandLine}
-  <p class="muted"><strong>${escapeHtml(t('pdf.productCategory') as string)}:</strong> ${escapeHtml(product.category)}</p>
+  <p class="muted"><strong>${escapeHtml(t('pdf.productCategory') as string)}:</strong> ${escapeHtml(t(categoryLabelKey(product.category)) as string)}</p>
   <h2>${escapeHtml(t('pdf.productUsages') as string)}</h2>
   ${usagesHtml}
   <h2>${escapeHtml(t('pdf.productDescriptionNotes') as string)}</h2>

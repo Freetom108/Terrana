@@ -38,6 +38,7 @@ const FAQ_ITEMS = [
   { q: 'faq.q4', a: 'faq.a4', btnKey: undefined },
   { q: 'faq.q5', a: 'faq.a5', btnKey: undefined },
   { q: 'faq.q6', a: 'faq.a6', btnKey: 'faq.a6Btn' },
+  { q: 'faq.q7', a: 'faq.a7', btnKey: undefined },
 ] satisfies Array<{ q: string; a: string; btnKey: string | undefined }>;
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
@@ -252,14 +253,6 @@ export default function SettingsTab() {
           })}
         </View>
 
-        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
-          {t('settings.tipsTitle')}
-        </Text>
-        <View style={[styles.tipCard, { backgroundColor: cardBg, borderColor: p.border }]}>
-          <Text style={[styles.tipTitle, { color: headline }]}>{t('settings.importTipTitle')}</Text>
-          <Text style={[styles.tipBody, { color: muted }]}>{t('settings.importTipBody')}</Text>
-        </View>
-
         {/* ── FAQ ── */}
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
           {t('settings.sectionFaq')}
@@ -306,40 +299,6 @@ export default function SettingsTab() {
               </View>
             );
           })}
-        </View>
-
-        {/* ── Export ── */}
-        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
-          {t('settings.sectionExport')}
-        </Text>
-        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
-          <Pressable
-            style={styles.exportRow}
-            onPress={() => void handleExportCollection()}
-            accessibilityRole="button"
-            disabled={exportingPdf}
-          >
-            <View style={styles.exportRowLeft}>
-              <Ionicons
-                name="document-text-outline"
-                size={22}
-                color={isPro || isLifetime ? colors.sage : p.muted}
-              />
-              <View style={styles.exportRowText}>
-                <Text style={[styles.exportRowTitle, { color: headline, opacity: exportingPdf ? 0.5 : 1 }]}>
-                  {t('settings.exportCollection') as string}
-                </Text>
-                <Text style={[styles.exportRowHint, { color: muted }]}>
-                  {t('settings.exportCollectionHint') as string}
-                </Text>
-              </View>
-            </View>
-            <Ionicons
-              name={isPro || isLifetime ? 'chevron-forward' : 'lock-closed-outline'}
-              size={18}
-              color={muted}
-            />
-          </Pressable>
         </View>
 
         {/* ── Backup & Restore ── */}
@@ -413,6 +372,40 @@ export default function SettingsTab() {
               <Ionicons name="chevron-forward" size={18} color={muted} />
             </Pressable>
           )}
+        </View>
+
+        {/* ── Export ── */}
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
+          {t('settings.sectionExport')}
+        </Text>
+        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
+          <Pressable
+            style={styles.exportRow}
+            onPress={() => void handleExportCollection()}
+            accessibilityRole="button"
+            disabled={exportingPdf}
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons
+                name="document-text-outline"
+                size={22}
+                color={isPro || isLifetime ? colors.sage : p.muted}
+              />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, { color: headline, opacity: exportingPdf ? 0.5 : 1 }]}>
+                  {t('settings.exportCollection') as string}
+                </Text>
+                <Text style={[styles.exportRowHint, { color: muted }]}>
+                  {t('settings.exportCollectionHint') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons
+              name={isPro || isLifetime ? 'chevron-forward' : 'lock-closed-outline'}
+              size={18}
+              color={muted}
+            />
+          </Pressable>
         </View>
 
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
@@ -508,21 +501,6 @@ const styles = StyleSheet.create({
   langLabel: {
     fontSize: 15,
     fontWeight: '600',
-  },
-  tipCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 16,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  tipBody: {
-    fontSize: 15,
-    lineHeight: 23,
-    fontWeight: '500',
   },
   aboutCard: {
     borderRadius: 16,

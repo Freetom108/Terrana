@@ -1,4 +1,12 @@
 {
+  "categories": {
+    "essentialOil": "Ätherisches Öl",
+    "supplement":   "Supplement",
+    "herbTea":      "Kraut & Tee",
+    "care":         "Pflege",
+    "blend":        "Mischung",
+    "other":        "Sonstiges"
+  },
   "onboarding": {
     "title": "Organisiere deine Sammlung",
     "subtitle": "Alles was dir wichtig ist an einem Ort",
@@ -39,8 +47,8 @@
     "screenSubtitle": "Füge Text aus deiner Quelle ein",
     "pastePlaceholder": "Text hier einfügen...",
     "placeholder": "Text hier einfügen...",
-    "detect": "Erkennen ✨",
-    "button": "Erkennen ✨",
+    "detect": "Importieren",
+    "button": "Importieren",
     "detecting": "Erkenne Daten...",
     "resultTitle": "Prüfen",
     "save": "Speichern",
@@ -62,16 +70,14 @@
     "inventoryMedium": "🟡 Halb",
     "inventoryLow": "🔴 Fast leer",
     "inventoryEmpty": "⬜ Leer",
-    "pasteTip": "💡 Tipp: Für beste Ergebnisse nur die Produktbeschreibung einfügen."
+    "pasteTip": "Kopiere die passenden Textabschnitte einer Webseite, füge sie in den Import-Bereich ein und tippe auf 'Importieren'. Je mehr relevanter Text, desto besser erkennt die KI alle Informationen und trägt sie automatisch in die entsprechenden Felder ein."
   },
   "settings": {
     "title": "Einstellungen",
     "language": "Sprache",
     "pro": "Pro",
     "lifetime": "Lifetime",
-    "tipsTitle": "Tipps & Hilfe",
-    "importTipTitle": "So gelingt der Import am besten",
-    "importTipBody": "Kopiere am besten nur die Produktbeschreibung einer Webseite - nicht die gesamte Seite. Die KI blendet irrelevante Inhalte automatisch aus, aber ein gezielter Text liefert die besten Ergebnisse.",
+
     "sectionAppearance": "DARSTELLUNG",
     "appearanceLabel": "Erscheinungsbild",
     "themeLight": "Hell",
@@ -112,10 +118,16 @@
   },
   "tabs": {
     "home": "Sammlung",
-    "search": "Suche",
+    "favorites": "Favoriten",
     "import": "Import",
     "blends": "Meine Blends",
     "settings": "Einstellungen"
+  },
+  "favorites": {
+    "screenTitle": "Favoriten",
+    "emptyTitle": "Noch keine Favoriten",
+    "emptyHint": "Tippe auf den Stern eines Produkts, um es zu deinen Favoriten hinzuzufügen.",
+    "addProducts": "Produkte durchsuchen"
   },
   "blends": {
     "screenSubtitle": "Rezepte als Mix, Kombination oder strukturiertes Protokoll.",
@@ -237,7 +249,7 @@
     "featurePdf": "PDF-Export",
     "featurePrint": "🖨️ Sammlung",
     "featureInventory": "Inventar",
-    "featureBackup": "Backup & Wiederherstellung",
+    "featureBackup": "Backup & Restore",
     "backupTagline": "Deine Sammlung bleibt erhalten – auch auf einem neuen Gerät.",
     "sharing": "Teile mit deiner Community",
     "sharingDesc": "Teile via WhatsApp, Mail, SMS & alle Apps",
@@ -335,9 +347,11 @@
     "q4": "Was ist Restore Purchases?",
     "a4": "Falls du die App neu installiert hast oder ein neues Gerät verwendest, kannst du deine gekauften Upgrades kostenlos wiederherstellen. Tippe dazu auf 'Käufe wiederherstellen' in der Paywall.",
     "q5": "Wie funktioniert der KI-Import?",
-    "a5": "Kopiere den Text einer Produktseite und füge ihn in den Import-Bereich ein. Die KI erkennt automatisch Produktname, Kategorie, Beschreibung, Anwendungen und Tags.",
+    "a5": "Kopiere die passenden Textabschnitte einer Webseite, füge sie in den Import-Bereich ein und tippe auf 'Importieren'. Je mehr relevanter Text, desto besser erkennt die KI alle Informationen und trägt sie automatisch in die entsprechenden Felder ein.",
     "q6": "Wo finde ich die Upgrade-Optionen?",
     "a6": "Du findest alle Upgrade-Optionen im Terrana Upgrade-Bereich.",
-    "a6Btn": "Upgrade-Optionen ansehen →"
+    "a6Btn": "Upgrade-Optionen ansehen →",
+    "q7": "Was ist Backup & Restore?",
+    "a7": "Mit Backup & Restore kannst du deine gesamte Sammlung – alle Produkte, Mischungen und Einstellungen – als Datei exportieren und sicher speichern. Bei einem neuen Gerät oder nach einer Neuinstallation stellst du alles mit einem Tipp wieder her. Backup & Restore ist ein exklusives Lifetime-Feature."
   }
 }

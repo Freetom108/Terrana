@@ -14,6 +14,7 @@ export interface Product {
   /** 1–5 */
   rating: number;
   inventory: InventoryLevel;
+  isFavorite?: boolean;
   /** ISO 8601, optional */
   lastUsed?: string;
   createdAt: string;

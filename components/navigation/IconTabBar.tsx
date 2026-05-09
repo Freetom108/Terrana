@@ -8,7 +8,7 @@ import { useEffect, useReducer } from 'react';
 
 const ROUTE_TAB_KEY: Record<string, string> = {
   index: 'tabs.home',
-  search: 'tabs.search',
+  favorites: 'tabs.favorites',
   import: 'tabs.import',
   blends: 'tabs.blends',
   settings: 'tabs.settings',
@@ -16,7 +16,7 @@ const ROUTE_TAB_KEY: Record<string, string> = {
 
 const ICON_ROUTE_ICONS = {
   index: { inactive: 'home-outline' as const, active: 'home' as const },
-  search: { inactive: 'search-outline' as const, active: 'search' as const },
+  favorites: { inactive: 'star-outline' as const, active: 'star' as const },
   import: { inactive: 'add-circle-outline' as const, active: 'add-circle' as const },
   blends: { inactive: 'flask-outline' as const, active: 'flask' as const },
   settings: { inactive: 'settings-outline' as const, active: 'settings' as const },

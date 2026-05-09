@@ -1,6 +1,7 @@
 import { HomeBlendCard, HomeProductCard } from '../../components/home/HomeListCards';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
+import { toggleFavorite } from '../../services/storage/products';
 import {
   FREE_BLEND_LIMIT,
   FREE_BLEND_WARN,
@@ -99,6 +100,11 @@ export default function HomeTab() {
   const recentlyUsedPreview = recentlyUsed.slice(0, LAST_USED_LIMIT);
   const blendsPreview = blends.slice(0, BLENDS_LIMIT);
 
+  const handleToggleFavorite = useCallback(async (id: string) => {
+    await toggleFavorite(id);
+    void refreshProducts();
+  }, [refreshProducts]);
+
   const showMoreRecentlyUsed = recentlyUsed.length > LAST_USED_LIMIT;
   const showMoreBlends = blends.length > BLENDS_LIMIT;
 
@@ -151,7 +157,7 @@ export default function HomeTab() {
           ) : (
             <View style={styles.productStack}>
               {recentlyUsedPreview.map((prod) => (
-                <HomeProductCard key={`recent-${prod.id}`} product={prod} palette={palette} />
+                <HomeProductCard key={`recent-${prod.id}`} product={prod} palette={palette} onToggleFavorite={(id) => void handleToggleFavorite(id)} />
               ))}
             </View>
           )}
@@ -172,7 +178,7 @@ export default function HomeTab() {
           ) : (
             <View style={styles.productStack}>
               {byName.map((prod) => (
-                <HomeProductCard key={`all-${prod.id}`} product={prod} palette={palette} />
+                <HomeProductCard key={`all-${prod.id}`} product={prod} palette={palette} onToggleFavorite={(id) => void handleToggleFavorite(id)} />
               ))}
             </View>
           )}
