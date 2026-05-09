@@ -17,6 +17,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.tommi07051967.terrana",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#4A6B4E"
@@ -26,6 +27,12 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "30de8186-fe7f-423f-b5e7-206fc94ad66d"
+      }
+    },
+    "owner": "tommi07051967"
   }
 }

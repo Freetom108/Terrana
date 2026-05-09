@@ -8,10 +8,19 @@
     "other":        "Autre"
   },
   "onboarding": {
-    "title": "Organisez votre collection",
-    "subtitle": "Tout ce qui compte pour vous en un seul endroit",
+    "title": "Bienvenue sur Terrana",
+    "subtitle": "Collecte et gère tes produits préférés, crée tes propres blends et partage-les avec tes amis.",
+    "next": "Suivant →",
+    "skip": "Passer",
+    "page2Title": "Ajoutez des produits en quelques secondes",
+    "page2Body": "Tu trouves un produit intéressant sur un site web ? Copie le texte pertinent et laisse l'IA faire le travail. Elle reconnaît automatiquement toutes les informations importantes, les importe dans la zone désignée de ton app et les classe dans les bonnes catégories pour toi.",
+    "page3Title": "Organisez vos recettes",
+    "page3Body": "Crée et gère tes propres mélanges, combinaisons et protocoles – et garde toujours une vue d'ensemble de toutes tes créations.",
+    "page4Title": "Prêt ?",
     "button": "C'est parti →",
-    "languageHint": "Vous pouvez changer la langue dans Paramètres"
+    "hint": "La langue, le mode sombre et tous les autres réglages se trouvent à tout moment dans la FAQ sous Paramètres.",
+    "languageHint": "Vous pouvez changer la langue dans Paramètres à tout moment.",
+    "faqHint": "Vous trouverez toutes les informations à tout moment dans la FAQ sous Paramètres."
   },
   "home": {
     "greeting": "Bonjour",
@@ -345,6 +354,8 @@
     "permissionDenied": "Veuillez autoriser les notifications de Terrana dans les paramètres de votre téléphone pour utiliser cette fonctionnalité."
   },
   "faq": {
+    "q0": "Revoir l'intro de l'app",
+    "a0": "Revoir comment Terrana fonctionne",
     "q1": "Puis-je passer de Pro à Lifetime plus tard ?",
     "a1": "Oui, à tout moment ! Votre contenu Pro est conservé et vous obtenez un accès complet à toutes les fonctionnalités Lifetime. Notez que le prix Lifetime complet s'applique, car un crédit partiel n'est techniquement pas possible.",
     "q3": "Qu'arrive-t-il à mes données ?",

@@ -8,10 +8,19 @@
     "other":        "Other"
   },
   "onboarding": {
-    "title": "Organize your collection",
-    "subtitle": "Everything that matters to you in one place",
+    "title": "Welcome to Terrana",
+    "subtitle": "Collect and manage your favorite products, create your own blends and share them with friends.",
+    "next": "Next →",
+    "skip": "Skip",
+    "page2Title": "Add products in seconds",
+    "page2Body": "Found an interesting product on a website? Copy the relevant text and let the AI do the work. It automatically recognizes all important information, imports it into the designated area of your app and places it in the right categories for you.",
+    "page3Title": "Organize your recipes",
+    "page3Body": "Create and manage your own blends, combinations and protocols – and always keep track of all your creations.",
+    "page4Title": "Ready?",
     "button": "Let's go →",
-    "languageHint": "You can change the language anytime in Settings"
+    "hint": "Language, Dark Mode and all other settings can be found at any time in the FAQs under Settings.",
+    "languageHint": "You can change the language anytime in Settings.",
+    "faqHint": "You can find all information at any time in the FAQs under Settings."
   },
   "home": {
     "greeting": "Hello",
@@ -345,6 +354,8 @@
     "permissionDenied": "Please allow notifications for Terrana in your phone settings to use this feature."
   },
   "faq": {
+    "q0": "Replay app intro",
+    "a0": "Watch again how Terrana works",
     "q1": "Can I upgrade from Pro to Lifetime later?",
     "a1": "Yes, anytime! Your Pro content stays and you get full access to all Lifetime features. Please note that the full Lifetime price applies, as a partial credit is technically not possible.",
     "q3": "What happens to my data?",

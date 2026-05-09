@@ -8,10 +8,19 @@
     "other":        "Sonstiges"
   },
   "onboarding": {
-    "title": "Organisiere deine Sammlung",
-    "subtitle": "Alles was dir wichtig ist an einem Ort",
+    "title": "Willkommen bei Terrana",
+    "subtitle": "Sammle und verwalte deine Lieblingsprodukte, erstelle eigene Blends und teile sie mit Freunden.",
+    "next": "Weiter →",
+    "skip": "Überspringen",
+    "page2Title": "Produkte in Sekunden hinzufügen",
+    "page2Body": "Findest du ein interessantes Produkt auf einer Webseite, kopiere den relevanten Text und lass die KI die Arbeit erledigen. Sie erkennt automatisch alle wichtigen Informationen, importiert sie im dafür zuständigen Bereich in deine App und legt sie in den richtigen Kategorien für dich an.",
+    "page3Title": "Organisiere deine Rezepte",
+    "page3Body": "Erstelle und verwalte eigene Mischungen, Kombinationen und Protokolle – und behalte immer den Überblick über deine gesamten Kreationen.",
+    "page4Title": "Bereit?",
     "button": "Los geht's →",
-    "languageHint": "Du kannst die Sprache jederzeit in den Einstellungen ändern"
+    "hint": "Sprache, Dark Mode und alle weiteren Einstellungen findest du jederzeit in den FAQs unter Einstellungen.",
+    "languageHint": "Du kannst die Sprache jederzeit in den Einstellungen ändern.",
+    "faqHint": "Alle Informationen findest du jederzeit in den FAQs unter Einstellungen."
   },
   "home": {
     "greeting": "Guten Tag",
@@ -345,6 +354,8 @@
     "permissionDenied": "Bitte erlaube Benachrichtigungen von Terrana in deinen Handy-Einstellungen, um diese Funktion zu nutzen."
   },
   "faq": {
+    "q0": "App Intro wiederholen",
+    "a0": "Noch mal ansehen wie Terrana funktioniert",
     "q1": "Kann ich später von Pro auf Lifetime upgraden?",
     "a1": "Ja, jederzeit! Deine Pro-Inhalte bleiben erhalten und du erhältst vollen Zugriff auf alle Lifetime-Features. Bitte beachte dass der Lifetime-Preis in voller Höhe anfällt, da eine nachträgliche Verrechnung technisch nicht möglich ist.",
     "q3": "Was passiert mit meinen Daten?",

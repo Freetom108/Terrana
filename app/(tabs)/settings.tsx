@@ -39,6 +39,7 @@ import {
 const APP_VERSION = '1.0.0';
 
 const FAQ_ITEMS = [
+  { q: 'faq.q0', a: 'faq.a0', btnKey: 'faq.a0', action: 'onboarding' as const, btnOnly: true as const },
   { q: 'faq.q1', a: 'faq.a1', btnKey: undefined },
   { q: 'faq.q3', a: 'faq.a3', btnKey: undefined },
   { q: 'faq.q4', a: 'faq.a4', btnKey: undefined },
@@ -46,7 +47,7 @@ const FAQ_ITEMS = [
   { q: 'faq.q6', a: 'faq.a6', btnKey: 'faq.a6Btn' },
   { q: 'faq.q7', a: 'faq.a7', btnKey: undefined },
   { q: 'faq.q8', a: 'faq.a8', btnKey: undefined },
-] satisfies Array<{ q: string; a: string; btnKey: string | undefined }>;
+] satisfies Array<{ q: string; a: string; btnKey: string | undefined; action?: string; btnOnly?: boolean }>;
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
   { value: 'light', labelKey: 'settings.themeLight' },
@@ -283,7 +284,7 @@ export default function SettingsTab() {
           {t('settings.sectionFaq')}
         </Text>
         <View style={[styles.faqCard, { backgroundColor: cardBg, borderColor: p.border }]}>
-          {FAQ_ITEMS.map(({ q, a, btnKey }, idx) => {
+          {FAQ_ITEMS.map(({ q, a, btnKey, action, btnOnly }, idx) => {
             const isOpen = openFaq === idx;
             const isLast = idx === FAQ_ITEMS.length - 1;
             return (
@@ -306,10 +307,18 @@ export default function SettingsTab() {
                 </Pressable>
                 {isOpen ? (
                   <View style={styles.faqAnswerWrap}>
-                    <Text style={[styles.faqAnswer, { color: muted }]}>{t(a) as string}</Text>
+                    {!btnOnly ? (
+                      <Text style={[styles.faqAnswer, { color: muted }]}>{t(a) as string}</Text>
+                    ) : null}
                     {btnKey ? (
                       <Pressable
-                        onPress={() => router.push('/paywall')}
+                        onPress={() => {
+                          if (action === 'onboarding') {
+                            router.push({ pathname: '/onboarding', params: { from: 'settings' } });
+                          } else {
+                            router.push('/paywall');
+                          }
+                        }}
                         style={[styles.faqBtn, { backgroundColor: colors.sage }]}
                         accessibilityRole="button"
                       >

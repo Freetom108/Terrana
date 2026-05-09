@@ -99,7 +99,8 @@ export default function BlendsTab() {
           <EmptyState
             title={t('blends.emptyTitle')}
             message={t('blends.emptyMessage')}
-            emoji="🧪"
+            icon="flask-outline"
+            iconColor="#C2D4C4"
           />
         ) : showFilterEmpty ? (
           <EmptyState title={t('blends.noMatchesTitle')} message={t('blends.noMatchesMessage')} emoji="🔍" />
