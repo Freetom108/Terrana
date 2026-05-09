@@ -1,8 +1,8 @@
-import { categoryLabelKey, PRODUCT_CATEGORIES } from '../../constants/categories';
+import { categoryLabelKey, PRODUCT_CATEGORIES, resolveProductCategory } from '../../constants/categories';
 import { colors } from '../../constants/colors';
 import { usePro } from '../../hooks/usePro';
 import { useThemePalette } from '../../hooks/useThemePalette';
-import { t } from '../../services/i18n/i18n';
+import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { exportProductAsPDF, printProduct } from '../../services/export/pdfExport';
 import { shareProduct } from '../../services/export/shareService';
 import { deleteProduct, getProductById, saveProduct, toggleFavorite } from '../../services/storage/products';
@@ -11,10 +11,12 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -43,6 +45,7 @@ function inventoryLabel(inv: InventoryLevel): string {
 function cloneProduct(pr: Product): Product {
   return {
     ...pr,
+    brand: typeof pr.brand === 'string' ? pr.brand : '',
     usages: [...pr.usages],
     tags: [...pr.tags],
   };
@@ -60,6 +63,9 @@ export default function ProductScreen() {
   const palette = useThemePalette();
   const p = palette;
   const { isPro, isLifetime } = usePro();
+
+  const [, redrawLocale] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => subscribeLocale(redrawLocale), []);
 
   const [product, setProduct] = useState<Product | null | undefined>(undefined);
   const [editing, setEditing] = useState(false);
@@ -121,7 +127,8 @@ export default function ProductScreen() {
     const next: Product = {
       ...draft,
       name: draft.name.trim(),
-      brand: draft.brand.trim(),
+      brand: typeof draft.brand === 'string' ? draft.brand.trim() : '',
+      category: resolveProductCategory(draft.category),
       description: draft.description.trim(),
       notes: draft.notes.trim(),
       usages,
@@ -237,13 +244,22 @@ export default function ProductScreen() {
   const notes = display.notes.trim();
 
   return (
-    <View style={[styles.root, { backgroundColor: p.surface }]}>
-      <LinearGradient
-        colors={[colors.sageDark, colors.sage]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={[styles.hero, { paddingTop: Math.max(insets.top, 12) + 8 }]}
+    <KeyboardAvoidingView
+      style={[styles.root, { backgroundColor: p.surface }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 28 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
+        <LinearGradient
+          colors={[colors.sageDark, colors.sage]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={[styles.hero, { paddingTop: Math.max(insets.top, 12) + 8 }]}
+        >
         <View style={styles.heroTop}>
           <Pressable
             onPress={() => router.back()}
@@ -379,12 +395,7 @@ export default function ProductScreen() {
         )}
       </LinearGradient>
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.scrollInner, { paddingBottom: insets.bottom + 28 }]}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
+        <View style={styles.scrollInner}>
         <Section palette={palette} title={t('import.fieldBrand')}>
           {editing && draft ? (
             <TextInput
@@ -607,8 +618,9 @@ export default function ProductScreen() {
             </View>
           )}
         </Section>
+        </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

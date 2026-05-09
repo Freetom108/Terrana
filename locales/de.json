@@ -1,11 +1,11 @@
 {
   "categories": {
     "essentialOil": "Ätherisches Öl",
-    "supplement":   "Supplement",
-    "herbTea":      "Kraut & Tee",
-    "care":         "Pflege",
-    "blend":        "Mischung",
-    "other":        "Sonstiges"
+    "carrierOil": "Trägeröl",
+    "herbTea": "Kraut & Tee",
+    "supplement": "Nahrungsergänzung",
+    "bachFlower": "Bachblüten",
+    "other": "Sonstiges"
   },
   "onboarding": {
     "title": "Willkommen bei Terrana",
@@ -48,7 +48,8 @@
     "emptyBlendsTitle": "Noch keine Mischungen",
     "emptyBlendsMessage": "Lege eine Mischung aus deinen Produkten an.",
     "blendIngredientSummary": "%{count} Zutaten",
-    "viewAll": "Alle anzeigen →"
+    "viewAll": "Alle anzeigen →",
+    "addProductManually": "+ Manuell anlegen"
   },
   "import": {
     "title": "Importieren",
@@ -79,7 +80,8 @@
     "inventoryMedium": "🟡 Halb",
     "inventoryLow": "🔴 Fast leer",
     "inventoryEmpty": "⬜ Leer",
-    "pasteTip": "Kopiere die passenden Textabschnitte einer Webseite, füge sie in den Import-Bereich ein und tippe auf 'Importieren'. Je mehr relevanter Text, desto besser erkennt die KI alle Informationen und trägt sie automatisch in die entsprechenden Felder ein."
+    "pasteTip": "Kopiere die passenden Textabschnitte einer Webseite, füge sie in den Import-Bereich ein und tippe auf 'Importieren'. Je mehr relevanter Text, desto besser erkennt die KI alle Informationen und trägt sie automatisch in die entsprechenden Felder ein.",
+    "addProductManually": "Produkt manuell anlegen →"
   },
   "settings": {
     "title": "Einstellungen",
@@ -195,6 +197,11 @@
     "deleteTitle": "Mischung löschen",
     "deleteMessage": "Möchtest du \"%{name}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "deleteConfirm": "Löschen"
+  },
+  "productNew": {
+    "title": "Neues Produkt",
+    "validationTitle": "Hinweis",
+    "nameRequired": "Bitte gib einen Produktnamen ein."
   },
   "blendNew": {
     "screenTitle": "Neuer Blend",

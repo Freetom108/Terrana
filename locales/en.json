@@ -1,11 +1,11 @@
 {
   "categories": {
     "essentialOil": "Essential Oil",
-    "supplement":   "Supplement",
-    "herbTea":      "Herb & Tea",
-    "care":         "Care",
-    "blend":        "Blend",
-    "other":        "Other"
+    "carrierOil": "Carrier Oil",
+    "herbTea": "Herb & Tea",
+    "supplement": "Supplement",
+    "bachFlower": "Bach Flower",
+    "other": "Other"
   },
   "onboarding": {
     "title": "Welcome to Terrana",
@@ -48,7 +48,8 @@
     "emptyBlendsTitle": "No blends yet",
     "emptyBlendsMessage": "Create a blend from your products.",
     "blendIngredientSummary": "%{count} ingredients",
-    "viewAll": "Show all →"
+    "viewAll": "Show all →",
+    "addProductManually": "+ Add manually"
   },
   "import": {
     "title": "Import",
@@ -79,7 +80,8 @@
     "inventoryMedium": "🟡 Half",
     "inventoryLow": "🔴 Nearly empty",
     "inventoryEmpty": "⬜ Empty",
-    "pasteTip": "Copy the relevant text sections from a website, paste them into the Import area and tap 'Import'. The more relevant text you provide, the better the AI recognizes all information and automatically fills in the corresponding fields."
+    "pasteTip": "Copy the relevant text sections from a website, paste them into the Import area and tap 'Import'. The more relevant text you provide, the better the AI recognizes all information and automatically fills in the corresponding fields.",
+    "addProductManually": "Add product manually →"
   },
   "settings": {
     "title": "Settings",
@@ -195,6 +197,11 @@
     "deleteTitle": "Delete blend",
     "deleteMessage": "Do you really want to delete \"%{name}\"? This cannot be undone.",
     "deleteConfirm": "Delete"
+  },
+  "productNew": {
+    "title": "New product",
+    "validationTitle": "Missing information",
+    "nameRequired": "Please enter a product name."
   },
   "blendNew": {
     "screenTitle": "New blend",

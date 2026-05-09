@@ -1,4 +1,5 @@
 import { HomeProductCard } from '../../components/home/HomeListCards';
+import { categoryLabelKey } from '../../constants/categories';
 import { colors } from '../../constants/colors';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
@@ -29,6 +30,9 @@ function matchesQuery(product: Product, query: string): boolean {
   if (product.description?.toLowerCase().includes(q)) return true;
   if (product.usages?.some((u) => u.toLowerCase().includes(q))) return true;
   if (product.tags?.some((tag) => tag.toLowerCase().includes(q))) return true;
+  const catLabel = String(t(categoryLabelKey(product.category))).toLowerCase();
+  if (catLabel.includes(q)) return true;
+  if (product.category.toLowerCase().includes(q)) return true;
   return false;
 }
 

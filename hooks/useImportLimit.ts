@@ -30,6 +30,7 @@ export function useImportLimit({ isPro = false, isLifetime = false }: ImportLimi
     ? Math.max(0, (effectiveLimit as number) - importsUsed)
     : Number.POSITIVE_INFINITY;
 
+  /** Free: true while `importsUsed < FREE_IMPORT_LIMIT`. After the last allowed run, increments to equal limit — import screens should still allow finishing the open result (e.g. keep UI when `showResult`). */
   const canImport = isLifetime || isPro || importsUsed < FREE_IMPORT_LIMIT;
 
   const incrementImport = useCallback(async () => {

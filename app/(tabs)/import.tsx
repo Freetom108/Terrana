@@ -1,7 +1,11 @@
-import { colors } from '../../constants/colors';
-import { PRODUCT_CATEGORIES } from '../../constants/categories';
 import type { ProductCategory } from '../../constants/categories';
-import { FREE_IMPORT_LIMIT, FREE_IMPORT_WARN } from '../../constants/limits';
+import {
+  PRODUCT_CATEGORIES,
+  categoryLabelKey,
+  resolveProductCategory,
+} from '../../constants/categories';
+import { colors } from '../../constants/colors';
+import { FREE_IMPORT_DISPLAY_MAX, FREE_IMPORT_LIMIT, FREE_IMPORT_WARN } from '../../constants/limits';
 import { useImportLimit } from '../../hooks/useImportLimit';
 import { usePro } from '../../hooks/usePro';
 import type { ThemePalette } from '../../hooks/useThemePalette';
@@ -33,15 +37,6 @@ function parseList(s: string): string[] {
     .filter(Boolean);
 }
 
-function toCategory(raw: string): ProductCategory {
-  const s = raw.trim();
-  if (PRODUCT_CATEGORIES.includes(s as ProductCategory)) {
-    return s as ProductCategory;
-  }
-  const lower = s.toLowerCase();
-  return PRODUCT_CATEGORIES.find((c) => c.toLowerCase() === lower) ?? 'Sonstiges';
-}
-
 function newId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
@@ -49,7 +44,7 @@ function newId(): string {
 type FormState = {
   name: string;
   brand: string;
-  category: string;
+  category: ProductCategory;
   description: string;
   userNotes: string;
   usagesText: string;
@@ -60,7 +55,7 @@ type FormState = {
 const EMPTY_FORM: FormState = {
   name: '',
   brand: '',
-  category: '',
+  category: 'other',
   description: '',
   userNotes: '',
   usagesText: '',
@@ -160,6 +155,11 @@ export default function ImportTab() {
   const handleDetect = async () => {
     const text = sourceText.trim();
     if (!text || loading) return;
+    /** Block before API call: free tier has exactly FREE_IMPORT_LIMIT runs (counts after success). */
+    if (isFreeUser && importsUsed >= FREE_IMPORT_LIMIT) {
+      router.push('/paywall');
+      return;
+    }
     setError(null);
     setSaveError(null);
     setLoading(true);
@@ -181,8 +181,8 @@ export default function ImportTab() {
       const d = result.data;
       setForm({
         name: d.productName,
-        brand: '',
-        category: d.category,
+        brand: d.brand,
+        category: resolveProductCategory(d.category),
         description: d.notes,
         userNotes: '',
         usagesText: d.usage.join('\n'),
@@ -218,7 +218,7 @@ export default function ImportTab() {
         id: newId(),
         name,
         brand: form.brand.trim(),
-        category: toCategory(form.category),
+        category: form.category,
         description: desc,
         notes: form.userNotes.trim(),
         usages: parseList(form.usagesText),
@@ -260,7 +260,10 @@ export default function ImportTab() {
             <View style={[styles.importProgressWrap, { backgroundColor: palette.isDark ? '#3D2E1A' : '#FFF3E0', borderColor: '#E6A817' }]}>
               <View style={styles.importProgressRow}>
                 <Text style={[styles.importProgressText, { color: palette.isDark ? '#FFD580' : '#8A5A00' }]}>
-                  {t('limits.importProgress', { used: importsUsed, max: FREE_IMPORT_LIMIT }) as string}
+                  {t('limits.importProgress', {
+                    used: Math.min(importsUsed, FREE_IMPORT_DISPLAY_MAX),
+                    max: FREE_IMPORT_DISPLAY_MAX,
+                  }) as string}
                 </Text>
                 <Pressable onPress={() => router.push('/paywall')} hitSlop={8}>
                   <Text style={[styles.importProgressLink, { color: palette.isDark ? '#FFD580' : '#8A5A00' }]}>
@@ -274,12 +277,15 @@ export default function ImportTab() {
                     styles.importProgressFill,
                     {
                       backgroundColor: importsUsed >= FREE_IMPORT_LIMIT ? '#E65C00' : '#E6A817',
-                      width: `${Math.min(100, (importsUsed / FREE_IMPORT_LIMIT) * 100)}%` as `${number}%`,
+                      width: `${Math.min(
+                        100,
+                        (Math.min(importsUsed, FREE_IMPORT_DISPLAY_MAX) / FREE_IMPORT_DISPLAY_MAX) * 100,
+                      )}%` as `${number}%`,
                     },
                   ]}
                 />
               </View>
-              {importsUsed >= FREE_IMPORT_LIMIT - 1 ? (
+              {importsUsed >= FREE_IMPORT_DISPLAY_MAX - 1 ? (
                 <Text style={[styles.importNearLimit, { color: palette.isDark ? '#FFD580' : '#8A5A00' }]}>
                   {t('limits.importNearLimit') as string}
                 </Text>
@@ -287,22 +293,34 @@ export default function ImportTab() {
             </View>
           )}
 
-          {!canImport ? (
-            <Pressable
-              style={[
-                styles.upgradeBox,
-                {
-                  backgroundColor: palette.isDark ? 'rgba(122,158,126,0.22)' : colors.sageLight,
-                  borderColor: colors.sage,
-                },
-              ]}
-              onPress={() => router.push('/paywall')}
-              accessibilityRole="button"
-            >
-              <Text style={[styles.upgradeText, { color: palette.isDark ? colors.sageLight : colors.sageDark }]}>
-                {t('import.upgradeMessage', { limit: FREE_IMPORT_LIMIT })}
-              </Text>
-            </Pressable>
+          {!canImport && !showResult ? (
+            <>
+              <Pressable
+                style={[
+                  styles.upgradeBox,
+                  {
+                    backgroundColor: palette.isDark ? 'rgba(122,158,126,0.22)' : colors.sageLight,
+                    borderColor: colors.sage,
+                  },
+                ]}
+                onPress={() => router.push('/paywall')}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.upgradeText, { color: palette.isDark ? colors.sageLight : colors.sageDark }]}>
+                  {t('import.upgradeMessage', { limit: FREE_IMPORT_DISPLAY_MAX })}
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => router.push('/product/new')}
+                style={styles.manualAddLinkWrap}
+                hitSlop={{ top: 8, bottom: 8 }}
+                accessibilityRole="link"
+              >
+                <Text style={[styles.manualAddLinkText, { color: colors.mid }]}>
+                  {t('import.addProductManually')}
+                </Text>
+              </Pressable>
+            </>
           ) : (
             <>
               <TextInput
@@ -332,23 +350,35 @@ export default function ImportTab() {
               ) : null}
 
               {!showResult ? (
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.detectBtn,
-                    (pressed || loading || !sourceText.trim()) && styles.detectBtnDim,
-                  ]}
-                  onPress={() => void handleDetect()}
-                  disabled={loading || !sourceText.trim()}
-                >
-                  {loading ? (
-                    <View style={styles.rowCenter}>
-                      <ActivityIndicator color={colors.white} style={styles.spinner} />
-                      <Text style={styles.detectBtnText}>{t('import.detecting')}</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.detectBtnText}>{t('import.detect')}</Text>
-                  )}
-                </Pressable>
+                <>
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.detectBtn,
+                      (pressed || loading || !sourceText.trim()) && styles.detectBtnDim,
+                    ]}
+                    onPress={() => void handleDetect()}
+                    disabled={loading || !sourceText.trim()}
+                  >
+                    {loading ? (
+                      <View style={styles.rowCenter}>
+                        <ActivityIndicator color={colors.white} style={styles.spinner} />
+                        <Text style={styles.detectBtnText}>{t('import.detecting')}</Text>
+                      </View>
+                    ) : (
+                      <Text style={styles.detectBtnText}>{t('import.detect')}</Text>
+                    )}
+                  </Pressable>
+                  <Pressable
+                    onPress={() => router.push('/product/new')}
+                    style={styles.manualAddLinkWrap}
+                    hitSlop={{ top: 8, bottom: 8 }}
+                    accessibilityRole="link"
+                  >
+                    <Text style={[styles.manualAddLinkText, { color: colors.mid }]}>
+                      {t('import.addProductManually')}
+                    </Text>
+                  </Pressable>
+                </>
               ) : (
                 <View style={[styles.resultCard, { backgroundColor: palette.card, borderColor: palette.border }]}>
                   <Text style={[styles.resultHeading, { color: palette.text }]}>{t('import.resultTitle')}</Text>
@@ -367,12 +397,44 @@ export default function ImportTab() {
                     onChangeText={(brand) => setForm((f) => ({ ...f, brand }))}
                     placeholder="Wikipedia"
                   />
-                  <FieldBlock
-                    palette={palette}
-                    labelKey="import.fieldCategory"
-                    value={form.category}
-                    onChangeText={(category) => setForm((f) => ({ ...f, category }))}
-                  />
+                  <View style={styles.fieldBlock}>
+                    <Text style={[styles.fieldLabel, { color: palette.muted }]}>
+                      ✏️ {t('import.fieldCategory')}
+                    </Text>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.categoryChipRow}
+                    >
+                      {PRODUCT_CATEGORIES.map((cat) => {
+                        const sel = form.category === cat;
+                        return (
+                          <Pressable
+                            key={cat}
+                            onPress={() => setForm((f) => ({ ...f, category: cat }))}
+                            style={[
+                              styles.categoryChip,
+                              {
+                                borderColor: sel ? colors.sageDark : palette.border,
+                                backgroundColor: sel ? colors.sageDark : palette.inputBg,
+                              },
+                            ]}
+                            accessibilityRole="button"
+                            accessibilityState={{ selected: sel }}
+                          >
+                            <Text
+                              style={[
+                                styles.categoryChipText,
+                                { color: sel ? colors.white : palette.text },
+                              ]}
+                            >
+                              {t(categoryLabelKey(cat)) as string}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
                   <FieldBlock
                     palette={palette}
                     labelKey="import.fieldDescription"
@@ -551,6 +613,15 @@ const styles = StyleSheet.create({
   detectBtnDim: {
     opacity: 0.75,
   },
+  manualAddLinkWrap: {
+    alignSelf: 'center',
+    paddingVertical: 10,
+    marginBottom: 4,
+  },
+  manualAddLinkText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
   detectBtnText: {
     color: colors.white,
     fontSize: 17,
@@ -589,6 +660,23 @@ const styles = StyleSheet.create({
   },
   fieldInputMulti: {
     textAlignVertical: 'top',
+  },
+  categoryChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    gap: 8,
+    paddingVertical: 4,
+    paddingRight: 4,
+  },
+  categoryChip: {
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+  },
+  categoryChipText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   notesInput: {
     minHeight: 80,

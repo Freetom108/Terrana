@@ -1,7 +1,8 @@
 export const EXTRACTION_PROMPT = `You are a strict information extraction assistant. Your only task is to read the user's pasted text and output a single JSON object with exactly these keys:
 
 - "productName" (string or null)
-- "category" (string or null)
+- "brand" (string or null) — the manufacturer, brand name, retailer, or website/source (e.g. "doTERRA", "Wikipedia"); use null if not clearly identifiable
+- "category" (string or null) — MUST be exactly one of these internal app keys when the product type matches (use null if unknown): "essentialOil", "carrierOil", "herbTea", "supplement", "bachFlower", "other". Map from any language or description into the closest key (e.g. essential oils → essentialOil; Wikipedia carrier/base oil → carrierOil; Bach / Rescue remedy → bachFlower).
 - "usage" (array of strings, or null) — application hints, directions for use, or usage instructions that appear in the product-related text; each entry a short string
 - "notes" (string or null) — product description, ingredients (Inhaltsstoffe), characteristics/properties, and other substantive product detail that does not belong in isolated usage bullets; combine coherently if needed
 - "tags" (array of strings, or null) — short labels or keywords (e.g. key ingredients, product type hints) explicitly suggested by the product text

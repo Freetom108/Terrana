@@ -5,6 +5,7 @@ export type InventoryLevel = 'full' | 'medium' | 'low' | 'empty';
 export interface Product {
   id: string;
   name: string;
+  /** Manufacturer, retailer, or site/source (single persisted field — not `source`) */
   brand: string;
   category: ProductCategory;
   description: string;

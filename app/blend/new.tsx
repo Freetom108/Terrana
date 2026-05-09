@@ -1,8 +1,9 @@
+import { categoryLabelKey } from '../../constants/categories';
 import { colors } from '../../constants/colors';
 import { usePro } from '../../hooks/usePro';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
-import { t } from '../../services/i18n/i18n';
+import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { saveBlend } from '../../services/storage/blends';
 import { LimitExceededError } from '../../services/storage/errors';
 import {
@@ -16,11 +17,13 @@ import {
 import type { Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import {
   Alert,
   FlatList,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -76,12 +79,25 @@ type PickerTarget =
   | { kind: 'combo'; idx: number }
   | { kind: 'proto'; idx: number };
 
+function pickerProductMatchesQuery(product: Product, q: string): boolean {
+  if (product.name.toLowerCase().includes(q)) return true;
+  if (product.brand.toLowerCase().includes(q)) return true;
+  const catLabel = String(t(categoryLabelKey(product.category))).toLowerCase();
+  if (catLabel.includes(q)) return true;
+  if (product.category.toLowerCase().includes(q)) return true;
+  return false;
+}
+
 export default function NewBlendScreen() {
   const palette = useThemePalette();
   const p = palette;
   const insets = useSafeAreaInsets();
   const { isPro, isLifetime } = usePro();
   const { products } = useProducts();
+
+  const [, redrawLocale] = useReducer((n: number) => n + 1, 0);
+
+  useEffect(() => subscribeLocale(redrawLocale), []);
 
   const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
   const [pickerSearch, setPickerSearch] = useState('');
@@ -128,13 +144,8 @@ export default function NewBlendScreen() {
   const filteredPickerProducts = useMemo(() => {
     const q = pickerSearch.trim().toLowerCase();
     if (!q) return products;
-    return products.filter(
-      (prod) =>
-        prod.name.toLowerCase().includes(q) ||
-        prod.category.toLowerCase().includes(q) ||
-        prod.brand.toLowerCase().includes(q),
-    );
-  }, [products, pickerSearch]);
+    return products.filter((prod) => pickerProductMatchesQuery(prod, q));
+  }, [products, pickerSearch, redrawLocale]);
 
   const openPicker = useCallback((target: PickerTarget) => {
     setPickerSearch('');
@@ -316,30 +327,33 @@ export default function NewBlendScreen() {
   const topPad = Math.max(insets.top, 12);
 
   return (
-    <View style={[styles.root, { backgroundColor: p.surface }]}>
-      <View style={[styles.topBar, { paddingTop: topPad }]}>
-        <Pressable
-          onPress={() => router.back()}
-          style={styles.backRow}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel={t('blendNew.a11yBack') as string}
-        >
-          <Ionicons name="chevron-back" size={26} color={p.secondaryBtnLabel} />
-          <Text style={[styles.backText, { color: p.secondaryBtnLabel }]}>{t('general.back')}</Text>
-        </Pressable>
-        <Text style={[styles.title, { color: p.text }]}>{t('blendNew.screenTitle')}</Text>
-      </View>
-
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[
-          styles.scrollInner,
-          { paddingBottom: insets.bottom + 32 },
-        ]}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={[styles.root, { backgroundColor: p.surface }]}
       >
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[
+            styles.scrollInner,
+            { paddingBottom: insets.bottom + 32 },
+          ]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={[styles.topBar, { paddingTop: topPad }]}>
+            <Pressable
+              onPress={() => router.back()}
+              style={styles.backRow}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel={t('blendNew.a11yBack') as string}
+            >
+              <Ionicons name="chevron-back" size={26} color={p.secondaryBtnLabel} />
+              <Text style={[styles.backText, { color: p.secondaryBtnLabel }]}>{t('general.back')}</Text>
+            </Pressable>
+            <Text style={[styles.title, { color: p.text }]}>{t('blendNew.screenTitle')}</Text>
+          </View>
         {/* ── Kind selector ── */}
         <View style={styles.kindSelector}>
           {(['mix', 'combination', 'protocol'] as BlendKind[]).map((k) => {
@@ -757,7 +771,8 @@ export default function NewBlendScreen() {
               <Text style={styles.savePillText}>{t('blendNew.save')}</Text>
             </Pressable>
           </>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <Modal
         visible={pickerTarget !== null}
@@ -822,7 +837,7 @@ export default function NewBlendScreen() {
           )}
         </View>
       </Modal>
-    </View>
+    </>
   );
 }
 

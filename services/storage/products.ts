@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FREE_PRODUCT_LIMIT, LIFETIME_LIMIT, PRO_PRODUCT_LIMIT } from '../../constants/limits';
 import type { ProductCategory } from '../../constants/categories';
-import { PRODUCT_CATEGORIES } from '../../constants/categories';
+import { resolveProductCategory } from '../../constants/categories';
 import { LimitExceededError } from './errors';
 import type { Product } from '../../types/product';
 
@@ -13,19 +13,24 @@ function clampRating(n: unknown): number {
 }
 
 function normalizeCategory(raw: unknown): ProductCategory {
-  const s = typeof raw === 'string' ? raw.trim() : '';
-  if (PRODUCT_CATEGORIES.includes(s as ProductCategory)) {
-    return s as ProductCategory;
-  }
-  const lower = s.toLowerCase();
-  const hit = PRODUCT_CATEGORIES.find((c) => c.toLowerCase() === lower);
-  return hit ?? 'Sonstiges';
+  return resolveProductCategory(raw);
 }
 
 function normalizeInventory(raw: unknown): Product['inventory'] {
   const v = typeof raw === 'string' ? raw : '';
   if (v === 'full' || v === 'medium' || v === 'low' || v === 'empty') return v;
   return 'full';
+}
+
+/** Persisted and displayed field is always `brand`. Legacy or AI exports may use `source` / `sourceOrBrand`. */
+function pickBrand(raw: Record<string, unknown>): string {
+  for (const key of ['brand', 'source', 'sourceOrBrand'] as const) {
+    const v = raw[key];
+    if (typeof v === 'string' && v.trim().length > 0) {
+      return v.trim();
+    }
+  }
+  return '';
 }
 
 function normalizeProduct(raw: Record<string, unknown>): Product {
@@ -45,7 +50,7 @@ function normalizeProduct(raw: Record<string, unknown>): Product {
   return {
     id: String(raw.id ?? ''),
     name: String(raw.name ?? ''),
-    brand: String(raw.brand ?? ''),
+    brand: pickBrand(raw),
     category: normalizeCategory(raw.category),
     description,
     notes,
@@ -105,6 +110,7 @@ export async function saveProduct(
   const products = await readProducts();
   const normalized: Product = {
     ...product,
+    brand: typeof product.brand === 'string' ? product.brand.trim() : '',
     rating: clampRating(product.rating),
     category: normalizeCategory(product.category),
     inventory: normalizeInventory(product.inventory),

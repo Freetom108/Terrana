@@ -1,11 +1,11 @@
 {
   "categories": {
-    "essentialOil": "Aceite Esencial",
-    "supplement":   "Suplemento",
-    "herbTea":      "Hierba & Té",
-    "care":         "Cuidado",
-    "blend":        "Mezcla",
-    "other":        "Otro"
+    "essentialOil": "Aceite esencial",
+    "carrierOil": "Aceite portador",
+    "herbTea": "Hierba & té",
+    "supplement": "Suplemento",
+    "bachFlower": "Flores de Bach",
+    "other": "Otro"
   },
   "onboarding": {
     "title": "Bienvenido a Terrana",
@@ -48,7 +48,8 @@
     "emptyBlendsTitle": "Aún no hay mezclas",
     "emptyBlendsMessage": "Crea una mezcla a partir de tus productos.",
     "blendIngredientSummary": "%{count} ingredientes",
-    "viewAll": "Ver todo →"
+    "viewAll": "Ver todo →",
+    "addProductManually": "+ Añadir manualmente"
   },
   "import": {
     "title": "Importar",
@@ -79,7 +80,8 @@
     "inventoryMedium": "🟡 Medio",
     "inventoryLow": "🔴 Casi vacío",
     "inventoryEmpty": "⬜ Vacío",
-    "pasteTip": "Copia las secciones de texto relevantes de un sitio web, pégalas en el área de importación y pulsa 'Importar'. Cuanto más texto relevante proporciones, mejor reconocerá la IA toda la información y la introducirá automáticamente en los campos correspondientes."
+    "pasteTip": "Copia las secciones de texto relevantes de un sitio web, pégalas en el área de importación y pulsa 'Importar'. Cuanto más texto relevante proporciones, mejor reconocerá la IA toda la información y la introducirá automáticamente en los campos correspondientes.",
+    "addProductManually": "Añadir producto manualmente →"
   },
   "settings": {
     "title": "Configuración",
@@ -186,6 +188,11 @@
     "deleteTitle": "Eliminar producto",
     "deleteMessage": "¿Realmente quieres eliminar \"%{name}\"? Esta acción no se puede deshacer.",
     "deleteConfirm": "Eliminar"
+  },
+  "productNew": {
+    "title": "Producto nuevo",
+    "validationTitle": "Información incompleta",
+    "nameRequired": "Introduce un nombre para el producto."
   },
   "blend": {
     "notFoundTitle": "Mezcla no encontrada",

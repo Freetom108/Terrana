@@ -14,6 +14,9 @@ export type ExtractProductResult =
 
 type RawExtracted = {
   productName?: string | null;
+  brand?: string | null;
+  /** Some model responses use "source" for retailer / website — treated like brand */
+  source?: string | null;
   category?: string | null;
   usage?: string[] | null;
   notes?: string | null;
@@ -57,11 +60,16 @@ function normalizeExtracted(raw: unknown): ExtractedData {
   const usage = r.usage;
   const tags = r.tags;
 
+  const brandFromBrand = typeof r.brand === 'string' ? r.brand.trim() : '';
+  const brandFromSource = typeof r.source === 'string' ? r.source.trim() : '';
+  const brand = brandFromBrand.length > 0 ? brandFromBrand : brandFromSource;
+
   return {
-    productName: typeof r.productName === 'string' ? r.productName : r.productName === null ? '' : '',
-    category: typeof r.category === 'string' ? r.category : r.category === null ? '' : '',
+    productName: typeof r.productName === 'string' ? r.productName : '',
+    brand,
+    category: typeof r.category === 'string' ? r.category : '',
     usage: usage === null ? [] : Array.isArray(usage) ? usage.filter((u): u is string => typeof u === 'string') : [],
-    notes: typeof r.notes === 'string' ? r.notes : r.notes === null ? '' : '',
+    notes: typeof r.notes === 'string' ? r.notes : '',
     tags: tags === null ? [] : Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
   };
 }

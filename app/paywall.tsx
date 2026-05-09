@@ -1,8 +1,8 @@
 import { colors } from '../constants/colors';
 import {
-  FREE_BLEND_LIMIT,
-  FREE_IMPORT_LIMIT,
-  FREE_PRODUCT_LIMIT,
+  FREE_BLEND_DISPLAY_MAX,
+  FREE_IMPORT_DISPLAY_MAX,
+  FREE_PRODUCT_DISPLAY_MAX,
   PRO_BLEND_LIMIT,
   PRO_IMPORT_LIMIT,
   PRO_PRODUCT_LIMIT,
@@ -40,19 +40,19 @@ interface FeatureRow {
 const FEATURES: FeatureRow[] = [
   {
     labelKey: 'paywall.featureProducts',
-    free: String(FREE_PRODUCT_LIMIT),
+    free: String(FREE_PRODUCT_DISPLAY_MAX),
     pro: String(PRO_PRODUCT_LIMIT),
     lifetime: '1.000',
   },
   {
     labelKey: 'paywall.featureBlends',
-    free: String(FREE_BLEND_LIMIT),
+    free: String(FREE_BLEND_DISPLAY_MAX),
     pro: String(PRO_BLEND_LIMIT),
     lifetime: '1.000',
   },
   {
     labelKey: 'paywall.featureAiImport',
-    free: String(FREE_IMPORT_LIMIT),
+    free: String(FREE_IMPORT_DISPLAY_MAX),
     pro: String(PRO_IMPORT_LIMIT),
     lifetime: '1.000',
   },

@@ -3,9 +3,9 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
 import { toggleFavorite } from '../../services/storage/products';
 import {
-  FREE_BLEND_LIMIT,
+  FREE_BLEND_DISPLAY_MAX,
   FREE_BLEND_WARN,
-  FREE_PRODUCT_LIMIT,
+  FREE_PRODUCT_DISPLAY_MAX,
   FREE_PRODUCT_WARN,
 } from '../../constants/limits';
 import { useBlends } from '../../hooks/useBlends';
@@ -168,6 +168,11 @@ export default function HomeTab() {
             <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
               {t('home.allProducts')}
             </Text>
+            <Link href="/product/new" asChild>
+              <Pressable hitSlop={8} accessibilityRole="link">
+                <Text style={[styles.addManual, { color: colors.sage }]}>{t('home.addProductManually')}</Text>
+              </Pressable>
+            </Link>
           </View>
           {showProductEmpty ? (
             <EmptyState
@@ -189,7 +194,10 @@ export default function HomeTab() {
               accessibilityRole="button"
             >
               <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.productWarning', { used: productCount, max: FREE_PRODUCT_LIMIT }) as string}
+                {t('limits.productWarning', {
+                  used: Math.min(productCount, FREE_PRODUCT_DISPLAY_MAX),
+                  max: FREE_PRODUCT_DISPLAY_MAX,
+                }) as string}
               </Text>
               <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
                 {t('limits.upgradeLink') as string}
@@ -219,7 +227,8 @@ export default function HomeTab() {
               <EmptyState
                 title={t('home.emptyBlendsTitle')}
                 message={t('home.emptyBlendsMessage')}
-                emoji="🧪"
+                icon="flask-outline"
+                iconColor="#C2D4C4"
               />
             </Pressable>
           ) : (
@@ -236,7 +245,10 @@ export default function HomeTab() {
               accessibilityRole="button"
             >
               <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.blendWarning', { used: blendCount, max: FREE_BLEND_LIMIT }) as string}
+                {t('limits.blendWarning', {
+                  used: Math.min(blendCount, FREE_BLEND_DISPLAY_MAX),
+                  max: FREE_BLEND_DISPLAY_MAX,
+                }) as string}
               </Text>
               <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
                 {t('limits.upgradeLink') as string}
@@ -313,6 +325,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   viewAll: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  addManual: {
     fontSize: 15,
     fontWeight: '600',
   },
