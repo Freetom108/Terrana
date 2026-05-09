@@ -10,6 +10,11 @@ import { getLocale, setLocale, t } from '../../services/i18n/i18n';
 import { exportCollectionAsPDF } from '../../services/export/pdfExport';
 import { createBackup, restoreBackup } from '../../services/storage/backup';
 import {
+  disableBackupReminder,
+  enableBackupReminder,
+  isBackupReminderEnabled,
+} from '../../services/notifications';
+import {
   getThemePreference,
   setSavedLanguageCode,
   setThemePreference,
@@ -22,6 +27,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from 'react-native';
@@ -39,6 +45,7 @@ const FAQ_ITEMS = [
   { q: 'faq.q5', a: 'faq.a5', btnKey: undefined },
   { q: 'faq.q6', a: 'faq.a6', btnKey: 'faq.a6Btn' },
   { q: 'faq.q7', a: 'faq.a7', btnKey: undefined },
+  { q: 'faq.q8', a: 'faq.a8', btnKey: undefined },
 ] satisfies Array<{ q: string; a: string; btnKey: string | undefined }>;
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
@@ -66,6 +73,7 @@ export default function SettingsTab() {
   const [exportingPdf, setExportingPdf] = useState(false);
   const [backingUp, setBackingUp] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [reminderEnabled, setReminderEnabled] = useState(false);
 
   const [themePref, setThemePrefState] = useState<ThemePreference>('auto');
 
@@ -74,6 +82,7 @@ export default function SettingsTab() {
       void reload();
       void getThemePreference().then(setThemePrefState);
       void refreshProducts();
+      void isBackupReminderEnabled().then(setReminderEnabled);
     }, [reload, refreshProducts]),
   );
 
@@ -123,6 +132,22 @@ export default function SettingsTab() {
       setRestoring(false);
     }
   }, [router]);
+
+  const handleToggleReminder = useCallback(async (value: boolean) => {
+    if (value) {
+      const granted = await enableBackupReminder();
+      if (!granted) {
+        Alert.alert(
+          t('settings.backupReminderToggle') as string,
+          t('notifications.permissionDenied') as string,
+        );
+        return;
+      }
+    } else {
+      await disableBackupReminder();
+    }
+    setReminderEnabled(value);
+  }, []);
 
   const surfaceBg = p.surface;
   const headline = p.text;
@@ -351,6 +376,29 @@ export default function SettingsTab() {
                 </View>
                 <Ionicons name="chevron-forward" size={18} color={muted} />
               </Pressable>
+
+              <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+
+              {/* Weekly reminder toggle */}
+              <View style={styles.exportRow}>
+                <View style={styles.exportRowLeft}>
+                  <Ionicons name="notifications-outline" size={22} color={colors.sageDark} />
+                  <View style={styles.exportRowText}>
+                    <Text style={[styles.exportRowTitle, { color: headline }]}>
+                      {t('settings.backupReminderToggle') as string}
+                    </Text>
+                    <Text style={[styles.exportRowHint, { color: muted }]}>
+                      {t('settings.backupReminderHint') as string}
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={reminderEnabled}
+                  onValueChange={(v) => void handleToggleReminder(v)}
+                  trackColor={{ false: p.border, true: colors.sage }}
+                  thumbColor={reminderEnabled ? colors.sageDark : p.muted}
+                />
+              </View>
             </>
           ) : (
             <Pressable

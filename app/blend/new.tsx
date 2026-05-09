@@ -86,7 +86,6 @@ export default function NewBlendScreen() {
   const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
   const [pickerSearch, setPickerSearch] = useState('');
 
-  const [phase, setPhase] = useState<'pick' | 'form'>('pick');
   const [kind, setKind] = useState<BlendKind>('mix');
 
   const [name, setName] = useState('');
@@ -166,13 +165,13 @@ export default function NewBlendScreen() {
     [pickerTarget, closePicker],
   );
 
-  const pickKind = useCallback(
+  const selectKind = useCallback(
     (k: BlendKind) => {
+      if (k === kind) return;
       resetAllFields();
       setKind(k);
-      setPhase('form');
     },
-    [resetAllFields],
+    [kind, resetAllFields],
   );
 
   const addTag = useCallback(() => {
@@ -320,7 +319,7 @@ export default function NewBlendScreen() {
     <View style={[styles.root, { backgroundColor: p.surface }]}>
       <View style={[styles.topBar, { paddingTop: topPad }]}>
         <Pressable
-          onPress={() => (phase === 'form' ? setPhase('pick') : router.back())}
+          onPress={() => router.back()}
           style={styles.backRow}
           hitSlop={12}
           accessibilityRole="button"
@@ -330,11 +329,6 @@ export default function NewBlendScreen() {
           <Text style={[styles.backText, { color: p.secondaryBtnLabel }]}>{t('general.back')}</Text>
         </Pressable>
         <Text style={[styles.title, { color: p.text }]}>{t('blendNew.screenTitle')}</Text>
-        {phase === 'form' ? (
-          <Text style={[styles.kindPillText, { color: p.muted }]}>
-            {t(blendKindLabelKey(kind))}
-          </Text>
-        ) : null}
       </View>
 
       <ScrollView
@@ -346,66 +340,33 @@ export default function NewBlendScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {phase === 'pick' ? (
-          <>
-            <Text style={[styles.subtitle, { color: p.muted }]}>{t('blendNew.pickSubtitle')}</Text>
-            <View style={styles.cardStack}>
+        {/* ── Kind selector ── */}
+        <View style={styles.kindSelector}>
+          {(['mix', 'combination', 'protocol'] as BlendKind[]).map((k) => {
+            const sel = kind === k;
+            return (
               <Pressable
-                onPress={() => pickKind('mix')}
-                style={({ pressed }) => [
-                  styles.kindCard,
-                  { backgroundColor: p.card, borderColor: p.border },
-                  pressed && styles.pressed,
-                ]}
+                key={k}
+                onPress={() => selectKind(k)}
                 accessibilityRole="button"
-              >
-                <Text style={styles.kindEmoji}>🧪</Text>
-                <Text style={[styles.kindTitle, { color: p.text }]}>{t('blendNew.cardMixTitle')}</Text>
-                <Text style={[styles.kindBody, { color: p.muted }]}>{t('blendNew.cardMixBody')}</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => pickKind('combination')}
-                style={({ pressed }) => [
-                  styles.kindCard,
-                  { backgroundColor: p.card, borderColor: p.border },
-                  pressed && styles.pressed,
+                accessibilityState={{ selected: sel }}
+                style={[
+                  styles.kindChip,
+                  {
+                    backgroundColor: sel ? colors.sageDark : p.card,
+                    borderColor: sel ? colors.sageDark : p.border,
+                  },
                 ]}
-                accessibilityRole="button"
               >
-                <Text style={styles.kindEmoji}>🔀</Text>
-                <Text style={[styles.kindTitle, { color: p.text }]}>{t('blendNew.cardComboTitle')}</Text>
-                <Text style={[styles.kindBody, { color: p.muted }]}>{t('blendNew.cardComboBody')}</Text>
+                <Text style={[styles.kindChipText, { color: sel ? colors.white : p.text }]}>
+                  {t(blendKindLabelKey(k)) as string}
+                </Text>
               </Pressable>
-              <Pressable
-                onPress={() => pickKind('protocol')}
-                style={({ pressed }) => [
-                  styles.kindCard,
-                  { backgroundColor: p.card, borderColor: p.border },
-                  pressed && styles.pressed,
-                ]}
-                accessibilityRole="button"
-              >
-                <Text style={styles.kindEmoji}>📋</Text>
-                <Text style={[styles.kindTitle, { color: p.text }]}>{t('blendNew.cardProtoTitle')}</Text>
-                <Text style={[styles.kindBody, { color: p.muted }]}>{t('blendNew.cardProtoBody')}</Text>
-              </Pressable>
-            </View>
-          </>
-        ) : (
-          <>
-            <Pressable
-              onPress={() => {
-                resetAllFields();
-                setPhase('pick');
-              }}
-              style={styles.changeType}
-              accessibilityRole="button"
-            >
-              <Text style={[styles.changeTypeText, { color: p.secondaryBtnLabel }]}>
-                {t('blendNew.changeType')}
-              </Text>
-            </Pressable>
+            );
+          })}
+        </View>
 
+        <>
             <FieldLabel text={t('blendNew.fieldName') as string} muted={p.muted} />
             <TextInput
               value={name}
@@ -796,7 +757,6 @@ export default function NewBlendScreen() {
               <Text style={styles.savePillText}>{t('blendNew.save')}</Text>
             </Pressable>
           </>
-        )}
       </ScrollView>
 
       <Modal
@@ -884,23 +844,28 @@ const styles = StyleSheet.create({
   },
   backText: { fontSize: 17, fontWeight: '600', marginLeft: 2 },
   title: { fontSize: 22, fontWeight: '700' },
-  kindPillText: { fontSize: 14, fontWeight: '600', marginTop: 4 },
-  subtitle: { fontSize: 15, lineHeight: 22, fontWeight: '500', marginBottom: 16 },
   scroll: { flex: 1 },
   scrollInner: { paddingHorizontal: 20, paddingTop: 8 },
-  cardStack: { gap: 12 },
-  kindCard: {
-    borderRadius: 16,
+  kindSelector: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 18,
+    flexWrap: 'nowrap',
+  },
+  kindChip: {
+    flex: 1,
+    borderRadius: 999,
     borderWidth: 1,
-    paddingVertical: 20,
-    paddingHorizontal: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  kindChipText: {
+    fontSize: 13,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   pressed: { opacity: 0.88 },
-  kindEmoji: { fontSize: 32, marginBottom: 8 },
-  kindTitle: { fontSize: 20, fontWeight: '700', marginBottom: 6 },
-  kindBody: { fontSize: 15, lineHeight: 22, fontWeight: '500' },
-  changeType: { alignSelf: 'flex-start', marginBottom: 14 },
-  changeTypeText: { fontSize: 15, fontWeight: '700' },
   fieldLabel: {
     fontSize: 12,
     fontWeight: '700',

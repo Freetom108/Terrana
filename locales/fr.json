@@ -104,6 +104,8 @@
     "backupRestore": "Restaurer une sauvegarde",
     "backupRestoreHint": "Importer un fichier de sauvegarde (les données seront écrasées)",
     "backupLockedHint": "Fonctionnalité Lifetime – débloquer maintenant",
+    "backupReminderToggle": "Rappel hebdomadaire",
+    "backupReminderHint": "Chaque dimanche à 10h00 – exclusif Lifetime",
     "sectionExport": "EXPORT",
     "exportCollection": "Exporter la collection en PDF",
     "exportCollectionHint": "Tous les produits en un PDF (Pro & Lifetime)",
@@ -339,6 +341,9 @@
     "edit": "Modifier",
     "back": "Retour"
   },
+  "notifications": {
+    "permissionDenied": "Veuillez autoriser les notifications de Terrana dans les paramètres de votre téléphone pour utiliser cette fonctionnalité."
+  },
   "faq": {
     "q1": "Puis-je passer de Pro à Lifetime plus tard ?",
     "a1": "Oui, à tout moment ! Votre contenu Pro est conservé et vous obtenez un accès complet à toutes les fonctionnalités Lifetime. Notez que le prix Lifetime complet s'applique, car un crédit partiel n'est techniquement pas possible.",
@@ -352,6 +357,8 @@
     "a6": "Vous trouverez toutes les options de mise à niveau dans l'écran Upgrade de Terrana.",
     "a6Btn": "Voir les options d'upgrade →",
     "q7": "Qu'est-ce que Backup & Restore ?",
-    "a7": "Avec Backup & Restore, tu peux exporter toute ta collection – tous les produits, mélanges et paramètres – sous forme de fichier et la stocker en sécurité. Sur un nouvel appareil ou après une réinstallation, tu restaures tout d'un seul tap. Backup & Restore est une fonctionnalité exclusive Lifetime."
+    "a7": "Avec Backup & Restore, tu peux exporter toute ta collection – tous les produits, mélanges et paramètres – sous forme de fichier et la stocker en sécurité. Sur un nouvel appareil ou après une réinstallation, tu restaures tout d'un seul tap. Backup & Restore est une fonctionnalité exclusive Lifetime. En tant qu'utilisateur Lifetime, vous recevrez un rappel hebdomadaire si vous avez activé les notifications de Terrana dans les paramètres.",
+    "q8": "Comment activer le rappel de sauvegarde ?",
+    "a8": "Le rappel de sauvegarde est une fonctionnalité Lifetime exclusive. Assurez-vous d'avoir autorisé les notifications de Terrana dans les paramètres de votre téléphone."
   }
 }

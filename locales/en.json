@@ -104,6 +104,8 @@
     "backupRestore": "Restore backup",
     "backupRestoreHint": "Import a backup file (existing data will be replaced)",
     "backupLockedHint": "Lifetime feature – unlock now",
+    "backupReminderToggle": "Weekly reminder",
+    "backupReminderHint": "Every Sunday at 10:00 – Lifetime exclusive",
     "sectionExport": "EXPORT",
     "exportCollection": "Export collection as PDF",
     "exportCollectionHint": "All products in one PDF (Pro & Lifetime)",
@@ -339,6 +341,9 @@
     "edit": "Edit",
     "back": "Back"
   },
+  "notifications": {
+    "permissionDenied": "Please allow notifications for Terrana in your phone settings to use this feature."
+  },
   "faq": {
     "q1": "Can I upgrade from Pro to Lifetime later?",
     "a1": "Yes, anytime! Your Pro content stays and you get full access to all Lifetime features. Please note that the full Lifetime price applies, as a partial credit is technically not possible.",
@@ -352,6 +357,8 @@
     "a6": "You can view all upgrade options in the Terrana upgrade screen.",
     "a6Btn": "View upgrade options →",
     "q7": "What is Backup & Restore?",
-    "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature."
+    "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature. As a Lifetime user, you will receive a weekly reminder if you have enabled notifications from Terrana in the settings.",
+    "q8": "How do I activate the backup reminder?",
+    "a8": "The backup reminder is an exclusive Lifetime feature. Make sure you have allowed notifications from Terrana in your phone settings."
   }
 }

@@ -104,6 +104,8 @@
     "backupRestore": "Restaurar copia de seguridad",
     "backupRestoreHint": "Importar archivo de copia (los datos actuales se reemplazarán)",
     "backupLockedHint": "Función Lifetime – desbloquear ahora",
+    "backupReminderToggle": "Recordatorio semanal",
+    "backupReminderHint": "Cada domingo a las 10:00 – exclusivo Lifetime",
     "sectionExport": "EXPORTAR",
     "exportCollection": "Exportar colección como PDF",
     "exportCollectionHint": "Todos los productos en un PDF (Pro & Lifetime)",
@@ -339,6 +341,9 @@
     "edit": "Editar",
     "back": "Atrás"
   },
+  "notifications": {
+    "permissionDenied": "Por favor, permite las notificaciones de Terrana en la configuración de tu teléfono para usar esta función."
+  },
   "faq": {
     "q1": "¿Puedo actualizar de Pro a Lifetime más tarde?",
     "a1": "¡Sí, en cualquier momento! Tu contenido Pro se mantiene y obtienes acceso completo a todas las funciones Lifetime. Ten en cuenta que se aplica el precio completo de Lifetime, ya que un crédito parcial no es técnicamente posible.",
@@ -352,6 +357,8 @@
     "a6": "Puedes ver todas las opciones de mejora en la pantalla de Upgrade de Terrana.",
     "a6Btn": "Ver opciones de mejora →",
     "q7": "¿Qué es Backup & Restore?",
-    "a7": "Con Backup & Restore puedes exportar toda tu colección – todos los productos, mezclas y ajustes – como archivo y guardarlo de forma segura. En un nuevo dispositivo o tras una reinstalación, restauras todo con un solo toque. Backup & Restore es una función exclusiva Lifetime."
+    "a7": "Con Backup & Restore puedes exportar toda tu colección – todos los productos, mezclas y ajustes – como archivo y guardarlo de forma segura. En un nuevo dispositivo o tras una reinstalación, restauras todo con un solo toque. Backup & Restore es una función exclusiva Lifetime. Como usuario Lifetime, recibirás un recordatorio semanal si has activado las notificaciones de Terrana en los ajustes.",
+    "q8": "¿Cómo activo el recordatorio de copia de seguridad?",
+    "a8": "El recordatorio de copia de seguridad es una función exclusiva de Lifetime. Asegúrate de haber permitido las notificaciones de Terrana en los ajustes de tu teléfono."
   }
 }

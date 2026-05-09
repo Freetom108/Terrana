@@ -104,6 +104,8 @@
     "backupRestore": "Backup wiederherstellen",
     "backupRestoreHint": "Backup-Datei importieren (Daten werden überschrieben)",
     "backupLockedHint": "Nur für Lifetime – jetzt freischalten",
+    "backupReminderToggle": "Wöchentliche Erinnerung",
+    "backupReminderHint": "Jeden Sonntag um 10:00 Uhr – exklusiv für Lifetime",
     "sectionExport": "EXPORT",
     "exportCollection": "Sammlung als PDF exportieren",
     "exportCollectionHint": "Alle Produkte in einem PDF (Pro & Lifetime)",
@@ -339,6 +341,9 @@
     "edit": "Bearbeiten",
     "back": "Zurück"
   },
+  "notifications": {
+    "permissionDenied": "Bitte erlaube Benachrichtigungen von Terrana in deinen Handy-Einstellungen, um diese Funktion zu nutzen."
+  },
   "faq": {
     "q1": "Kann ich später von Pro auf Lifetime upgraden?",
     "a1": "Ja, jederzeit! Deine Pro-Inhalte bleiben erhalten und du erhältst vollen Zugriff auf alle Lifetime-Features. Bitte beachte dass der Lifetime-Preis in voller Höhe anfällt, da eine nachträgliche Verrechnung technisch nicht möglich ist.",
@@ -352,6 +357,8 @@
     "a6": "Du findest alle Upgrade-Optionen im Terrana Upgrade-Bereich.",
     "a6Btn": "Upgrade-Optionen ansehen →",
     "q7": "Was ist Backup & Restore?",
-    "a7": "Mit Backup & Restore kannst du deine gesamte Sammlung – alle Produkte, Mischungen und Einstellungen – als Datei exportieren und sicher speichern. Bei einem neuen Gerät oder nach einer Neuinstallation stellst du alles mit einem Tipp wieder her. Backup & Restore ist ein exklusives Lifetime-Feature."
+    "a7": "Mit Backup & Restore kannst du deine gesamte Sammlung – alle Produkte, Mischungen und Einstellungen – als Datei exportieren und sicher speichern. Bei einem neuen Gerät oder nach einer Neuinstallation stellst du alles mit einem Tipp wieder her. Backup & Restore ist ein exklusives Lifetime-Feature. Als Lifetime-User erhältst du einmal pro Woche eine Erinnerung, wenn du in den Einstellungen Benachrichtigungen von Terrana aktiviert hast.",
+    "q8": "Wie aktiviere ich die Backup-Erinnerung?",
+    "a8": "Die Backup-Erinnerung ist ein exklusives Lifetime-Feature. Stelle sicher, dass du Benachrichtigungen von Terrana in den Einstellungen deines Telefons erlaubt hast."
   }
 }
