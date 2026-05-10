@@ -15,7 +15,10 @@ export default function TabsLayout() {
         options={{ title: t('tabs.favorites'), tabBarLabel: t('tabs.favorites') }}
       />
       <Tabs.Screen name="import" options={{ title: t('tabs.import'), tabBarLabel: t('tabs.import') }} />
-      <Tabs.Screen name="search" options={{ href: null }} />
+      <Tabs.Screen
+        name="search"
+        options={{ href: null, title: t('tabs.search'), tabBarLabel: t('tabs.search') }}
+      />
       <Tabs.Screen
         name="blends"
         options={{ headerShown: false, title: t('tabs.blends'), tabBarLabel: t('tabs.blends') }}

@@ -28,6 +28,7 @@
     "greetingAfternoon": "Good afternoon 🌿",
     "greetingEvening": "Good evening 🌿",
     "greetingNight": "Good night 🌙",
+    "heroTagline": "Organize, track & share your collection",
     "statsSubtitle": "%{productCount} products · %{blendCount} blends",
     "statProduct": "1 product",
     "statProducts": "%{count} products",
@@ -131,6 +132,7 @@
     "home": "Collection",
     "favorites": "Favorites",
     "import": "Import",
+    "search": "Search",
     "blends": "My Blends",
     "settings": "Settings"
   },

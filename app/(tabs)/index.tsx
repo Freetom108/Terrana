@@ -118,14 +118,9 @@ export default function HomeTab() {
         style={[styles.header, { paddingTop: insets.top + 20 }]}
       >
         <Text style={styles.greeting}>{t(greetingKey)}</Text>
-        <Text style={styles.statsLine}>{statsSubtitle}</Text>
-
-        <Link href="/search" asChild>
-          <Pressable style={styles.searchShell} accessibilityRole="button">
-            <Text style={styles.searchIcon}>🔍</Text>
-            <Text style={styles.searchPlaceholder}>{t('home.searchPlaceholder')}</Text>
-          </Pressable>
-        </Link>
+        <Text style={styles.heroBrand}>{t('settings.appName')}</Text>
+        <Text style={styles.heroTagline}>{t('home.heroTagline')}</Text>
+        <Text style={styles.heroStats}>{statsSubtitle}</Text>
       </LinearGradient>
 
       <ScrollView
@@ -263,34 +258,33 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   greeting: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: colors.white,
-    marginBottom: 6,
-  },
-  statsLine: {
-    fontSize: 15,
-    color: colors.sageLight,
-    marginBottom: 18,
-    fontWeight: '500',
-  },
-  searchShell: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-  },
-  searchIcon: {
     fontSize: 18,
-    opacity: 0.55,
-    marginRight: 10,
+    fontWeight: '600',
+    color: colors.white,
+    letterSpacing: -0.2,
+    opacity: 0.92,
   },
-  searchPlaceholder: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.mid,
+  heroBrand: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: colors.white,
+    marginTop: 8,
+    letterSpacing: -0.8,
+  },
+  heroTagline: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.sageLight,
+    marginTop: 8,
+    lineHeight: 21,
+    opacity: 0.95,
+  },
+  heroStats: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.sageLight,
+    marginTop: 10,
+    opacity: 0.85,
   },
   scroll: {
     flex: 1,
