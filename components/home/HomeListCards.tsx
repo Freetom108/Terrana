@@ -50,7 +50,11 @@ export function HomeProductCard({
           onPress={() => onToggleFavorite(product.id)}
           hitSlop={10}
           accessibilityRole="button"
-          accessibilityLabel={product.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          accessibilityLabel={
+            product.isFavorite
+              ? (t('general.removeFavorite') as string)
+              : (t('general.addFavorite') as string)
+          }
         >
           <Ionicons
             name={product.isFavorite ? 'star' : 'star-outline'}

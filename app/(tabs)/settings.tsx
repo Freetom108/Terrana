@@ -91,7 +91,7 @@ export default function SettingsTab() {
       await exportCollectionAsPDF(products);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      Alert.alert('PDF', msg);
+      Alert.alert(t('alerts.pdf') as string, msg);
     } finally {
       setExportingPdf(false);
     }

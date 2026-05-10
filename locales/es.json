@@ -65,7 +65,7 @@
     "saveEmoji": "Guardar 💾",
     "retry": "Reintentar",
     "resetAgain": "Otra vez",
-    "upgradeMessage": "Has usado tus 10 importaciones gratuitas.",
+    "upgradeMessage": "Has usado tus %{limit} importaciones gratuitas de IA.",
     "fieldProductName": "Nombre del producto",
     "fieldPlaceholderName": "Ingresa el nombre del producto...",
     "fieldBrand": "Fuente / Marca",
@@ -283,7 +283,16 @@
     "restore": "Restaurar compras",
     "noSubscription": "Pago único – sin suscripción",
     "privacy": "Privacidad",
-    "terms": "Términos"
+    "terms": "Términos",
+    "placeholderProTitle": "Pro",
+    "placeholderProMessage": "Pro activado (marcador de posición).",
+    "placeholderLifetimeTitle": "Lifetime",
+    "placeholderLifetimeMessage": "Lifetime activado (marcador de posición).",
+    "restoreNotImplementedMessage": "Restaurar aún no está implementado.",
+    "shareMethodWhatsapp": "WhatsApp",
+    "shareMethodEmail": "Correo",
+    "shareMethodSms": "SMS",
+    "shareMethodMore": "Más"
   },
   "extractor": {
     "errorNoJson": "La extracción no devolvió JSON válido.",
@@ -291,7 +300,11 @@
     "errorGeneric": "La solicitud falló.",
     "errorNoKey": "Clave API no configurada. Por favor contacta con soporte.",
     "errorEmptyResponse": "Respuesta del modelo vacía o inválida.",
-    "errorParseJson": "No se pudo leer el JSON de la respuesta del modelo."
+    "errorParseJson": "No se pudo leer el JSON de la respuesta del modelo.",
+    "errorHttp": "Error %{status}: %{message}",
+    "errorUnknown": "Error de API desconocido",
+    "errorNetwork": "Error: %{message}",
+    "errorNetworkFallback": "Error de red o en tiempo de ejecución."
   },
   "pdf": {
     "blendType": "Tipo",
@@ -351,14 +364,26 @@
     "restoreTitle": "Restaurar copia de seguridad",
     "restoreWarning": "Atención: todos los productos y blends actuales serán reemplazados por la copia de seguridad. Esta acción no se puede deshacer.",
     "restoreConfirm": "Restaurar",
-    "errorTitle": "Error"
+    "errorTitle": "Error",
+    "restoreFailedTitle": "No se pudo restaurar",
+    "restoreFailedBody": "%{message}"
+  },
+  "alerts": {
+    "share": "Compartir",
+    "pdf": "PDF",
+    "print": "Imprimir"
   },
   "general": {
     "cancel": "Cancelar",
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "back": "Atrás"
+    "back": "Atrás",
+    "addFavorite": "Añadir a favoritos",
+    "removeFavorite": "Quitar de favoritos",
+    "share": "Compartir",
+    "pdfPrint": "PDF / impresión",
+    "closePaywall": "Cerrar"
   },
   "faq": {
     "q0": "Repetir la intro de la app",

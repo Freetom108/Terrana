@@ -38,7 +38,7 @@ export default function FavoritesTab() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: p.subtleBorder }]}>
         <Text style={[styles.title, { color: p.text }]}>{t('favorites.screenTitle') as string}</Text>
-        <Link href="/" asChild>
+        <Link href="/(tabs)" asChild>
           <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel={t('favorites.addProducts') as string}>
             <Ionicons name="add" size={28} color={colors.sage} />
           </Pressable>

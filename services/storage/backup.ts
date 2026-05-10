@@ -2,13 +2,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { Alert } from 'react-native';
 import { t } from '../i18n/i18n';
 
 const BACKUP_VERSION = 1;
 const BACKUP_MARKER = '_terranaBackup';
 
-/** AsyncStorage keys included in a backup (user data only, no subscription state). */
-const BACKUP_KEYS = ['terrana_products', 'terrana_blends'] as const;
+/** AsyncStorage keys included in a backup (user data + app preferences; no subscription state). */
+const BACKUP_KEYS = [
+  'terrana_products',
+  'terrana_blends',
+  'terrana_theme',
+  'terrana_language',
+  'terrana_importCount',
+  'terrana_onboarded',
+] as const;
 
 interface TerranBackupFile {
   [key: string]: unknown;
@@ -97,7 +105,6 @@ export async function restoreBackup(): Promise<boolean> {
   const backupData = parsed.data;
 
   return new Promise<boolean>((resolve) => {
-    const { Alert } = require('react-native') as typeof import('react-native');
     Alert.alert(
       t('backup.restoreTitle') as string,
       t('backup.restoreWarning') as string,
@@ -112,16 +119,25 @@ export async function restoreBackup(): Promise<boolean> {
           style: 'destructive',
           onPress: () => {
             void (async () => {
-              const pairs: [string, string][] = [];
-              for (const [key, value] of Object.entries(backupData)) {
-                if (typeof value === 'string') {
-                  pairs.push([key, value]);
+              try {
+                const pairs: [string, string][] = [];
+                for (const [key, value] of Object.entries(backupData)) {
+                  if (typeof value === 'string') {
+                    pairs.push([key, value]);
+                  }
                 }
+                if (pairs.length > 0) {
+                  await AsyncStorage.multiSet(pairs);
+                }
+                resolve(true);
+              } catch (e) {
+                const msg = e instanceof Error ? e.message : String(e);
+                Alert.alert(
+                  t('backup.restoreFailedTitle') as string,
+                  t('backup.restoreFailedBody', { message: msg }) as string,
+                );
+                resolve(false);
               }
-              if (pairs.length > 0) {
-                await AsyncStorage.multiSet(pairs);
-              }
-              resolve(true);
             })();
           },
         },

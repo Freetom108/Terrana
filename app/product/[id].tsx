@@ -170,7 +170,7 @@ export default function ProductScreen() {
     }
     void shareProduct(product).catch((e) => {
       const msg = e instanceof Error ? e.message : String(e);
-      Alert.alert('Share', msg);
+      Alert.alert(t('alerts.share') as string, msg);
     });
   }, [product, isPro, isLifetime]);
 
@@ -182,10 +182,10 @@ export default function ProductScreen() {
     }
     const actions: Parameters<typeof Alert.alert>[2] = [
       {
-        text: 'PDF',
+        text: t('alerts.pdf') as string,
         onPress: () => void exportProductAsPDF(product).catch((e) => {
           const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert('PDF', msg);
+          Alert.alert(t('alerts.pdf') as string, msg);
         }),
       },
     ];
@@ -194,7 +194,7 @@ export default function ProductScreen() {
         text: t('pdf.print') as string,
         onPress: () => void printProduct(product).catch((e) => {
           const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert('Print', msg);
+          Alert.alert(t('alerts.print') as string, msg);
         }),
       });
     }
@@ -298,7 +298,11 @@ export default function ProductScreen() {
               <Pressable
                 onPress={() => void handleToggleFavorite()}
                 accessibilityRole="button"
-                accessibilityLabel={product.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                accessibilityLabel={
+                  product.isFavorite
+                    ? (t('general.removeFavorite') as string)
+                    : (t('general.addFavorite') as string)
+                }
                 style={styles.iconBtn}
                 hitSlop={12}
               >
@@ -311,7 +315,7 @@ export default function ProductScreen() {
               <Pressable
                 onPress={handleShare}
                 accessibilityRole="button"
-                accessibilityLabel="Share"
+                accessibilityLabel={t('general.share') as string}
                 style={styles.iconBtn}
                 hitSlop={12}
               >
@@ -320,7 +324,7 @@ export default function ProductScreen() {
               <Pressable
                 onPress={handlePdfPrint}
                 accessibilityRole="button"
-                accessibilityLabel="PDF / Print"
+                accessibilityLabel={t('general.pdfPrint') as string}
                 style={styles.iconBtn}
                 hitSlop={12}
               >

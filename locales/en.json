@@ -65,7 +65,7 @@
     "saveEmoji": "Save 💾",
     "retry": "Try again",
     "resetAgain": "Again",
-    "upgradeMessage": "You've used your 10 free AI imports.",
+    "upgradeMessage": "You've used your %{limit} free AI imports.",
     "fieldProductName": "Product name",
     "fieldPlaceholderName": "Enter product name...",
     "fieldBrand": "Source / Brand",
@@ -283,7 +283,16 @@
     "restore": "Restore Purchases",
     "noSubscription": "One-time payment – no subscription",
     "privacy": "Privacy",
-    "terms": "Terms"
+    "terms": "Terms",
+    "placeholderProTitle": "Pro",
+    "placeholderProMessage": "Pro activated (placeholder).",
+    "placeholderLifetimeTitle": "Lifetime",
+    "placeholderLifetimeMessage": "Lifetime activated (placeholder).",
+    "restoreNotImplementedMessage": "Restore is not implemented yet.",
+    "shareMethodWhatsapp": "WhatsApp",
+    "shareMethodEmail": "Email",
+    "shareMethodSms": "SMS",
+    "shareMethodMore": "More"
   },
   "extractor": {
     "errorNoJson": "Extraction returned no valid JSON.",
@@ -291,7 +300,11 @@
     "errorGeneric": "The request failed.",
     "errorNoKey": "API key is not configured. Please contact support.",
     "errorEmptyResponse": "Empty or invalid model response.",
-    "errorParseJson": "Could not read JSON from model response."
+    "errorParseJson": "Could not read JSON from model response.",
+    "errorHttp": "Error %{status}: %{message}",
+    "errorUnknown": "Unknown API error",
+    "errorNetwork": "Error: %{message}",
+    "errorNetworkFallback": "Network or runtime error."
   },
   "pdf": {
     "blendType": "Type",
@@ -351,14 +364,26 @@
     "restoreTitle": "Restore backup",
     "restoreWarning": "Warning: All current products and blends will be replaced by the backup. This cannot be undone.",
     "restoreConfirm": "Restore",
-    "errorTitle": "Error"
+    "errorTitle": "Error",
+    "restoreFailedTitle": "Could not restore",
+    "restoreFailedBody": "%{message}"
+  },
+  "alerts": {
+    "share": "Share",
+    "pdf": "PDF",
+    "print": "Print"
   },
   "general": {
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "back": "Back"
+    "back": "Back",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites",
+    "share": "Share",
+    "pdfPrint": "PDF / Print",
+    "closePaywall": "Close"
   },
   "faq": {
     "q0": "Replay app intro",

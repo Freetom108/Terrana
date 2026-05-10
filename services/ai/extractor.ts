@@ -38,9 +38,13 @@ function sanitizeUserFacingError(message: string): string {
   return stripped.length > 0 ? stripped : (t('extractor.errorGeneric') as string);
 }
 
-/** Anzeige wie „Fehler 401: Invalid API Key“ */
+/** User-facing HTTP / API failure line (localized). */
 function formatHttpApiError(status: number, apiMessage: string): string {
-  return `Fehler ${status}: ${sanitizeUserFacingError(apiMessage)}`;
+  const message = sanitizeUserFacingError(apiMessage);
+  return t('extractor.errorHttp', {
+    status: String(status),
+    message,
+  }) as string;
 }
 
 function parseExtractedJson(text: string): unknown {
@@ -161,7 +165,8 @@ export async function extractProductFromText(
       if (msg && typ) {
         raw = msg.includes(typ) ? msg : `${typ}: ${msg}`;
       } else {
-        raw = msg || typ || res.statusText || 'Unbekannter API-Fehler';
+        raw =
+          msg || typ || res.statusText || (t('extractor.errorUnknown') as string);
       }
       return { success: false, error: formatHttpApiError(res.status, raw) };
     }
@@ -188,9 +193,12 @@ export async function extractProductFromText(
     return { success: true, data };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
+    const detail = sanitizeUserFacingError(
+      message || (t('extractor.errorNetworkFallback') as string),
+    );
     return {
       success: false,
-      error: `Fehler: ${sanitizeUserFacingError(message || 'Netzwerk- oder Laufzeitfehler.')}`,
+      error: t('extractor.errorNetwork', { message: detail }) as string,
     };
   }
 }

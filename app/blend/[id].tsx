@@ -441,7 +441,7 @@ export default function BlendScreen() {
     }
     void shareBlend(blend).catch((e) => {
       const msg = e instanceof Error ? e.message : String(e);
-      Alert.alert('Share', msg);
+      Alert.alert(t('alerts.share') as string, msg);
     });
   }, [blend, isPro, isLifetime]);
 
@@ -453,10 +453,10 @@ export default function BlendScreen() {
     }
     const actions: Parameters<typeof Alert.alert>[2] = [
       {
-        text: 'PDF',
+        text: t('alerts.pdf') as string,
         onPress: () => void exportBlendAsPDF(blend).catch((e) => {
           const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert('PDF', msg);
+          Alert.alert(t('alerts.pdf') as string, msg);
         }),
       },
     ];
@@ -465,7 +465,7 @@ export default function BlendScreen() {
         text: t('pdf.print') as string,
         onPress: () => void printBlend(blend).catch((e) => {
           const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert('Print', msg);
+          Alert.alert(t('alerts.print') as string, msg);
         }),
       });
     }
@@ -569,7 +569,7 @@ export default function BlendScreen() {
               <Pressable
                 onPress={handleShare}
                 accessibilityRole="button"
-                accessibilityLabel="Share"
+                accessibilityLabel={t('general.share') as string}
                 style={styles.iconBtn}
                 hitSlop={12}
               >
@@ -578,7 +578,7 @@ export default function BlendScreen() {
               <Pressable
                 onPress={handlePdfPrint}
                 accessibilityRole="button"
-                accessibilityLabel="PDF / Print"
+                accessibilityLabel={t('general.pdfPrint') as string}
                 style={styles.iconBtn}
                 hitSlop={12}
               >

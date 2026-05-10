@@ -88,11 +88,14 @@ const FEATURES: FeatureRow[] = [
   },
 ];
 
-const SHARE_METHODS: Array<{ icon: 'logo-whatsapp' | 'mail-outline' | 'chatbubble-outline' | 'share-outline'; label: string }> = [
-  { icon: 'logo-whatsapp', label: 'WhatsApp' },
-  { icon: 'mail-outline', label: 'E-Mail' },
-  { icon: 'chatbubble-outline', label: 'SMS' },
-  { icon: 'share-outline', label: 'More' },
+const SHARE_METHODS: Array<{
+  icon: 'logo-whatsapp' | 'mail-outline' | 'chatbubble-outline' | 'share-outline';
+  labelKey: string;
+}> = [
+  { icon: 'logo-whatsapp', labelKey: 'paywall.shareMethodWhatsapp' },
+  { icon: 'mail-outline', labelKey: 'paywall.shareMethodEmail' },
+  { icon: 'chatbubble-outline', labelKey: 'paywall.shareMethodSms' },
+  { icon: 'share-outline', labelKey: 'paywall.shareMethodMore' },
 ];
 
 // ─── Cell renderer ────────────────────────────────────────────────────────────
@@ -119,7 +122,10 @@ export default function PaywallScreen() {
   const handleBuyPro = useCallback(async () => {
     // TODO: Replace with RevenueCat purchase flow
     await setIsPro(true);
-    Alert.alert('Pro', 'Pro activated (placeholder).');
+    Alert.alert(
+      t('paywall.placeholderProTitle') as string,
+      t('paywall.placeholderProMessage') as string,
+    );
     router.back();
   }, []);
 
@@ -127,13 +133,19 @@ export default function PaywallScreen() {
     // TODO: Replace with RevenueCat purchase flow
     await setIsLifetime(true);
     await setIsPro(true);
-    Alert.alert('Lifetime', 'Lifetime activated (placeholder).');
+    Alert.alert(
+      t('paywall.placeholderLifetimeTitle') as string,
+      t('paywall.placeholderLifetimeMessage') as string,
+    );
     router.back();
   }, []);
 
   const handleRestore = useCallback(() => {
     // TODO: Replace with RevenueCat restorePurchases()
-    Alert.alert(t('paywall.restore') as string, 'Restore not yet implemented.');
+    Alert.alert(
+      t('paywall.restore') as string,
+      t('paywall.restoreNotImplementedMessage') as string,
+    );
   }, []);
 
   return (
@@ -150,7 +162,7 @@ export default function PaywallScreen() {
           style={styles.closeBtn}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Close"
+          accessibilityLabel={t('general.closePaywall') as string}
         >
           <Ionicons name="close" size={26} color={colors.white} />
         </Pressable>
@@ -248,11 +260,13 @@ export default function PaywallScreen() {
 
           <View style={styles.shareMethodsRow}>
             {SHARE_METHODS.map((method) => (
-              <View key={method.label} style={styles.shareMethod}>
+              <View key={method.labelKey} style={styles.shareMethod}>
                 <View style={[styles.shareIconWrap, { backgroundColor: p.chipBg }]}>
                   <Ionicons name={method.icon} size={22} color={colors.sageDark} />
                 </View>
-                <Text style={[styles.shareMethodLabel, { color: p.muted }]}>{method.label}</Text>
+                <Text style={[styles.shareMethodLabel, { color: p.muted }]}>
+                  {t(method.labelKey) as string}
+                </Text>
               </View>
             ))}
           </View>

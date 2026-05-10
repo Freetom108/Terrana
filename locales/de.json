@@ -65,7 +65,7 @@
     "saveEmoji": "Speichern 💾",
     "retry": "Erneut versuchen",
     "resetAgain": "Nochmal",
-    "upgradeMessage": "Du hast deine 10 kostenlosen KI-Importe verwendet.",
+    "upgradeMessage": "Du hast deine %{limit} kostenlosen KI-Importe verwendet.",
     "fieldProductName": "Produktname",
     "fieldPlaceholderName": "Produktnamen eingeben...",
     "fieldBrand": "Quelle / Marke",
@@ -283,7 +283,16 @@
     "restore": "Käufe wiederherstellen",
     "noSubscription": "Einmalige Zahlung – kein Abo",
     "privacy": "Datenschutz",
-    "terms": "AGB"
+    "terms": "AGB",
+    "placeholderProTitle": "Pro",
+    "placeholderProMessage": "Pro aktiviert (Platzhalter).",
+    "placeholderLifetimeTitle": "Lifetime",
+    "placeholderLifetimeMessage": "Lifetime aktiviert (Platzhalter).",
+    "restoreNotImplementedMessage": "Wiederherstellen ist noch nicht implementiert.",
+    "shareMethodWhatsapp": "WhatsApp",
+    "shareMethodEmail": "E-Mail",
+    "shareMethodSms": "SMS",
+    "shareMethodMore": "Mehr"
   },
   "extractor": {
     "errorNoJson": "Extraktion lieferte kein gültiges JSON.",
@@ -291,7 +300,11 @@
     "errorGeneric": "Die Anfrage ist fehlgeschlagen.",
     "errorNoKey": "API-Schlüssel nicht konfiguriert. Bitte Support kontaktieren.",
     "errorEmptyResponse": "Leere oder ungültige Modell-Antwort.",
-    "errorParseJson": "Konnte JSON aus der Modell-Antwort nicht lesen."
+    "errorParseJson": "Konnte JSON aus der Modell-Antwort nicht lesen.",
+    "errorHttp": "Fehler %{status}: %{message}",
+    "errorUnknown": "Unbekannter API-Fehler",
+    "errorNetwork": "Fehler: %{message}",
+    "errorNetworkFallback": "Netzwerk- oder Laufzeitfehler."
   },
   "pdf": {
     "blendType": "Typ",
@@ -351,14 +364,26 @@
     "restoreTitle": "Backup wiederherstellen",
     "restoreWarning": "Achtung: Alle aktuellen Produkte und Blends werden durch das Backup ersetzt. Dieser Vorgang kann nicht rückgängig gemacht werden.",
     "restoreConfirm": "Wiederherstellen",
-    "errorTitle": "Fehler"
+    "errorTitle": "Fehler",
+    "restoreFailedTitle": "Wiederherstellung fehlgeschlagen",
+    "restoreFailedBody": "%{message}"
+  },
+  "alerts": {
+    "share": "Teilen",
+    "pdf": "PDF",
+    "print": "Druck"
   },
   "general": {
     "cancel": "Abbrechen",
     "save": "Speichern",
     "delete": "Löschen",
     "edit": "Bearbeiten",
-    "back": "Zurück"
+    "back": "Zurück",
+    "addFavorite": "Zu Favoriten hinzufügen",
+    "removeFavorite": "Aus Favoriten entfernen",
+    "share": "Teilen",
+    "pdfPrint": "PDF und Druck",
+    "closePaywall": "Schließen"
   },
   "faq": {
     "q0": "App Intro wiederholen",
