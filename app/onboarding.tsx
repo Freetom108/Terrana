@@ -84,13 +84,11 @@ export default function OnboardingScreen() {
       >
         {/* Page 1 – Welcome */}
         <View style={[styles.page, { width: SCREEN_W }]}>
-        <View style={styles.logoWrap}>
           <Image
-            source={require('../assets/images/icon.png')}
-            style={styles.logoImage}
+            source={require('../assets/images/onboarding-logo.png')}
+            style={styles.onboardingLogo}
             resizeMode="contain"
           />
-        </View>
           <Text style={[styles.pageTitle, { color: p.text }]}>
             {t('onboarding.title') as string}
           </Text>
@@ -199,19 +197,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     gap: 16,
   },
-  logoWrap: {
-    width: 96,
-    height: 96,
-    borderRadius: 22,
-    overflow: 'hidden',
-    backgroundColor: colors.cream,
+  onboardingLogo: {
+    width: 120,
+    height: 120,
     marginBottom: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoImage: {
-    width: 88,
-    height: 88,
   },
   iconCircle: {
     width: 100,
