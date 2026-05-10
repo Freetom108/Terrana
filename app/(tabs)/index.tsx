@@ -3,9 +3,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
 import { toggleFavorite } from '../../services/storage/products';
 import {
-  FREE_BLEND_DISPLAY_MAX,
   FREE_BLEND_WARN,
-  FREE_PRODUCT_DISPLAY_MAX,
   FREE_PRODUCT_WARN,
 } from '../../constants/limits';
 import { useBlends } from '../../hooks/useBlends';
@@ -194,10 +192,7 @@ export default function HomeTab() {
               accessibilityRole="button"
             >
               <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.productWarning', {
-                  used: Math.min(productCount, FREE_PRODUCT_DISPLAY_MAX),
-                  max: FREE_PRODUCT_DISPLAY_MAX,
-                }) as string}
+                {t('limits.productWarning') as string}
               </Text>
               <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
                 {t('limits.upgradeLink') as string}
@@ -245,10 +240,7 @@ export default function HomeTab() {
               accessibilityRole="button"
             >
               <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.blendWarning', {
-                  used: Math.min(blendCount, FREE_BLEND_DISPLAY_MAX),
-                  max: FREE_BLEND_DISPLAY_MAX,
-                }) as string}
+                {t('limits.blendWarning') as string}
               </Text>
               <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
                 {t('limits.upgradeLink') as string}

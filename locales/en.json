@@ -13,9 +13,9 @@
     "next": "Next →",
     "skip": "Skip",
     "page2Title": "Add products in seconds",
-    "page2Body": "Found an interesting product on a website? Copy the relevant text and let the AI do the work. It automatically recognizes all important information, imports it into the designated area of your app and places it in the right categories for you.",
+    "page2Body": "Found an interesting product on a website? Copy the relevant text and let the AI do the work. It automatically recognizes all important information, imports it into the designated area of your app and places it in the right categories for you. Of course, you also have the option to manually add special products to your collection.",
     "page3Title": "Organize your recipes",
-    "page3Body": "Create and manage your own blends, combinations and protocols – and always keep track of all your creations.",
+    "page3Body": "Create and manage your own blends, combinations and protocols – and always keep track of all your creations. The Backup & Restore function also gives you the option to save your entire collection externally and restore it at any time, even on a new device.",
     "page4Title": "Ready?",
     "button": "Let's go →",
     "hint": "Language, Dark Mode and all other settings can be found at any time in the FAQs under Settings.",
@@ -65,7 +65,7 @@
     "saveEmoji": "Save 💾",
     "retry": "Try again",
     "resetAgain": "Again",
-    "upgradeMessage": "You've used your %{limit} free imports. Upgrade to Pro.",
+    "upgradeMessage": "You've used your 10 free AI imports.",
     "fieldProductName": "Product name",
     "fieldPlaceholderName": "Enter product name...",
     "fieldBrand": "Source / Brand",
@@ -115,8 +115,6 @@
     "backupRestore": "Restore backup",
     "backupRestoreHint": "Import a backup file (existing data will be replaced)",
     "backupLockedHint": "Lifetime feature – unlock now",
-    "backupReminderToggle": "Weekly reminder",
-    "backupReminderHint": "Every Sunday at 10:00 – Lifetime exclusive",
     "sectionExport": "EXPORT",
     "exportCollection": "Export collection as PDF",
     "exportCollectionHint": "All products in one PDF (Pro & Lifetime)",
@@ -335,10 +333,10 @@
     "productLimitMessage": "The free version supports up to %{limit} products. Upgrade to Pro for unlimited access.",
     "blendLimitTitle": "Limit reached",
     "blendLimitMessage": "The free version supports up to %{limit} blends. Upgrade to Pro for unlimited access.",
-    "productWarning": "%{used}/%{max} products used · upgrade for unlimited",
-    "blendWarning": "%{used}/%{max} blends used · upgrade for unlimited",
+    "productWarning": "Expand your collection",
+    "blendWarning": "Expand your collection",
     "importProgress": "%{used}/%{max} AI imports used",
-    "importNearLimit": "Running low — upgrade for unlimited imports",
+    "importNearLimit": "AI imports used up – expand your collection",
     "upgradeLink": "Upgrade →"
   },
   "search": {
@@ -362,9 +360,6 @@
     "edit": "Edit",
     "back": "Back"
   },
-  "notifications": {
-    "permissionDenied": "Please allow notifications for Terrana in your phone settings to use this feature."
-  },
   "faq": {
     "q0": "Replay app intro",
     "a0": "Watch again how Terrana works",
@@ -380,8 +375,6 @@
     "a6": "You can view all upgrade options in the Terrana upgrade screen.",
     "a6Btn": "View upgrade options →",
     "q7": "What is Backup & Restore?",
-    "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature. As a Lifetime user, you will receive a weekly reminder if you have enabled notifications from Terrana in the settings.",
-    "q8": "How do I activate the backup reminder?",
-    "a8": "The backup reminder is an exclusive Lifetime feature. Make sure you have allowed notifications from Terrana in your phone settings."
+    "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature."
   }
 }

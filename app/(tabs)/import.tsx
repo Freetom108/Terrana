@@ -307,7 +307,7 @@ export default function ImportTab() {
                 accessibilityRole="button"
               >
                 <Text style={[styles.upgradeText, { color: palette.isDark ? colors.sageLight : colors.sageDark }]}>
-                  {t('import.upgradeMessage', { limit: FREE_IMPORT_DISPLAY_MAX })}
+                  {t('import.upgradeMessage') as string}
                 </Text>
               </Pressable>
               <Pressable

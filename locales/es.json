@@ -13,9 +13,9 @@
     "next": "Siguiente →",
     "skip": "Omitir",
     "page2Title": "Añade productos en segundos",
-    "page2Body": "¿Encontraste un producto interesante en un sitio web? Copia el texto relevante y deja que la IA haga el trabajo. Reconoce automáticamente toda la información importante, la importa en el área designada de tu app y la coloca en las categorías correctas por ti.",
+    "page2Body": "¿Encontraste un producto interesante en un sitio web? Copia el texto relevante y deja que la IA haga el trabajo. Reconoce automáticamente toda la información importante, la importa en el área designada de tu app y la coloca en las categorías correctas por ti. Por supuesto, también tienes la posibilidad de añadir manualmente productos especiales a tu colección.",
     "page3Title": "Organiza tus recetas",
-    "page3Body": "Crea y gestiona tus propias mezclas, combinaciones y protocolos – y mantén siempre una visión general de todas tus creaciones.",
+    "page3Body": "Crea y gestiona tus propias mezclas, combinaciones y protocolos – y mantén siempre una visión general de todas tus creaciones. La función Backup & Restore también te da la posibilidad de guardar tu colección externamente y restaurarla en cualquier momento, incluso en un nuevo dispositivo.",
     "page4Title": "¿Listo?",
     "button": "Empecemos →",
     "hint": "El idioma, el modo oscuro y todos los demás ajustes los encontrarás en cualquier momento en las preguntas frecuentes en Ajustes.",
@@ -65,7 +65,7 @@
     "saveEmoji": "Guardar 💾",
     "retry": "Reintentar",
     "resetAgain": "Otra vez",
-    "upgradeMessage": "Has usado tus %{limit} importaciones gratuitas. Pasa a Pro.",
+    "upgradeMessage": "Has usado tus 10 importaciones gratuitas.",
     "fieldProductName": "Nombre del producto",
     "fieldPlaceholderName": "Ingresa el nombre del producto...",
     "fieldBrand": "Fuente / Marca",
@@ -113,10 +113,8 @@
     "backupCreate": "Crear copia de seguridad",
     "backupCreateHint": "Guardar datos como archivo JSON",
     "backupRestore": "Restaurar copia de seguridad",
-    "backupRestoreHint": "Importar archivo de copia (los datos actuales se reemplazarán)",
+    "backupRestoreHint": "Importar archivo de copia de seguridad",
     "backupLockedHint": "Función Lifetime – desbloquear ahora",
-    "backupReminderToggle": "Recordatorio semanal",
-    "backupReminderHint": "Cada domingo a las 10:00 – exclusivo Lifetime",
     "sectionExport": "EXPORTAR",
     "exportCollection": "Exportar colección como PDF",
     "exportCollectionHint": "Todos los productos en un PDF (Pro & Lifetime)",
@@ -335,10 +333,10 @@
     "productLimitMessage": "La versión gratuita admite hasta %{limit} productos. Actualiza a Pro para acceso ilimitado.",
     "blendLimitTitle": "Límite alcanzado",
     "blendLimitMessage": "La versión gratuita admite hasta %{limit} mezclas. Actualiza a Pro para acceso ilimitado.",
-    "productWarning": "%{used}/%{max} productos usados · mejora para ilimitado",
-    "blendWarning": "%{used}/%{max} mezclas usadas · mejora para ilimitado",
+    "productWarning": "Ampliar mi colección",
+    "blendWarning": "Ampliar mi colección",
     "importProgress": "%{used}/%{max} importaciones IA usadas",
-    "importNearLimit": "Casi agotado — mejora para importaciones ilimitadas",
+    "importNearLimit": "Importaciones IA agotadas – amplía tu colección",
     "upgradeLink": "Mejorar →"
   },
   "search": {
@@ -362,9 +360,6 @@
     "edit": "Editar",
     "back": "Atrás"
   },
-  "notifications": {
-    "permissionDenied": "Por favor, permite las notificaciones de Terrana en la configuración de tu teléfono para usar esta función."
-  },
   "faq": {
     "q0": "Repetir la intro de la app",
     "a0": "Ver de nuevo cómo funciona Terrana",
@@ -380,8 +375,6 @@
     "a6": "Puedes ver todas las opciones de mejora en la pantalla de Upgrade de Terrana.",
     "a6Btn": "Ver opciones de mejora →",
     "q7": "¿Qué es Backup & Restore?",
-    "a7": "Con Backup & Restore puedes exportar toda tu colección – todos los productos, mezclas y ajustes – como archivo y guardarlo de forma segura. En un nuevo dispositivo o tras una reinstalación, restauras todo con un solo toque. Backup & Restore es una función exclusiva Lifetime. Como usuario Lifetime, recibirás un recordatorio semanal si has activado las notificaciones de Terrana en los ajustes.",
-    "q8": "¿Cómo activo el recordatorio de copia de seguridad?",
-    "a8": "El recordatorio de copia de seguridad es una función exclusiva de Lifetime. Asegúrate de haber permitido las notificaciones de Terrana en los ajustes de tu teléfono."
+    "a7": "Con Backup & Restore puedes exportar toda tu colección – todos los productos, mezclas y ajustes – como archivo y guardarlo de forma segura. En un nuevo dispositivo o tras una reinstalación, restauras todo con un solo toque. Backup & Restore es una función exclusiva Lifetime."
   }
 }
