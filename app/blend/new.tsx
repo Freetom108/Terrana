@@ -393,8 +393,8 @@ export default function NewBlendScreen() {
                 style={[
                   styles.kindChip,
                   {
-                    backgroundColor: sel ? colors.sageDark : p.card,
-                    borderColor: sel ? colors.sageDark : p.border,
+                    backgroundColor: sel ? colors.sage : p.card,
+                    borderColor: sel ? colors.sage : p.border,
                   },
                 ]}
               >

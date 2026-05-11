@@ -8,11 +8,13 @@ import { exportBlendAsPDF, printBlend } from '../../services/export/pdfExport';
 import { shareBlend } from '../../services/export/shareService';
 import { deleteBlend, getBlendById, updateBlend } from '../../services/storage/blends';
 import {
+  BLEND_KINDS,
   blendKindLabelKey,
   blendStructuredItemCount,
   cloneBlend,
   deriveDropsFromQuantityLabel,
   type Blend,
+  type BlendKind,
   type MixDropletLine,
   type ProtocolTiming,
 } from '../../types/blend';
@@ -171,6 +173,109 @@ function ensureDraftForEdit(b: Blend): Blend {
   return c;
 }
 
+/** Change draft recipe kind while migrating product rows (no wipe of name/description/notes/tags). */
+function draftWithKind(prev: Blend, kind: BlendKind): Blend {
+  if (prev.kind === kind) return ensureDraftForEdit(cloneBlend(prev));
+
+  const before = cloneBlend(prev);
+
+  const next: Blend = {
+    ...before,
+    kind,
+    ingredients: [],
+    mixRecipe: undefined,
+    combinationSlots: undefined,
+    protocolSteps: undefined,
+  };
+
+  if (kind === 'mix') {
+    const droplets: MixDropletLine[] = [];
+    if (before.kind === 'combination') {
+      for (const s of before.combinationSlots ?? []) {
+        const pn = s.productName.trim();
+        if (!pn) continue;
+        const pid = s.productId?.trim();
+        droplets.push({
+          ...(pid ? { productId: pid } : {}),
+          productName: pn,
+          drops: 0,
+        });
+      }
+    } else {
+      for (const st of before.protocolSteps ?? []) {
+        const pn = st.productName.trim();
+        if (!pn) continue;
+        droplets.push({
+          ...(st.productId ? { productId: st.productId } : {}),
+          productName: pn,
+          drops: 0,
+        });
+      }
+    }
+    if (droplets.length === 0) droplets.push({ productName: '', drops: 0 });
+    next.mixRecipe = { droplets };
+    return ensureDraftForEdit(next);
+  }
+
+  if (kind === 'combination') {
+    const slots: NonNullable<Blend['combinationSlots']> = [];
+    if (before.kind === 'mix') {
+      for (const d of before.mixRecipe?.droplets ?? []) {
+        const pn = d.productName.trim();
+        if (!pn) continue;
+        const pid = d.productId?.trim();
+        slots.push({
+          productId: pid || pn,
+          productName: pn,
+          applicationSite: '',
+        });
+      }
+    } else {
+      for (const st of before.protocolSteps ?? []) {
+        const pn = st.productName.trim();
+        if (!pn) continue;
+        const pid = st.productId?.trim();
+        slots.push({
+          productId: pid || pn,
+          productName: pn,
+          applicationSite: '',
+        });
+      }
+    }
+    if (slots.length === 0)
+      slots.push({ productId: '', productName: '', applicationSite: '' });
+    next.combinationSlots = slots;
+    return ensureDraftForEdit(next);
+  }
+
+  const steps: NonNullable<Blend['protocolSteps']> = [];
+  if (before.kind === 'mix') {
+    for (const d of before.mixRecipe?.droplets ?? []) {
+      const pn = d.productName.trim();
+      if (!pn) continue;
+      steps.push({
+        ...(d.productId ? { productId: d.productId } : {}),
+        productName: pn,
+        timing: 'morning',
+      });
+    }
+  } else {
+    for (const s of before.combinationSlots ?? []) {
+      const pn = s.productName.trim();
+      if (!pn) continue;
+      const pid = s.productId?.trim();
+      steps.push({
+        ...(pid ? { productId: pid } : {}),
+        productName: pn,
+        timing: 'morning',
+      });
+    }
+  }
+  if (steps.length === 0) steps.push({ productName: '', timing: 'morning' });
+  next.protocolSteps = steps;
+  return ensureDraftForEdit(next);
+}
+
 export default function BlendScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const blendId = typeof id === 'string' ? id : '';
@@ -248,6 +353,27 @@ export default function BlendScreen() {
     setTotalVolAmtStr('');
     setCarrierPickerOpen(false);
     setPickerSearch('');
+  }, []);
+
+  const selectDraftKind = useCallback((k: BlendKind) => {
+    setDraft((prev) => {
+      if (!prev || prev.kind === k) return prev;
+      const next = draftWithKind(prev, k);
+      if (k === 'mix') {
+        const amt = next.mixRecipe?.baseOil?.amount;
+        setBaseOilAmountStr(
+          amt !== undefined && Number.isFinite(amt) ? String(amt) : '',
+        );
+        const tv = next.mixRecipe?.totalVolumeAmount;
+        setTotalVolAmtStr(
+          tv !== undefined && Number.isFinite(tv) ? String(tv) : '',
+        );
+      } else {
+        setBaseOilAmountStr('');
+        setTotalVolAmtStr('');
+      }
+      return next;
+    });
   }, []);
 
   const carrierOilCount = useMemo(
@@ -608,6 +734,31 @@ export default function BlendScreen() {
 
         {editing && draft ? (
           <>
+            <View style={styles.heroKindSelector}>
+              {BLEND_KINDS.map((k) => {
+                const sel = draft.kind === k;
+                return (
+                  <Pressable
+                    key={k}
+                    onPress={() => selectDraftKind(k)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: sel }}
+                    style={({ pressed }) => [
+                      styles.kindChip,
+                      {
+                        backgroundColor: sel ? colors.sage : p.card,
+                        borderColor: sel ? colors.sage : p.border,
+                        opacity: pressed ? 0.88 : 1,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.kindChipText, { color: sel ? colors.white : p.text }]}>
+                      {t(blendKindLabelKey(k)) as string}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
             <TextInput
               value={draft.name}
               onChangeText={(txt) => setDraft({ ...draft, name: txt })}
@@ -616,9 +767,6 @@ export default function BlendScreen() {
               style={styles.heroNameInput}
               maxLength={200}
             />
-            <View style={styles.heroKindBadge}>
-              <Text style={styles.heroKindBadgeText}>{kindLabel}</Text>
-            </View>
           </>
         ) : (
           <>
@@ -1305,20 +1453,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.35)',
   },
-  heroKindBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    borderRadius: 999,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    marginBottom: 10,
+  heroKindSelector: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
+    flexWrap: 'nowrap',
   },
-  heroKindBadgeText: {
-    color: colors.white,
+  kindChip: {
+    flex: 1,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  kindChipText: {
     fontSize: 13,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    fontWeight: '700',
+    textAlign: 'center',
   },
   editHint: {
     fontSize: 13,
