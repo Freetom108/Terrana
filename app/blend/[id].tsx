@@ -23,7 +23,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -39,6 +39,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PROTO_TIMINGS: ProtocolTiming[] = ['morning', 'evening', 'as_needed', 'flexible'];
+
+/** Modal for picking a carrier oil row vs a mix-droplet ingredient row */
+type BlendProductPickerTarget =
+  | null
+  | { kind: 'carrierOil' }
+  | { kind: 'mixDroplet'; index: number };
 
 function formatLocalizedDate(iso: string): string {
   const d = new Date(iso);
@@ -290,7 +296,10 @@ export default function BlendScreen() {
 
   const [blend, setBlend] = useState<Blend | null | undefined>(undefined);
 
-  const [carrierPickerOpen, setCarrierPickerOpen] = useState(false);
+  const blendPickerTargetRef = useRef<BlendProductPickerTarget>(null);
+  const [blendPickerTarget, setBlendPickerTarget] = useState<BlendProductPickerTarget>(null);
+  blendPickerTargetRef.current = blendPickerTarget;
+
   const [pickerSearch, setPickerSearch] = useState('');
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Blend | null>(null);
@@ -305,7 +314,7 @@ export default function BlendScreen() {
     setTagInput('');
     setBaseOilAmountStr('');
     setTotalVolAmtStr('');
-    setCarrierPickerOpen(false);
+    setBlendPickerTarget(null);
     setPickerSearch('');
   }, [blendId]);
 
@@ -340,7 +349,7 @@ export default function BlendScreen() {
     const tv = d.mixRecipe?.totalVolumeAmount;
     setTotalVolAmtStr(tv !== undefined && Number.isFinite(tv) ? String(tv) : '');
     setTagInput('');
-    setCarrierPickerOpen(false);
+    setBlendPickerTarget(null);
     setPickerSearch('');
     setEditing(true);
   }, [blend]);
@@ -351,7 +360,7 @@ export default function BlendScreen() {
     setTagInput('');
     setBaseOilAmountStr('');
     setTotalVolAmtStr('');
-    setCarrierPickerOpen(false);
+    setBlendPickerTarget(null);
     setPickerSearch('');
   }, []);
 
@@ -381,45 +390,72 @@ export default function BlendScreen() {
     [products],
   );
 
-  const carrierPickerPool = useMemo(
-    () => (carrierPickerOpen ? products.filter((x) => x.category === 'carrierOil') : []),
-    [carrierPickerOpen, products],
-  );
+  const catalogProductCount = products.length;
 
-  const filteredCarrierPickerProducts = useMemo(() => {
+  const blendPickerPool = useMemo(() => {
+    if (!blendPickerTarget) return [];
+    if (blendPickerTarget.kind === 'carrierOil') {
+      return products.filter((x) => x.category === 'carrierOil');
+    }
+    return products;
+  }, [blendPickerTarget, products]);
+
+  const filteredBlendPickerProducts = useMemo(() => {
     const q = pickerSearch.trim().toLowerCase();
-    if (!q) return carrierPickerPool;
-    return carrierPickerPool.filter((prod) => pickerProductMatchesQuery(prod, q));
-  }, [carrierPickerPool, pickerSearch, redrawLocale]);
+    if (!q) return blendPickerPool;
+    return blendPickerPool.filter((prod) => pickerProductMatchesQuery(prod, q));
+  }, [blendPickerPool, pickerSearch, redrawLocale]);
 
-  const carrierPickerEmptyMessage = useMemo(() => {
-    if (!carrierPickerOpen) return '';
-    if (carrierPickerPool.length === 0) return String(t('blendNew.pickerEmptyCarrier'));
+  const blendPickerEmptyMessage = useMemo(() => {
+    if (!blendPickerTarget) return '';
+    if (blendPickerTarget.kind === 'carrierOil') {
+      if (carrierOilCount === 0) return String(t('blendNew.pickerEmptyCarrier'));
+      return String(t('blendNew.pickerNoResults'));
+    }
+    if (catalogProductCount === 0) return String(t('blendNew.pickerEmpty'));
     return String(t('blendNew.pickerNoResults'));
-  }, [carrierPickerOpen, carrierPickerPool.length]);
+  }, [blendPickerTarget, carrierOilCount, catalogProductCount]);
+
+  const closeBlendPicker = useCallback(() => {
+    setBlendPickerTarget(null);
+    setPickerSearch('');
+  }, []);
 
   const openCarrierPicker = useCallback(() => {
     setPickerSearch('');
-    setCarrierPickerOpen(true);
+    setBlendPickerTarget({ kind: 'carrierOil' });
   }, []);
 
-  const selectCarrierProduct = useCallback((picked: Product) => {
+  const openMixDropletPicker = useCallback((rowIndex: number) => {
+    setPickerSearch('');
+    setBlendPickerTarget({ kind: 'mixDroplet', index: rowIndex });
+  }, []);
+
+  const selectBlendPickerProduct = useCallback((picked: Product) => {
+    const target = blendPickerTargetRef.current;
     setDraft((prev) => {
       if (!prev || prev.kind !== 'mix' || !prev.mixRecipe) return prev;
+      if (!target) return prev;
+      if (target.kind === 'carrierOil') {
+        return {
+          ...prev,
+          mixRecipe: {
+            ...prev.mixRecipe,
+            baseOil: { ...(prev.mixRecipe.baseOil ?? {}), name: picked.name },
+          },
+        };
+      }
+      const idx = target.index;
+      const droplets = [...prev.mixRecipe.droplets];
+      const row = droplets[idx];
+      if (!row) return prev;
+      droplets[idx] = { ...row, productName: picked.name, productId: picked.id };
       return {
         ...prev,
-        mixRecipe: {
-          ...prev.mixRecipe,
-          baseOil: { ...(prev.mixRecipe.baseOil ?? {}), name: picked.name },
-        },
+        mixRecipe: { ...prev.mixRecipe, droplets },
       };
     });
-    setCarrierPickerOpen(false);
-    setPickerSearch('');
-  }, []);
-
-  const closeCarrierPicker = useCallback(() => {
-    setCarrierPickerOpen(false);
+    setBlendPickerTarget(null);
     setPickerSearch('');
   }, []);
 
@@ -528,7 +564,7 @@ export default function BlendScreen() {
     setTagInput('');
     setBaseOilAmountStr('');
     setTotalVolAmtStr('');
-    setCarrierPickerOpen(false);
+    setBlendPickerTarget(null);
     setPickerSearch('');
   }, [draft, baseOilAmountStr, totalVolAmtStr]);
 
@@ -896,20 +932,33 @@ export default function BlendScreen() {
                       key={`m-${idx}`}
                       style={[styles.editCard, { borderColor: p.border, backgroundColor: p.card }]}
                     >
-                      <TextInput
-                        value={row.productName}
-                        onChangeText={(txt) => {
-                          const droplets = [...draft.mixRecipe!.droplets];
-                          droplets[idx] = { ...row, productName: txt };
-                          setDraft({
-                            ...draft,
-                            mixRecipe: { ...draft.mixRecipe!, droplets },
-                          });
-                        }}
-                        placeholder={t('blendNew.fieldIngredientProduct') as string}
-                        placeholderTextColor={p.placeholderColor}
-                        style={[styles.inputInCard, { color: p.text }]}
-                      />
+                      <View style={styles.pickRow}>
+                        <TextInput
+                          value={row.productName}
+                          onChangeText={(txt) => {
+                            const droplets = [...draft.mixRecipe!.droplets];
+                            droplets[idx] = { ...row, productName: txt };
+                            setDraft({
+                              ...draft,
+                              mixRecipe: { ...draft.mixRecipe!, droplets },
+                            });
+                          }}
+                          placeholder={t('blendNew.fieldIngredientProduct') as string}
+                          placeholderTextColor={p.placeholderColor}
+                          style={[styles.inputInCard, styles.pickInput, { color: p.text }]}
+                        />
+                        {catalogProductCount > 0 ? (
+                          <Pressable
+                            onPress={() => openMixDropletPicker(idx)}
+                            style={styles.pickBtn}
+                            accessibilityRole="button"
+                            accessibilityLabel={t('blendNew.pickFromCollection') as string}
+                            hitSlop={8}
+                          >
+                            <Ionicons name="add-circle-outline" size={24} color={colors.sage} />
+                          </Pressable>
+                        ) : null}
+                      </View>
                       <TextInput
                         value={row.quantityLabel ?? ''}
                         onChangeText={(txt) => {
@@ -1324,17 +1373,19 @@ export default function BlendScreen() {
     </View>
 
       <Modal
-        visible={carrierPickerOpen}
+        visible={blendPickerTarget !== null}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={closeCarrierPicker}
+        onRequestClose={closeBlendPicker}
       >
         <View style={[styles.pickerRoot, { backgroundColor: p.surface }]}>
           <View style={[styles.pickerHeader, { borderBottomColor: p.border }]}>
             <Text style={[styles.pickerTitle, { color: p.text }]}>
-              {t('blendNew.pickerTitleCarrierOil') as string}
+              {(blendPickerTarget?.kind === 'carrierOil'
+                ? t('blendNew.pickerTitleCarrierOil')
+                : t('blendNew.pickerTitle')) as string}
             </Text>
-            <Pressable onPress={closeCarrierPicker} hitSlop={12} accessibilityRole="button">
+            <Pressable onPress={closeBlendPicker} hitSlop={12} accessibilityRole="button">
               <Ionicons name="close" size={24} color={p.secondaryBtnLabel} />
             </Pressable>
           </View>
@@ -1352,19 +1403,19 @@ export default function BlendScreen() {
             />
           </View>
 
-          {filteredCarrierPickerProducts.length === 0 ? (
+          {filteredBlendPickerProducts.length === 0 ? (
             <View style={styles.pickerEmpty}>
-              <Text style={[styles.pickerEmptyText, { color: p.muted }]}>{carrierPickerEmptyMessage}</Text>
+              <Text style={[styles.pickerEmptyText, { color: p.muted }]}>{blendPickerEmptyMessage}</Text>
             </View>
           ) : (
             <FlatList
-              data={filteredCarrierPickerProducts}
+              data={filteredBlendPickerProducts}
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
                 <Pressable
-                  onPress={() => selectCarrierProduct(item)}
+                  onPress={() => selectBlendPickerProduct(item)}
                   style={({ pressed }) => [
                     styles.pickerItem,
                     { borderBottomColor: p.border },
