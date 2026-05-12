@@ -4,7 +4,8 @@ import { applyThemePreference, screenSurfaceColor } from '../constants/themePref
 import { subscribeLocale, setLocale } from '../services/i18n/i18n';
 import { runStorageMigration } from '../services/storage/migration';
 import { useEffect, useReducer } from 'react';
-import { useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
+import Purchases from 'react-native-purchases';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
@@ -32,6 +33,17 @@ function RootNavigator() {
       cancelled = true;
       unsub();
     };
+  }, []);
+
+  useEffect(() => {
+    const apiKey = Platform.select({
+      ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
+      android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
+    });
+    if (!apiKey) return;
+    Purchases.configure({
+      apiKey,
+    });
   }, []);
 
   const bg = screenSurfaceColor(scheme);

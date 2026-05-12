@@ -3,7 +3,7 @@
     "scheme": "terrana",
     "name": "Terrana",
     "slug": "terrana",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -14,10 +14,15 @@
       "backgroundColor": "#4A6B4E"
     },
     "ios": {
+      "bundleIdentifier": "com.tommi07051967.terrana",
       "supportsTablet": true
     },
     "android": {
       "package": "com.tommi07051967.terrana",
+      "versionCode": 5,
+      "permissions": [
+        "com.android.vending.BILLING"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#4A6B4E"

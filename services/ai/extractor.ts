@@ -3,7 +3,7 @@ import type { ExtractedData } from '../../types/import';
 import { EXTRACTION_PROMPT } from './prompt';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-5';
+const MODEL = 'claude-haiku-4-5-20251001';
 const MAX_TOKENS = 1000;
 const MAX_USER_TEXT_LENGTH = 3000;
 const ANTHROPIC_VERSION = '2023-06-01';
@@ -137,7 +137,13 @@ export async function extractProductFromText(
       body: JSON.stringify({
         model: MODEL,
         max_tokens: MAX_TOKENS,
-        system: EXTRACTION_PROMPT,
+        system: [
+          {
+            type: 'text',
+            text: EXTRACTION_PROMPT,
+            cache_control: { type: 'ephemeral' },
+          },
+        ],
         messages: [
           {
             role: 'user',
