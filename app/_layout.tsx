@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { applyThemePreference, screenSurfaceColor } from '../constants/themePreference';
 import { subscribeLocale, setLocale } from '../services/i18n/i18n';
 import { runStorageMigration } from '../services/storage/migration';
@@ -12,6 +13,8 @@ import {
   getSavedLanguageCode,
   getThemePreference,
 } from '../services/storage/settings';
+
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 function RootNavigator() {
   const scheme = useColorScheme();
@@ -36,13 +39,14 @@ function RootNavigator() {
   }, []);
 
   useEffect(() => {
-    const apiKey = Platform.select({
-      ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
-      android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
-    });
-    if (!apiKey) return;
+    if (isExpoGo || Platform.OS === 'web') return;
+
     Purchases.configure({
-      apiKey,
+      apiKey:
+        Platform.select({
+          ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
+          android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
+        }) ?? '',
     });
   }, []);
 
