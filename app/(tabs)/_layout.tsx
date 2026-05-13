@@ -15,7 +15,9 @@ export default function TabsLayout() {
         options={{
           title: t('tabs.home'),
           tabBarLabel: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
+          ),
         }}
       />
       <Tabs.Screen

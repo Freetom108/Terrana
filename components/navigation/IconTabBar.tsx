@@ -47,7 +47,7 @@ export function IconTabBar({ state, navigation, descriptors }: BottomTabBarProps
       ]}
       accessibilityRole="tablist"
     >
-      {state.routes.map((route, index) => {
+      {state.routes.map((route) => {
         const tabKey = ROUTE_TAB_KEY[route.name];
         const opts = descriptors[route.key]?.options;
         const optLabel = opts?.tabBarLabel;
@@ -58,7 +58,8 @@ export function IconTabBar({ state, navigation, descriptors }: BottomTabBarProps
               ? (t(tabKey) as string)
               : route.name;
 
-        const focused = state.index === index;
+        const activeRoute = state.routes[state.index];
+        const focused = activeRoute != null && route.key === activeRoute.key;
         const pair = ICON_ROUTE_ICONS[route.name as keyof typeof ICON_ROUTE_ICONS];
         const iconName = pair ? (focused ? pair.active : pair.inactive) : 'ellipse-outline';
         const iconColor = focused ? p.tabLabelActive : p.tabLabelInactive;
