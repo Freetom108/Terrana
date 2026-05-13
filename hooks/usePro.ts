@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { getIsLifetime, getIsPro } from '../services/storage/settings';
 
 export function usePro() {
-  const [isPro, setIsPro] = useState(false);
-  const [isLifetime, setIsLifetime] = useState(false);
+  const [isPro, setIsPro] = useState(true);
+  const [isLifetime, setIsLifetime] = useState(true);
 
   const load = useCallback(async () => {
     const [pro, lifetime] = await Promise.all([getIsPro(), getIsLifetime()]);
@@ -11,9 +11,10 @@ export function usePro() {
     setIsLifetime(lifetime);
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  // TEMP TEST: re-enable after testing — restore `useEffect` import above and uncomment below.
+  // useEffect(() => {
+  //   void load();
+  // }, [load]);
 
   return { isPro, isLifetime, reload: load };
 }

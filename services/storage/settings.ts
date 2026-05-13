@@ -47,6 +47,18 @@ export async function setIsLifetime(value: boolean): Promise<void> {
   await AsyncStorage.setItem(KEY_LIFETIME, JSON.stringify(Boolean(value)));
 }
 
+/**
+ * TEMP TEST — remove after testing.
+ * Writes Pro + Lifetime flags to AsyncStorage (`terrana_isPro`, `terrana_isLifetime`)
+ * using the same format as {@link setIsPro} / {@link setIsLifetime}.
+ */
+export async function tempForceProLifetimeForTesting(): Promise<void> {
+  await AsyncStorage.multiSet([
+    [KEY_PRO, JSON.stringify(true)],
+    [KEY_LIFETIME, JSON.stringify(true)],
+  ]);
+}
+
 export async function getImportCount(): Promise<number> {
   return parseCount(await AsyncStorage.getItem(KEY_IMPORT_COUNT));
 }

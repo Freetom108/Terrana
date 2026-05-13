@@ -12,6 +12,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   getSavedLanguageCode,
   getThemePreference,
+  tempForceProLifetimeForTesting,
 } from '../services/storage/settings';
 
 const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
@@ -26,6 +27,7 @@ function RootNavigator() {
 
     void (async () => {
       await runStorageMigration();
+      await tempForceProLifetimeForTesting();
       const lang = await getSavedLanguageCode();
       if (!cancelled && lang) setLocale(lang);
       const theme = await getThemePreference();
@@ -41,13 +43,22 @@ function RootNavigator() {
   useEffect(() => {
     if (isExpoGo || Platform.OS === 'web') return;
 
-    Purchases.configure({
-      apiKey:
-        Platform.select({
-          ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
-          android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
-        }) ?? '',
-    });
+    const apiKey =
+      Platform.select({
+        ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
+        android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
+      }) ?? '';
+
+    if (!apiKey.trim()) {
+      console.error('RevenueCat init failed:', new Error('empty API key (set EXPO_PUBLIC_REVENUECAT_* for EAS builds)'));
+      return;
+    }
+
+    try {
+      Purchases.configure({ apiKey });
+    } catch (e) {
+      console.error('RevenueCat init failed:', e);
+    }
   }, []);
 
   const bg = screenSurfaceColor(scheme);

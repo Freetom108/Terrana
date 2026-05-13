@@ -27,10 +27,7 @@ const ICON_ROUTE_ICONS = {
 const ICON_SIZE = 24;
 const ICON_ROW_MIN_HEIGHT = 28;
 
-const ICON_ONLY_ROUTES = new Set(['index']);
-
-export function IconTabBar(props: BottomTabBarProps) {
-  const { state, navigation } = props;
+export function IconTabBar({ state, navigation, descriptors }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const bottomPad = Math.max(insets.bottom, 8);
   const p = useThemePalette();
@@ -52,13 +49,21 @@ export function IconTabBar(props: BottomTabBarProps) {
     >
       {state.routes.map((route, index) => {
         const tabKey = ROUTE_TAB_KEY[route.name];
-        const label = tabKey ? (t(tabKey) as string) : route.name;
+        const opts = descriptors[route.key]?.options;
+        const optLabel = opts?.tabBarLabel;
+        const label =
+          typeof optLabel === 'string'
+            ? optLabel
+            : tabKey
+              ? (t(tabKey) as string)
+              : route.name;
 
         const focused = state.index === index;
         const pair = ICON_ROUTE_ICONS[route.name as keyof typeof ICON_ROUTE_ICONS];
         const iconName = pair ? (focused ? pair.active : pair.inactive) : 'ellipse-outline';
         const iconColor = focused ? p.tabLabelActive : p.tabLabelInactive;
 
+        const TabIcon = opts?.tabBarIcon;
         const onPress = () => {
           const e = navigation.emit({
             type: 'tabPress',
@@ -88,22 +93,24 @@ export function IconTabBar(props: BottomTabBarProps) {
             style={({ pressed }) => [styles.cell, pressed && styles.cellPressed]}
           >
             <View style={styles.iconSlot}>
-              <Ionicons name={iconName} size={ICON_SIZE} color={iconColor} />
+              {typeof TabIcon === 'function' ? (
+                TabIcon({ focused, color: iconColor, size: ICON_SIZE })
+              ) : (
+                <Ionicons name={iconName} size={ICON_SIZE} color={iconColor} />
+              )}
             </View>
-            {!ICON_ONLY_ROUTES.has(route.name) ? (
-              <Text
-                style={[
-                  styles.label,
-                  { color: focused ? p.tabLabelActive : p.tabLabelInactive },
-                ]}
-                numberOfLines={2}
-                adjustsFontSizeToFit
-                minimumFontScale={0.82}
-                maxFontSizeMultiplier={1.12}
-              >
-                {label}
-              </Text>
-            ) : null}
+            <Text
+              style={[
+                styles.label,
+                { color: focused ? p.tabLabelActive : p.tabLabelInactive },
+              ]}
+              numberOfLines={2}
+              adjustsFontSizeToFit
+              minimumFontScale={0.82}
+              maxFontSizeMultiplier={1.12}
+            >
+              {label}
+            </Text>
           </Pressable>
         );
       })}

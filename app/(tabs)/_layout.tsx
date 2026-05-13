@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useReducer } from 'react';
 import { IconTabBar } from '../../components/navigation/IconTabBar';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
@@ -9,7 +10,14 @@ export default function TabsLayout() {
 
   return (
     <Tabs tabBar={(props) => <IconTabBar {...props} />} screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarLabel: t('tabs.home') }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: t('tabs.home'),
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
+        }}
+      />
       <Tabs.Screen
         name="favorites"
         options={{ title: t('tabs.favorites'), tabBarLabel: t('tabs.favorites') }}
