@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "com.tommi07051967.terrana",
-      "versionCode": 5,
+      "versionCode": 6,
       "permissions": [
         "com.android.vending.BILLING"
       ],
