@@ -133,8 +133,8 @@
     "favorites": "Favoriten",
     "import": "Import",
     "search": "Suche",
-    "blends": "Meine Blends",
-    "settings": "Einstellungen"
+    "blends": "Blends",
+    "settings": "Settings"
   },
   "favorites": {
     "screenTitle": "Favoriten",
@@ -273,7 +273,9 @@
     "featurePrint": "🖨️ Sammlung",
     "featureInventory": "Inventar",
     "featureBackup": "Backup & Restore",
-    "backupTagline": "Deine Sammlung bleibt erhalten – auch auf einem neuen Gerät.",
+    "backupHighlightTitle": "Sichere deine Sammlung",
+    "backupHighlightBadge": "Nur mit Lifetime",
+    "backupHighlightDesc": "Backup & Restore schützt deine Daten – auch auf einem neuen Gerät.",
     "sharing": "Teile mit deiner Community",
     "sharingDesc": "Teile via WhatsApp, Mail, SMS & alle Apps",
     "sharingBadge": "Ab Pro verfügbar",

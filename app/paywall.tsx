@@ -229,11 +229,6 @@ export default function PaywallScreen() {
           ))}
         </View>
 
-        {/* ── Backup tagline ── */}
-        <Text style={[styles.backupTagline, { color: p.muted }]}>
-          {t('paywall.backupTagline') as string}
-        </Text>
-
         {/* ── Sharing highlight card ── */}
         <View
           style={[
@@ -270,6 +265,27 @@ export default function PaywallScreen() {
               </View>
             ))}
           </View>
+        </View>
+
+        {/* ── Backup highlight card (Lifetime) ── */}
+        <View
+          style={[
+            styles.sharingCard,
+            {
+              backgroundColor: p.isDark ? '#2C3B2E' : 'rgba(122,158,126,0.1)',
+              borderColor: colors.sage,
+            },
+          ]}
+        >
+          <Text style={[styles.sharingTitle, { color: p.text }]}>
+            {t('paywall.backupHighlightTitle') as string}
+          </Text>
+          <View style={[styles.sharingBadge, styles.backupBadge]}>
+            <Text style={styles.sharingBadgeText}>{t('paywall.backupHighlightBadge') as string}</Text>
+          </View>
+          <Text style={[styles.sharingDesc, styles.backupHighlightDesc, { color: p.muted }]}>
+            {t('paywall.backupHighlightDesc') as string}
+          </Text>
         </View>
 
         {/* ── Buy buttons ── */}
@@ -452,13 +468,13 @@ const styles = StyleSheet.create({
     color: colors.sageDark,
   },
 
-  backupTagline: {
-    fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
-    marginTop: -4,
-    marginBottom: 16,
-    paddingHorizontal: 16,
+  backupBadge: {
+    alignSelf: 'flex-start',
+    marginTop: 6,
+    marginBottom: 6,
+  },
+  backupHighlightDesc: {
+    marginTop: 0,
   },
 
   /* Sharing card */
