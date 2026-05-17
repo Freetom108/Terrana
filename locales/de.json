@@ -288,11 +288,14 @@
     "noSubscription": "Einmalige Zahlung – kein Abo",
     "privacy": "Datenschutz",
     "terms": "AGB",
-    "placeholderProTitle": "Pro",
-    "placeholderProMessage": "Pro aktiviert (Platzhalter).",
-    "placeholderLifetimeTitle": "Lifetime",
-    "placeholderLifetimeMessage": "Lifetime aktiviert (Platzhalter).",
-    "restoreNotImplementedMessage": "Wiederherstellen ist noch nicht implementiert.",
+    "purchaseFailedTitle": "Kauf fehlgeschlagen",
+    "purchaseUnavailableMessage": "Das Produkt ist gerade nicht verfügbar. Prüfen Sie, ob In-App-Käufe für Terrana im Store korrekt eingerichtet sind.",
+    "purchaseNetworkError": "Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.",
+    "purchaseUnknownError": "Es ist ein Fehler aufgetreten. Bitte erneut versuchen.",
+    "restoreSuccessTitle": "Wiederhergestellt",
+    "restoreSuccessBody": "Ihre Käufe wurden wiederhergestellt.",
+    "restoreNothingTitle": "Keine Käufe gefunden",
+    "restoreNothingBody": "Für dieses Konto wurden keine aktiven Käufe gefunden.",
     "shareMethodWhatsapp": "WhatsApp",
     "shareMethodEmail": "E-Mail",
     "shareMethodSms": "SMS",
@@ -308,7 +311,8 @@
     "errorHttp": "Fehler %{status}: %{message}",
     "errorUnknown": "Unbekannter API-Fehler",
     "errorNetwork": "Fehler: %{message}",
-    "errorNetworkFallback": "Netzwerk- oder Laufzeitfehler."
+    "errorNetworkFallback": "Netzwerk- oder Laufzeitfehler.",
+    "errorTimeout": "Zeitüberschreitung. Bitte erneut versuchen."
   },
   "pdf": {
     "blendType": "Typ",
@@ -379,6 +383,7 @@
   },
   "general": {
     "cancel": "Abbrechen",
+    "ok": "OK",
     "save": "Speichern",
     "delete": "Löschen",
     "edit": "Bearbeiten",

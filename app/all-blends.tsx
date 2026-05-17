@@ -1,11 +1,13 @@
 import { HomeBlendCard } from '../components/home/HomeListCards';
+import { EmptyState } from '../components/ui/EmptyState';
 import { useBlends } from '../hooks/useBlends';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
+import type { Blend } from '../types/blend';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { FlatList, ListRenderItem, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AllBlendsScreen() {
@@ -18,6 +20,24 @@ export default function AllBlendsScreen() {
     useCallback(() => {
       void refreshBlends();
     }, [refreshBlends]),
+  );
+
+  const renderItem: ListRenderItem<Blend> = ({ item }) => (
+    <HomeBlendCard blend={item} palette={palette} />
+  );
+
+  const listEmpty = useMemo(
+    () => (
+      <Pressable onPress={() => router.push('/blend/new')} accessibilityRole="button">
+        <EmptyState
+          title={t('home.emptyBlendsTitle')}
+          message={t('home.emptyBlendsMessage')}
+          icon="flask-outline"
+          iconColor="#C2D4C4"
+        />
+      </Pressable>
+    ),
+    [],
   );
 
   return (
@@ -33,17 +53,19 @@ export default function AllBlendsScreen() {
         <Text style={[styles.backLabel, { color: p.secondaryBtnLabel }]}>{t('general.back')}</Text>
       </Pressable>
       <Text style={[styles.screenTitle, { color: p.text }]}>{t('home.myBlends')}</Text>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.scrollInner, { paddingBottom: insets.bottom + 24 }]}
+      <FlatList
+        data={blends}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={listEmpty}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingBottom: insets.bottom + 24 },
+          blends.length === 0 && styles.listEmptyGrow,
+        ]}
         showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.stack}>
-          {blends.map((blend) => (
-            <HomeBlendCard key={blend.id} blend={blend} palette={palette} />
-          ))}
-        </View>
-      </ScrollView>
+        ItemSeparatorComponent={() => <View style={styles.sep} />}
+      />
     </View>
   );
 }
@@ -69,13 +91,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
   },
-  scroll: {
-    flex: 1,
-  },
-  scrollInner: {
+  listContent: {
     paddingBottom: 8,
+    flexGrow: 1,
   },
-  stack: {
-    gap: 10,
+  listEmptyGrow: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  sep: {
+    height: 10,
   },
 });

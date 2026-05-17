@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FREE_IMPORT_LIMIT, PRO_IMPORT_LIMIT } from '../constants/limits';
+import {
+  FREE_IMPORT_LIMIT,
+  LIFETIME_IMPORT_LIMIT,
+  PRO_IMPORT_LIMIT,
+} from '../constants/limits';
 import { getImportCount, incrementImportCount } from '../services/storage/settings';
 
 interface ImportLimitOptions {
@@ -21,17 +25,15 @@ export function useImportLimit({ isPro = false, isLifetime = false }: ImportLimi
   }, [refresh]);
 
   const effectiveLimit = isLifetime
-    ? Number.POSITIVE_INFINITY
+    ? LIFETIME_IMPORT_LIMIT
     : isPro
       ? PRO_IMPORT_LIMIT
       : FREE_IMPORT_LIMIT;
 
-  const importsRemaining = Number.isFinite(effectiveLimit)
-    ? Math.max(0, (effectiveLimit as number) - importsUsed)
-    : Number.POSITIVE_INFINITY;
+  const importsRemaining = Math.max(0, effectiveLimit - importsUsed);
 
-  /** Free: true while `importsUsed < FREE_IMPORT_LIMIT`. After the last allowed run, increments to equal limit — import screens should still allow finishing the open result (e.g. keep UI when `showResult`). */
-  const canImport = isLifetime || isPro || importsUsed < FREE_IMPORT_LIMIT;
+  /** True while fewer than the tier's cap has been counted; save flow elsewhere may keep result UI open via `showResult`. */
+  const canImport = importsUsed < effectiveLimit;
 
   const incrementImport = useCallback(async () => {
     await incrementImportCount();
@@ -44,5 +46,6 @@ export function useImportLimit({ isPro = false, isLifetime = false }: ImportLimi
     canImport,
     incrementImport,
     refresh,
+    effectiveLimit,
   };
 }

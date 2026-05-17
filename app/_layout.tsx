@@ -9,11 +9,8 @@ import { Platform, useColorScheme } from 'react-native';
 import Purchases from 'react-native-purchases';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import {
-  getSavedLanguageCode,
-  getThemePreference,
-  tempForceProLifetimeForTesting,
-} from '../services/storage/settings';
+import { applyCustomerInfoToStorage } from '../services/purchase/iap';
+import { getSavedLanguageCode, getThemePreference } from '../services/storage/settings';
 
 const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
@@ -27,7 +24,6 @@ function RootNavigator() {
 
     void (async () => {
       await runStorageMigration();
-      await tempForceProLifetimeForTesting();
       const lang = await getSavedLanguageCode();
       if (!cancelled && lang) setLocale(lang);
       const theme = await getThemePreference();
@@ -56,6 +52,9 @@ function RootNavigator() {
 
     try {
       Purchases.configure({ apiKey });
+      Purchases.addCustomerInfoUpdateListener((info) => {
+        void applyCustomerInfoToStorage(info);
+      });
     } catch (e) {
       console.error('RevenueCat init failed:', e);
     }

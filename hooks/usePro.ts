@@ -1,9 +1,14 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import {
+  refreshCustomerInfoSync,
+  subscribePurchasesMutation,
+} from '../services/purchase/iap';
 import { getIsLifetime, getIsPro } from '../services/storage/settings';
 
 export function usePro() {
-  const [isPro, setIsPro] = useState(true);
-  const [isLifetime, setIsLifetime] = useState(true);
+  const [isPro, setIsPro] = useState(false);
+  const [isLifetime, setIsLifetime] = useState(false);
 
   const load = useCallback(async () => {
     const [pro, lifetime] = await Promise.all([getIsPro(), getIsLifetime()]);
@@ -11,10 +16,30 @@ export function usePro() {
     setIsLifetime(lifetime);
   }, []);
 
-  // TEMP TEST: re-enable after testing — restore `useEffect` import above and uncomment below.
-  // useEffect(() => {
-  //   void load();
-  // }, [load]);
+  useEffect(() => {
+    let alive = true;
+    const hydrate = async () => {
+      await load();
+      await refreshCustomerInfoSync();
+      if (alive) await load();
+    };
+    void hydrate();
 
-  return { isPro, isLifetime, reload: load };
+    const unsub = subscribePurchasesMutation(() => {
+      void load();
+    });
+
+    return () => {
+      alive = false;
+      unsub();
+    };
+  }, [load]);
+
+  const reload = useCallback(async () => {
+    await load();
+    await refreshCustomerInfoSync();
+    await load();
+  }, [load]);
+
+  return { isPro, isLifetime, reload };
 }

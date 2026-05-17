@@ -3,18 +3,29 @@ import {
   FREE_BLEND_DISPLAY_MAX,
   FREE_IMPORT_DISPLAY_MAX,
   FREE_PRODUCT_DISPLAY_MAX,
+  LIFETIME_LIMIT,
   PRO_BLEND_LIMIT,
   PRO_IMPORT_LIMIT,
   PRO_PRODUCT_LIMIT,
 } from '../constants/limits';
+import { usePro } from '../hooks/usePro';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
-import { setIsLifetime, setIsPro } from '../services/storage/settings';
+import {
+  deriveSubscriptionFlags,
+  formatPurchasesUserMessage,
+  isPurchasesCancelError,
+  isPurchasesNetworkError,
+  purchaseTerranaLifetime,
+  purchaseTerranaPro,
+  restorePurchasesSync,
+} from '../services/purchase/iap';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Pressable,
   ScrollView,
@@ -42,19 +53,19 @@ const FEATURES: FeatureRow[] = [
     labelKey: 'paywall.featureProducts',
     free: String(FREE_PRODUCT_DISPLAY_MAX),
     pro: String(PRO_PRODUCT_LIMIT),
-    lifetime: '1.000',
+    lifetime: String(LIFETIME_LIMIT),
   },
   {
     labelKey: 'paywall.featureBlends',
     free: String(FREE_BLEND_DISPLAY_MAX),
     pro: String(PRO_BLEND_LIMIT),
-    lifetime: '1.000',
+    lifetime: String(LIFETIME_LIMIT),
   },
   {
     labelKey: 'paywall.featureAiImport',
     free: String(FREE_IMPORT_DISPLAY_MAX),
     pro: String(PRO_IMPORT_LIMIT),
-    lifetime: '1.000',
+    lifetime: String(LIFETIME_LIMIT),
   },
   {
     labelKey: 'paywall.featureSharing',
@@ -118,35 +129,87 @@ function CellContent({ value, highlight }: { value: CellValue; highlight: boolea
 export default function PaywallScreen() {
   const p = useThemePalette();
   const insets = useSafeAreaInsets();
+  const { reload } = usePro();
+  const [iapBusy, setIapBusy] = useState<'idle' | 'pro' | 'lifetime' | 'restore'>('idle');
+
+  const showPurchaseFailure = useCallback((error: unknown) => {
+    if (error instanceof Error && error.message === 'PRODUCT_NOT_CONFIGURED') {
+      Alert.alert(
+        t('paywall.purchaseFailedTitle') as string,
+        t('paywall.purchaseUnavailableMessage') as string,
+      );
+      return;
+    }
+    if (isPurchasesNetworkError(error)) {
+      Alert.alert(
+        t('paywall.purchaseFailedTitle') as string,
+        t('paywall.purchaseNetworkError') as string,
+      );
+      return;
+    }
+    const hint = formatPurchasesUserMessage(error);
+    Alert.alert(
+      t('paywall.purchaseFailedTitle') as string,
+      hint ?? (t('paywall.purchaseUnknownError') as string),
+    );
+  }, []);
 
   const handleBuyPro = useCallback(async () => {
-    // TODO: Replace with RevenueCat purchase flow
-    await setIsPro(true);
-    Alert.alert(
-      t('paywall.placeholderProTitle') as string,
-      t('paywall.placeholderProMessage') as string,
-    );
-    router.back();
-  }, []);
+    if (iapBusy !== 'idle') return;
+    setIapBusy('pro');
+    try {
+      await purchaseTerranaPro();
+      await reload();
+      router.back();
+    } catch (e) {
+      if (isPurchasesCancelError(e)) return;
+      showPurchaseFailure(e);
+    } finally {
+      setIapBusy('idle');
+    }
+  }, [iapBusy, reload, showPurchaseFailure]);
 
   const handleBuyLifetime = useCallback(async () => {
-    // TODO: Replace with RevenueCat purchase flow
-    await setIsLifetime(true);
-    await setIsPro(true);
-    Alert.alert(
-      t('paywall.placeholderLifetimeTitle') as string,
-      t('paywall.placeholderLifetimeMessage') as string,
-    );
-    router.back();
-  }, []);
+    if (iapBusy !== 'idle') return;
+    setIapBusy('lifetime');
+    try {
+      await purchaseTerranaLifetime();
+      await reload();
+      router.back();
+    } catch (e) {
+      if (isPurchasesCancelError(e)) return;
+      showPurchaseFailure(e);
+    } finally {
+      setIapBusy('idle');
+    }
+  }, [iapBusy, reload, showPurchaseFailure]);
 
-  const handleRestore = useCallback(() => {
-    // TODO: Replace with RevenueCat restorePurchases()
-    Alert.alert(
-      t('paywall.restore') as string,
-      t('paywall.restoreNotImplementedMessage') as string,
-    );
-  }, []);
+  const handleRestore = useCallback(async () => {
+    if (iapBusy !== 'idle') return;
+    setIapBusy('restore');
+    try {
+      const ci = await restorePurchasesSync();
+      await reload();
+      const flags = deriveSubscriptionFlags(ci);
+      if (!flags.isPro && !flags.isLifetime) {
+        Alert.alert(
+          t('paywall.restoreNothingTitle') as string,
+          t('paywall.restoreNothingBody') as string,
+        );
+        return;
+      }
+      Alert.alert(
+        t('paywall.restoreSuccessTitle') as string,
+        t('paywall.restoreSuccessBody') as string,
+        [{ text: t('general.ok') as string, onPress: () => router.back() }],
+      );
+    } catch (e) {
+      if (isPurchasesCancelError(e)) return;
+      showPurchaseFailure(e);
+    } finally {
+      setIapBusy('idle');
+    }
+  }, [iapBusy, reload, showPurchaseFailure]);
 
   return (
     <View style={[styles.root, { backgroundColor: p.surface }]}>
@@ -161,6 +224,7 @@ export default function PaywallScreen() {
           onPress={() => router.back()}
           style={styles.closeBtn}
           hitSlop={12}
+          disabled={iapBusy !== 'idle'}
           accessibilityRole="button"
           accessibilityLabel={t('general.closePaywall') as string}
         >
@@ -292,12 +356,24 @@ export default function PaywallScreen() {
         <View style={styles.buttonsSection}>
           {/* Pro button */}
           <Pressable
-            style={({ pressed }) => [styles.buyBtn, styles.buyBtnPro, pressed && styles.buyBtnPressed]}
+            style={({ pressed }) => [
+              styles.buyBtn,
+              styles.buyBtnPro,
+              pressed && styles.buyBtnPressed,
+              iapBusy !== 'idle' && styles.buyBtnDisabled,
+            ]}
             onPress={() => void handleBuyPro()}
+            disabled={iapBusy !== 'idle'}
             accessibilityRole="button"
           >
-            <Text style={styles.buyBtnTitle}>{t('paywall.buyPro') as string}</Text>
-            <Text style={styles.buyBtnPrice}>{t('paywall.buyProPrice') as string}</Text>
+            {iapBusy === 'pro' ? (
+              <ActivityIndicator color={colors.white} />
+            ) : (
+              <>
+                <Text style={styles.buyBtnTitle}>{t('paywall.buyPro') as string}</Text>
+                <Text style={styles.buyBtnPrice}>{t('paywall.buyProPrice') as string}</Text>
+              </>
+            )}
           </Pressable>
 
           {/* Lifetime button — golden border + floating badge top-right */}
@@ -307,12 +383,20 @@ export default function PaywallScreen() {
                 styles.buyBtn,
                 styles.buyBtnLifetime,
                 pressed && styles.buyBtnPressed,
+                iapBusy !== 'idle' && styles.buyBtnDisabled,
               ]}
               onPress={() => void handleBuyLifetime()}
+              disabled={iapBusy !== 'idle'}
               accessibilityRole="button"
             >
-              <Text style={styles.buyBtnTitle}>{t('paywall.buyLifetime') as string}</Text>
-              <Text style={styles.buyBtnPrice}>{t('paywall.buyLifetimePrice') as string}</Text>
+              {iapBusy === 'lifetime' ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <>
+                  <Text style={styles.buyBtnTitle}>{t('paywall.buyLifetime') as string}</Text>
+                  <Text style={styles.buyBtnPrice}>{t('paywall.buyLifetimePrice') as string}</Text>
+                </>
+              )}
             </Pressable>
             <View style={styles.popularBadge} pointerEvents="none">
               <Text style={styles.popularBadgeText}>{t('paywall.mostPopular') as string}</Text>
@@ -322,7 +406,7 @@ export default function PaywallScreen() {
 
         {/* ── Footer ── */}
         <View style={styles.footer}>
-          <Pressable onPress={handleRestore} hitSlop={8}>
+          <Pressable onPress={() => void handleRestore()} hitSlop={8} disabled={iapBusy !== 'idle'}>
             <Text style={[styles.footerLink, { color: p.secondaryBtnLabel }]}>
               {t('paywall.restore') as string}
             </Text>
@@ -573,6 +657,9 @@ const styles = StyleSheet.create({
   },
   buyBtnPressed: {
     opacity: 0.82,
+  },
+  buyBtnDisabled: {
+    opacity: 0.65,
   },
   buyBtnTitle: {
     color: colors.white,

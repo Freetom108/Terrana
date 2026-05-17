@@ -1,4 +1,5 @@
 import { HomeProductCard } from '../components/home/HomeListCards';
+import { EmptyState } from '../components/ui/EmptyState';
 import { useProducts } from '../hooks/useProducts';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
@@ -6,7 +7,7 @@ import type { Product } from '../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, ListRenderItem, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function sortByName(a: Product, b: Product): number {
@@ -27,6 +28,17 @@ export default function AllProductsScreen() {
 
   const byName = useMemo(() => [...products].sort(sortByName), [products]);
 
+  const renderItem: ListRenderItem<Product> = ({ item }) => (
+    <HomeProductCard product={item} palette={palette} />
+  );
+
+  const listEmpty = useMemo(
+    () => (
+      <EmptyState title={t('home.emptyProductsTitle')} message={t('home.emptyProductsMessage')} emoji="📦" />
+    ),
+    [],
+  );
+
   return (
     <View style={[styles.root, { backgroundColor: p.surface, paddingTop: insets.top + 8 }]}>
       <Pressable
@@ -40,17 +52,19 @@ export default function AllProductsScreen() {
         <Text style={[styles.backLabel, { color: p.secondaryBtnLabel }]}>{t('general.back')}</Text>
       </Pressable>
       <Text style={[styles.screenTitle, { color: p.text }]}>{t('home.allProducts')}</Text>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.scrollInner, { paddingBottom: insets.bottom + 24 }]}
+      <FlatList
+        data={byName}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={listEmpty}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingBottom: insets.bottom + 24 },
+          byName.length === 0 && styles.listEmptyGrow,
+        ]}
         showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.stack}>
-          {byName.map((prod) => (
-            <HomeProductCard key={prod.id} product={prod} palette={palette} />
-          ))}
-        </View>
-      </ScrollView>
+        ItemSeparatorComponent={() => <View style={styles.sep} />}
+      />
     </View>
   );
 }
@@ -76,13 +90,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
   },
-  scroll: {
-    flex: 1,
-  },
-  scrollInner: {
+  listContent: {
     paddingBottom: 8,
+    flexGrow: 1,
   },
-  stack: {
-    gap: 10,
+  listEmptyGrow: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  sep: {
+    height: 10,
   },
 });

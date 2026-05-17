@@ -8,6 +8,8 @@ const MAX_TOKENS = 1000;
 const MAX_USER_TEXT_LENGTH = 3000;
 const ANTHROPIC_VERSION = '2023-06-01';
 
+const FETCH_TIMEOUT_MS = 30_000;
+
 export type ExtractProductResult =
   | { success: true; data: ExtractedData }
   | { success: false; error: string };
@@ -126,9 +128,13 @@ export async function extractProductFromText(
   /** Long input is truncated silently — no user-facing error. */
   const excerpt = text.length > MAX_USER_TEXT_LENGTH ? text.slice(0, MAX_USER_TEXT_LENGTH) : text;
 
+  const abort = new AbortController();
+  const timeoutId = setTimeout(() => abort.abort(), FETCH_TIMEOUT_MS);
+
   try {
     const res = await fetch(ANTHROPIC_API_URL, {
       method: 'POST',
+      signal: abort.signal,
       headers: {
         'content-type': 'application/json',
         'x-api-key': trimmedKey,
@@ -198,6 +204,14 @@ export async function extractProductFromText(
     const data = normalizeExtracted(parsed);
     return { success: true, data };
   } catch (e) {
+    if (
+      typeof e === 'object' &&
+      e !== null &&
+      'name' in e &&
+      (e as { name?: string }).name === 'AbortError'
+    ) {
+      return { success: false, error: t('extractor.errorTimeout') as string };
+    }
     const message = e instanceof Error ? e.message : String(e);
     const detail = sanitizeUserFacingError(
       message || (t('extractor.errorNetworkFallback') as string),
@@ -206,5 +220,7 @@ export async function extractProductFromText(
       success: false,
       error: t('extractor.errorNetwork', { message: detail }) as string,
     };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }

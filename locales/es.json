@@ -288,11 +288,14 @@
     "noSubscription": "Pago único – sin suscripción",
     "privacy": "Privacidad",
     "terms": "Términos",
-    "placeholderProTitle": "Pro",
-    "placeholderProMessage": "Pro activado (marcador de posición).",
-    "placeholderLifetimeTitle": "Lifetime",
-    "placeholderLifetimeMessage": "Lifetime activado (marcador de posición).",
-    "restoreNotImplementedMessage": "Restaurar aún no está implementado.",
+    "purchaseFailedTitle": "Compra fallida",
+    "purchaseUnavailableMessage": "Este producto no está disponible ahora. Comprueba los pagos dentro de la app para Terrana.",
+    "purchaseNetworkError": "Error de red. Comprueba la conexión e inténtalo de nuevo.",
+    "purchaseUnknownError": "Algo salió mal. Inténtalo de nuevo.",
+    "restoreSuccessTitle": "Restaurado",
+    "restoreSuccessBody": "Tus compras se han restaurado.",
+    "restoreNothingTitle": "Sin compras",
+    "restoreNothingBody": "No se encontraron compras activas para esta cuenta.",
     "shareMethodWhatsapp": "WhatsApp",
     "shareMethodEmail": "Correo",
     "shareMethodSms": "SMS",
@@ -308,7 +311,8 @@
     "errorHttp": "Error %{status}: %{message}",
     "errorUnknown": "Error de API desconocido",
     "errorNetwork": "Error: %{message}",
-    "errorNetworkFallback": "Error de red o en tiempo de ejecución."
+    "errorNetworkFallback": "Error de red o en tiempo de ejecución.",
+    "errorTimeout": "Tiempo agotado. Por favor, inténtalo de nuevo."
   },
   "pdf": {
     "blendType": "Tipo",
@@ -379,6 +383,7 @@
   },
   "general": {
     "cancel": "Cancelar",
+    "ok": "OK",
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",

@@ -288,11 +288,14 @@
     "noSubscription": "Paiement unique – pas d'abonnement",
     "privacy": "Confidentialité",
     "terms": "CGU",
-    "placeholderProTitle": "Pro",
-    "placeholderProMessage": "Pro activé (démo).",
-    "placeholderLifetimeTitle": "Lifetime",
-    "placeholderLifetimeMessage": "Lifetime activé (démo).",
-    "restoreNotImplementedMessage": "La restauration n’est pas encore implémentée.",
+    "purchaseFailedTitle": "Échec du paiement",
+    "purchaseUnavailableMessage": "Ce produit n'est pas disponible pour le moment. Vérifiez les achats intégrés pour Terrana.",
+    "purchaseNetworkError": "Erreur réseau. Vérifiez la connexion et réessayez.",
+    "purchaseUnknownError": "Une erreur est survenue. Réessayez.",
+    "restoreSuccessTitle": "Restauré",
+    "restoreSuccessBody": "Vos achats ont été restaurés.",
+    "restoreNothingTitle": "Aucun achat",
+    "restoreNothingBody": "Aucun achat actif trouvé pour ce compte.",
     "shareMethodWhatsapp": "WhatsApp",
     "shareMethodEmail": "E-mail",
     "shareMethodSms": "SMS",
@@ -308,7 +311,8 @@
     "errorHttp": "Erreur %{status}: %{message}",
     "errorUnknown": "Erreur API inconnue",
     "errorNetwork": "Erreur : %{message}",
-    "errorNetworkFallback": "Erreur réseau ou d'exécution."
+    "errorNetworkFallback": "Erreur réseau ou d'exécution.",
+    "errorTimeout": "Délai dépassé. Veuillez réessayer."
   },
   "pdf": {
     "blendType": "Type",
@@ -379,6 +383,7 @@
   },
   "general": {
     "cancel": "Annuler",
+    "ok": "OK",
     "save": "Enregistrer",
     "delete": "Supprimer",
     "edit": "Modifier",

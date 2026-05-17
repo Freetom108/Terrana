@@ -288,11 +288,14 @@
     "noSubscription": "One-time payment – no subscription",
     "privacy": "Privacy",
     "terms": "Terms",
-    "placeholderProTitle": "Pro",
-    "placeholderProMessage": "Pro activated (placeholder).",
-    "placeholderLifetimeTitle": "Lifetime",
-    "placeholderLifetimeMessage": "Lifetime activated (placeholder).",
-    "restoreNotImplementedMessage": "Restore is not implemented yet.",
+    "purchaseFailedTitle": "Purchase failed",
+    "purchaseUnavailableMessage": "This product isn't available right now. Check that Terrana purchases are configured in the store.",
+    "purchaseNetworkError": "Network error. Check your connection and try again.",
+    "purchaseUnknownError": "Something went wrong. Please try again.",
+    "restoreSuccessTitle": "Restored",
+    "restoreSuccessBody": "Your purchases have been restored.",
+    "restoreNothingTitle": "No purchases found",
+    "restoreNothingBody": "We couldn't find active purchases for this account.",
     "shareMethodWhatsapp": "WhatsApp",
     "shareMethodEmail": "Email",
     "shareMethodSms": "SMS",
@@ -308,7 +311,8 @@
     "errorHttp": "Error %{status}: %{message}",
     "errorUnknown": "Unknown API error",
     "errorNetwork": "Error: %{message}",
-    "errorNetworkFallback": "Network or runtime error."
+    "errorNetworkFallback": "Network or runtime error.",
+    "errorTimeout": "Request timed out. Please try again."
   },
   "pdf": {
     "blendType": "Type",
@@ -379,6 +383,7 @@
   },
   "general": {
     "cancel": "Cancel",
+    "ok": "OK",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",

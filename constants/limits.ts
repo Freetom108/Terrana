@@ -18,6 +18,9 @@ export const PRO_IMPORT_LIMIT = 100;
 /** Cap for Lifetime users (products, blends, AI imports). */
 export const LIFETIME_LIMIT = 1_000;
 
+/** Lifetime AI-import cap — same vault size as {@link LIFETIME_LIMIT}; paywall/UI should stay in sync. */
+export const LIFETIME_IMPORT_LIMIT = LIFETIME_LIMIT;
+
 /** Show limit-warning banner when count reaches these thresholds (relative to displayed cap). */
 export const FREE_PRODUCT_WARN = FREE_PRODUCT_DISPLAY_MAX - 2; // 8
 export const FREE_BLEND_WARN = FREE_BLEND_DISPLAY_MAX - 1; // 9

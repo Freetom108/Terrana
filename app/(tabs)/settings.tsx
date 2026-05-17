@@ -15,6 +15,7 @@ import {
   setThemePreference,
 } from '../../services/storage/settings';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Constants from 'expo-constants';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useReducer, useState } from 'react';
 import {
@@ -30,7 +31,7 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
 
 const FAQ_ITEMS = [
   { q: 'faq.q0', a: 'faq.a0', btnKey: 'faq.a0', action: 'onboarding' as const, btnOnly: true as const },

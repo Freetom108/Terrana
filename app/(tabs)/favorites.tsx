@@ -4,10 +4,11 @@ import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { toggleFavorite } from '../../services/storage/products';
+import type { Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useReducer } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, ListRenderItem, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function FavoritesTab() {
@@ -33,6 +34,25 @@ export default function FavoritesTab() {
     void refreshProducts();
   }, [refreshProducts]);
 
+  const renderItem: ListRenderItem<Product> = ({ item }) => (
+    <HomeProductCard
+      product={item}
+      palette={p}
+      onToggleFavorite={(id) => void handleToggleFavorite(id)}
+    />
+  );
+
+  const emptyComponent = useMemo(
+    () => (
+      <View style={styles.empty}>
+        <Ionicons name="star-outline" size={52} color={p.muted} />
+        <Text style={[styles.emptyTitle, { color: p.text }]}>{t('favorites.emptyTitle') as string}</Text>
+        <Text style={[styles.emptyHint, { color: p.muted }]}>{t('favorites.emptyHint') as string}</Text>
+      </View>
+    ),
+    [p.muted, p.text],
+  );
+
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: p.surface }]} edges={['top']}>
       {/* Header */}
@@ -45,29 +65,18 @@ export default function FavoritesTab() {
         </Link>
       </View>
 
-      {favorites.length === 0 ? (
-        /* Empty state */
-        <View style={styles.empty}>
-          <Ionicons name="star-outline" size={52} color={p.muted} />
-          <Text style={[styles.emptyTitle, { color: p.text }]}>{t('favorites.emptyTitle') as string}</Text>
-          <Text style={[styles.emptyHint, { color: p.muted }]}>{t('favorites.emptyHint') as string}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <HomeProductCard
-              product={item}
-              palette={p}
-              onToggleFavorite={(id) => void handleToggleFavorite(id)}
-            />
-          )}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
-      )}
+      <FlatList
+        data={favorites}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={emptyComponent}
+        contentContainerStyle={[
+          styles.list,
+          favorites.length === 0 && styles.listEmpty,
+        ]}
+        showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
     </SafeAreaView>
   );
 }
@@ -108,6 +117,11 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 16,
+    flexGrow: 1,
+  },
+  listEmpty: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   separator: {
     height: 10,

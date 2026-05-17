@@ -2,24 +2,54 @@ import { HomeBlendCard, HomeProductCard } from '../../components/home/HomeListCa
 import { EmptyState } from '../../components/ui/EmptyState';
 import { colors } from '../../constants/colors';
 import { toggleFavorite } from '../../services/storage/products';
-import {
-  FREE_BLEND_WARN,
-  FREE_PRODUCT_WARN,
-} from '../../constants/limits';
+import { FREE_BLEND_WARN, FREE_PRODUCT_WARN } from '../../constants/limits';
 import { useBlends } from '../../hooks/useBlends';
 import { usePro } from '../../hooks/usePro';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
+import type { Blend } from '../../types/blend';
 import type { Product } from '../../types/product';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect, useRouter } from 'expo-router';
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import type { ListRenderItem } from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LAST_USED_LIMIT = 3;
 const BLENDS_LIMIT = 3;
+
+/** Virtual rows for home feed (sections + lists + banners). */
+type HomeRow =
+  | { rowId: 'sec-recent'; kind: 'sectionHeader'; title: string; viewAllHref: '/recent-products' | null }
+  | { rowId: 'empty-recent-products'; kind: 'emptyProducts'; emoji: '🕐' | '📦' }
+  | { rowId: string; kind: 'productRecent'; product: Product }
+  | { rowId: 'sec-all-products'; kind: 'sectionHeaderAllProducts'; title: string }
+  | { rowId: 'empty-all-products'; kind: 'emptyProducts'; emoji: '📦' }
+  | { rowId: string; kind: 'productAll'; product: Product }
+  | { rowId: 'banner-products'; kind: 'limitBanner'; banner: 'product' }
+  | { rowId: 'sec-blends'; kind: 'sectionHeaderBlends'; title: string; viewAllHref: '/all-blends' | null }
+  | { rowId: string; kind: 'blendPreview'; blend: Blend }
+  | { rowId: 'empty-blends'; kind: 'emptyBlendsPressable' }
+  | { rowId: 'banner-blends'; kind: 'limitBanner'; banner: 'blend' };
+
+function rowStacksVertically(kind: HomeRow['kind']): boolean {
+  return kind === 'productRecent' || kind === 'productAll' || kind === 'blendPreview';
+}
+
+function stackingGap(prev: HomeRow | undefined, cur: HomeRow): undefined | { marginTop: number } {
+  if (!prev || !rowStacksVertically(cur.kind)) return undefined;
+  if (!rowStacksVertically(prev.kind)) return undefined;
+  return { marginTop: 10 };
+}
 
 function getGreetingKey(): string {
   const h = new Date().getHours();
@@ -98,10 +128,13 @@ export default function HomeTab() {
   const recentlyUsedPreview = recentlyUsed.slice(0, LAST_USED_LIMIT);
   const blendsPreview = blends.slice(0, BLENDS_LIMIT);
 
-  const handleToggleFavorite = useCallback(async (id: string) => {
-    await toggleFavorite(id);
-    void refreshProducts();
-  }, [refreshProducts]);
+  const handleToggleFavorite = useCallback(
+    async (id: string) => {
+      await toggleFavorite(id);
+      void refreshProducts();
+    },
+    [refreshProducts],
+  );
 
   const showMoreRecentlyUsed = recentlyUsed.length > LAST_USED_LIMIT;
   const showMoreBlends = blends.length > BLENDS_LIMIT;
@@ -109,8 +142,82 @@ export default function HomeTab() {
   const showProductEmpty = productCount === 0;
   const showBlendEmpty = blendCount === 0;
 
-  return (
-    <View style={[styles.root, { backgroundColor: p.surface }]}>
+  const listData = useMemo((): HomeRow[] => {
+    const rows: HomeRow[] = [];
+
+    rows.push({
+      rowId: 'sec-recent',
+      kind: 'sectionHeader',
+      title: t('home.lastUsed') as string,
+      viewAllHref:
+        !showProductEmpty && showMoreRecentlyUsed ? '/recent-products' : null,
+    });
+    if (showProductEmpty) {
+      rows.push({ rowId: 'empty-recent-products', kind: 'emptyProducts', emoji: '🕐' });
+    } else {
+      for (const prod of recentlyUsedPreview) {
+        rows.push({
+          rowId: `prd-recent-${prod.id}`,
+          kind: 'productRecent',
+          product: prod,
+        });
+      }
+    }
+
+    rows.push({
+      rowId: 'sec-all-products',
+      kind: 'sectionHeaderAllProducts',
+      title: t('home.allProducts') as string,
+    });
+    if (showProductEmpty) {
+      rows.push({ rowId: 'empty-all-products', kind: 'emptyProducts', emoji: '📦' });
+    } else {
+      for (const prod of byName) {
+        rows.push({ rowId: `prd-all-${prod.id}`, kind: 'productAll', product: prod });
+      }
+    }
+    if (isFreeUser && productCount >= FREE_PRODUCT_WARN) {
+      rows.push({ rowId: 'banner-products', kind: 'limitBanner', banner: 'product' });
+    }
+
+    rows.push({
+      rowId: 'sec-blends',
+      kind: 'sectionHeaderBlends',
+      title: t('home.myBlends') as string,
+      viewAllHref:
+        !showBlendEmpty && showMoreBlends ? '/all-blends' : null,
+    });
+    if (showBlendEmpty) {
+      rows.push({ rowId: 'empty-blends', kind: 'emptyBlendsPressable' });
+    } else {
+      for (const blend of blendsPreview) {
+        rows.push({
+          rowId: `blend-${blend.id}`,
+          kind: 'blendPreview',
+          blend,
+        });
+      }
+    }
+    if (isFreeUser && blendCount >= FREE_BLEND_WARN) {
+      rows.push({ rowId: 'banner-blends', kind: 'limitBanner', banner: 'blend' });
+    }
+
+    return rows;
+  }, [
+    showProductEmpty,
+    showBlendEmpty,
+    showMoreRecentlyUsed,
+    showMoreBlends,
+    recentlyUsedPreview,
+    byName,
+    blendsPreview,
+    isFreeUser,
+    productCount,
+    blendCount,
+  ]);
+
+  const listHeaderComponent = useMemo(
+    () => (
       <LinearGradient
         colors={[colors.sageDark, colors.sage]}
         start={{ x: 0, y: 0 }}
@@ -122,129 +229,152 @@ export default function HomeTab() {
         <Text style={styles.heroTagline}>{t('home.heroTagline')}</Text>
         <Text style={styles.heroStats}>{statsSubtitle}</Text>
       </LinearGradient>
+    ),
+    [greetingKey, insets.top, statsSubtitle],
+  );
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.scrollInner, { paddingBottom: insets.bottom + 24 }]}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.section}>
+  const renderHomeItem: ListRenderItem<HomeRow> = ({ item, index }) => {
+    const prevRow = index > 0 ? listData[index - 1] : undefined;
+    const gap = stackingGap(prevRow, item);
+
+    let inner: ReactNode;
+
+    switch (item.kind) {
+      case 'sectionHeader':
+        return (
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
-              {t('home.lastUsed')}
+              {item.title}
             </Text>
-            {!showProductEmpty && showMoreRecentlyUsed ? (
-              <Link href="/recent-products" asChild>
+            {item.viewAllHref ? (
+              <Link href={item.viewAllHref} asChild>
                 <Pressable hitSlop={8} accessibilityRole="link">
-                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>{t('home.viewAll')}</Text>
+                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>
+                    {t('home.viewAll')}
+                  </Text>
                 </Pressable>
               </Link>
             ) : null}
           </View>
-          {showProductEmpty ? (
-            <EmptyState
-              title={t('home.emptyProductsTitle')}
-              message={t('home.emptyProductsMessage')}
-              emoji="🕐"
-            />
-          ) : (
-            <View style={styles.productStack}>
-              {recentlyUsedPreview.map((prod) => (
-                <HomeProductCard key={`recent-${prod.id}`} product={prod} palette={palette} onToggleFavorite={(id) => void handleToggleFavorite(id)} />
-              ))}
-            </View>
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
+        );
+      case 'sectionHeaderAllProducts':
+        return (
+          <View style={[styles.sectionHeader, styles.sectionTopSpacing]}>
             <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
-              {t('home.allProducts')}
+              {item.title}
             </Text>
             <Link href="/product/new" asChild>
               <Pressable hitSlop={8} accessibilityRole="link">
-                <Text style={[styles.addManual, { color: colors.sage }]}>{t('home.addProductManually')}</Text>
+                <Text style={[styles.addManual, { color: colors.sage }]}>
+                  {t('home.addProductManually')}
+                </Text>
               </Pressable>
             </Link>
           </View>
-          {showProductEmpty ? (
-            <EmptyState
-              title={t('home.emptyProductsTitle')}
-              message={t('home.emptyProductsMessage')}
-              emoji="📦"
-            />
-          ) : (
-            <View style={styles.productStack}>
-              {byName.map((prod) => (
-                <HomeProductCard key={`all-${prod.id}`} product={prod} palette={palette} onToggleFavorite={(id) => void handleToggleFavorite(id)} />
-              ))}
-            </View>
-          )}
-          {isFreeUser && productCount >= FREE_PRODUCT_WARN ? (
-            <Pressable
-              style={[styles.limitBanner, { backgroundColor: p.isDark ? '#3D2E1A' : '#FFF3E0', borderColor: '#E6A817' }]}
-              onPress={() => router.push('/paywall')}
-              accessibilityRole="button"
-            >
-              <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.productWarning') as string}
-              </Text>
-              <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.upgradeLink') as string}
-              </Text>
-            </Pressable>
-          ) : null}
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
+        );
+      case 'sectionHeaderBlends':
+        return (
+          <View style={[styles.sectionHeader, styles.sectionTopSpacing]}>
             <Text style={[styles.sectionTitle, styles.sectionTitleFlex, { color: p.text }]}>
-              {t('home.myBlends')}
+              {item.title}
             </Text>
-            {!showBlendEmpty && showMoreBlends ? (
-              <Link href="/all-blends" asChild>
+            {item.viewAllHref ? (
+              <Link href={item.viewAllHref} asChild>
                 <Pressable hitSlop={8} accessibilityRole="link">
-                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>{t('home.viewAll')}</Text>
+                  <Text style={[styles.viewAll, { color: p.secondaryBtnLabel }]}>
+                    {t('home.viewAll')}
+                  </Text>
                 </Pressable>
               </Link>
             ) : null}
           </View>
-          {showBlendEmpty ? (
-            <Pressable
-              onPress={() => router.push('/blend/new')}
-              accessibilityRole="button"
-            >
-              <EmptyState
-                title={t('home.emptyBlendsTitle')}
-                message={t('home.emptyBlendsMessage')}
-                icon="flask-outline"
-                iconColor="#C2D4C4"
-              />
-            </Pressable>
-          ) : (
-            <View style={styles.productStack}>
-              {blendsPreview.map((blend) => (
-                <HomeBlendCard key={blend.id} blend={blend} palette={palette} />
-              ))}
-            </View>
-          )}
-          {isFreeUser && blendCount >= FREE_BLEND_WARN ? (
-            <Pressable
-              style={[styles.limitBanner, { backgroundColor: p.isDark ? '#3D2E1A' : '#FFF3E0', borderColor: '#E6A817' }]}
-              onPress={() => router.push('/paywall')}
-              accessibilityRole="button"
-            >
-              <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.blendWarning') as string}
-              </Text>
-              <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
-                {t('limits.upgradeLink') as string}
-              </Text>
-            </Pressable>
-          ) : null}
-        </View>
-      </ScrollView>
+        );
+      case 'emptyProducts':
+        return (
+          <EmptyState
+            title={t('home.emptyProductsTitle')}
+            message={t('home.emptyProductsMessage')}
+            emoji={item.emoji}
+          />
+        );
+      case 'productRecent':
+        inner = (
+          <HomeProductCard
+            product={item.product}
+            palette={palette}
+            onToggleFavorite={(id) => void handleToggleFavorite(id)}
+          />
+        );
+        break;
+      case 'productAll':
+        inner = (
+          <HomeProductCard
+            product={item.product}
+            palette={palette}
+            onToggleFavorite={(id) => void handleToggleFavorite(id)}
+          />
+        );
+        break;
+      case 'blendPreview':
+        inner = <HomeBlendCard blend={item.blend} palette={palette} />;
+        break;
+      case 'emptyBlendsPressable':
+        return (
+          <Pressable
+            onPress={() => router.push('/blend/new')}
+            accessibilityRole="button"
+          >
+            <EmptyState
+              title={t('home.emptyBlendsTitle')}
+              message={t('home.emptyBlendsMessage')}
+              icon="flask-outline"
+              iconColor="#C2D4C4"
+            />
+          </Pressable>
+        );
+      case 'limitBanner':
+        return (
+          <Pressable
+            style={[
+              styles.limitBanner,
+              {
+                marginTop: 10,
+                backgroundColor: p.isDark ? '#3D2E1A' : '#FFF3E0',
+                borderColor: '#E6A817',
+              },
+            ]}
+            onPress={() => router.push('/paywall')}
+            accessibilityRole="button"
+          >
+            <Text style={[styles.limitBannerText, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
+              {item.banner === 'product'
+                ? (t('limits.productWarning') as string)
+                : (t('limits.blendWarning') as string)}
+            </Text>
+            <Text style={[styles.limitBannerLink, { color: p.isDark ? '#FFD580' : '#8A5A00' }]}>
+              {t('limits.upgradeLink') as string}
+            </Text>
+          </Pressable>
+        );
+      default:
+        return null;
+    }
 
+    return <View style={gap}>{inner}</View>;
+  };
+
+  const keyExtractor = (row: HomeRow) => row.rowId;
+
+  return (
+    <View style={[styles.root, { backgroundColor: p.surface }]}>
+      <FlatList
+        data={listData}
+        keyExtractor={keyExtractor}
+        renderItem={renderHomeItem}
+        ListHeaderComponent={listHeaderComponent}
+        contentContainerStyle={[styles.scrollInner, { paddingBottom: insets.bottom + 24 }]}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
@@ -286,15 +416,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     opacity: 0.85,
   },
-  scroll: {
-    flex: 1,
-  },
   scrollInner: {
     paddingHorizontal: 20,
     paddingTop: 20,
   },
-  section: {
-    marginBottom: 24,
+  sectionTopSpacing: {
+    marginTop: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -318,11 +445,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  productStack: {
-    gap: 10,
-  },
   limitBanner: {
-    marginTop: 10,
     borderRadius: 10,
     borderWidth: 1,
     paddingVertical: 9,
