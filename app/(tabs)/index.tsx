@@ -7,16 +7,16 @@ import { useBlends } from '../../hooks/useBlends';
 import { usePro } from '../../hooks/usePro';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
-import { subscribeLocale, t } from '../../services/i18n/i18n';
+import { getLocale, subscribeLocale, t } from '../../services/i18n/i18n';
 import type { Blend } from '../../types/blend';
 import type { Product } from '../../types/product';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useFocusEffect, useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import type { ListRenderItem } from 'react-native';
 import {
   FlatList,
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -53,10 +53,10 @@ function stackingGap(prev: HomeRow | undefined, cur: HomeRow): undefined | { mar
 
 function getGreetingKey(): string {
   const h = new Date().getHours();
-  if (h >= 5 && h < 11) return 'home.greetingMorning';
-  if (h >= 11 && h < 17) return 'home.greetingAfternoon';
-  if (h >= 17 && h < 22) return 'home.greetingEvening';
-  return 'home.greetingNight';
+  if (h >= 5 && h < 11) return 'home.goodMorning';
+  if (h >= 11 && h < 17) return 'home.goodAfternoon';
+  if (h >= 17 && h < 22) return 'home.goodEvening';
+  return 'home.goodNight';
 }
 function sortByUpdatedDesc(a: Product, b: Product): number {
   const ta = Date.parse(a.updatedAt || a.createdAt);
@@ -99,18 +99,11 @@ export default function HomeTab() {
 
   const productCount = products.length;
   const blendCount = blends.length;
+  const localeTag = getLocale();
 
   const statsSubtitle = useMemo(() => {
-    const productLabel =
-      productCount === 1
-        ? (t('home.statProduct') as string)
-        : (t('home.statProducts', { count: productCount }) as string);
-    const blendLabel =
-      blendCount === 1
-        ? (t('home.statBlend') as string)
-        : (t('home.statBlends', { count: blendCount }) as string);
-    return `${productLabel} · ${blendLabel}`;
-  }, [productCount, blendCount]);
+    return t('home.stats', { products: productCount, blends: blendCount }) as string;
+  }, [productCount, blendCount, localeTag]);
 
   const byUpdated = useMemo(() => [...products].sort(sortByUpdatedDesc), [products]);
   const byName = useMemo(() => [...products].sort(sortByName), [products]);
@@ -218,19 +211,22 @@ export default function HomeTab() {
 
   const listHeaderComponent = useMemo(
     () => (
-      <LinearGradient
-        colors={[colors.sageDark, colors.sage]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={[styles.header, { paddingTop: insets.top + 20 }]}
-      >
-        <Text style={styles.greeting}>{t(greetingKey)}</Text>
-        <Text style={styles.heroBrand}>{t('settings.appName')}</Text>
-        <Text style={styles.heroTagline}>{t('home.heroTagline')}</Text>
-        <Text style={styles.heroStats}>{statsSubtitle}</Text>
-      </LinearGradient>
+      <View style={[styles.headerSafe, { paddingTop: insets.top + 6 }]}>
+        <View style={[styles.homeHeaderCard, styles.homeHeaderCardTint, { borderColor: colors.sage }]}>
+          <View style={styles.headerBrandRow}>
+            <Text style={styles.headerBrandText}>{t('settings.appName')}</Text>
+            <Image
+              source={require('../../assets/images/icon.png')}
+              style={styles.headerAppIcon}
+              accessibilityIgnoresInvertColors
+            />
+          </View>
+          <Text style={[styles.headerGreeting, { color: p.muted }]}>{t(greetingKey)}</Text>
+          <Text style={[styles.headerStats, { color: p.muted }]}>{statsSubtitle}</Text>
+        </View>
+      </View>
     ),
-    [greetingKey, insets.top, statsSubtitle],
+    [greetingKey, insets.top, statsSubtitle, p.muted, localeTag],
   );
 
   const renderHomeItem: ListRenderItem<HomeRow> = ({ item, index }) => {
@@ -383,42 +379,52 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  header: {
+  headerSafe: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 14,
   },
-  greeting: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.white,
-    letterSpacing: -0.2,
-    opacity: 0.92,
+  homeHeaderCard: {
+    borderRadius: 16,
+    borderWidth: 1.5,
+    padding: 16,
+    marginBottom: 4,
   },
-  heroBrand: {
-    fontSize: 34,
+  homeHeaderCardTint: {
+    backgroundColor: 'rgba(122,158,126,0.10)',
+  },
+  headerBrandRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerBrandText: {
+    flex: 1,
+    fontSize: 22,
     fontWeight: '800',
-    color: colors.white,
-    marginTop: 8,
-    letterSpacing: -0.8,
+    letterSpacing: -0.5,
+    color: colors.sageDark,
   },
-  heroTagline: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.sageLight,
-    marginTop: 8,
-    lineHeight: 21,
-    opacity: 0.95,
+  headerAppIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
   },
-  heroStats: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.sageLight,
+  headerGreeting: {
     marginTop: 10,
-    opacity: 0.85,
+    fontSize: 13,
+    fontWeight: '500',
+    letterSpacing: -0.2,
+  },
+  headerStats: {
+    marginTop: 5,
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: -0.1,
   },
   scrollInner: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 8,
   },
   sectionTopSpacing: {
     marginTop: 24,

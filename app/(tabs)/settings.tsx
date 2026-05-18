@@ -39,7 +39,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
 const URL_CONTACT_FEEDBACK = 'https://freetom108.github.io/Terrana/';
 
 const URL_PRIVACY_POLICY = 'https://freetom108.github.io/terrana-privacy-policy/';
-const URL_TERMS_OF_USE = 'https://terrana.app/terms';
+const URL_TERMS_OF_USE = 'https://freetom108.github.io/terrana-terms/';
 
 const FAQ_ITEMS = [
   { q: 'faq.q0', a: 'faq.a0', btnKey: 'faq.a0', action: 'onboarding' as const, btnOnly: true as const },
@@ -205,7 +205,6 @@ export default function SettingsTab() {
         <Text style={[styles.screenTitle, { color: headline }]}>{t('settings.title')}</Text>
 
         {/* ── Upgrade card ── */}
-        <Text style={[styles.sectionHeading, { color: muted }]}>{t('settings.sectionUpgrade')}</Text>
         {isLifetime ? (
           <View style={[styles.upgradeCard, styles.upgradeCardLifetime, { borderColor: colors.sageDark }]}>
             <Text style={[styles.upgradeTitle, { color: colors.sageDark }]}>
