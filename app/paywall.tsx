@@ -11,22 +11,18 @@ import {
 import { usePro } from '../hooks/usePro';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
+import { isPurchasesCancelError, purchaseTerranaLifetime, purchaseTerranaPro } from '../services/purchase/iap';
 import {
-  deriveSubscriptionFlags,
-  formatPurchasesUserMessage,
-  isPurchasesCancelError,
-  isPurchasesNetworkError,
-  purchaseTerranaLifetime,
-  purchaseTerranaPro,
-  restorePurchasesSync,
-} from '../services/purchase/iap';
+  restorePurchasesWithAlerts,
+  showPurchaseFailureAlert,
+} from '../services/purchase/restorePurchasesFlow';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -132,28 +128,6 @@ export default function PaywallScreen() {
   const { reload } = usePro();
   const [iapBusy, setIapBusy] = useState<'idle' | 'pro' | 'lifetime' | 'restore'>('idle');
 
-  const showPurchaseFailure = useCallback((error: unknown) => {
-    if (error instanceof Error && error.message === 'PRODUCT_NOT_CONFIGURED') {
-      Alert.alert(
-        t('paywall.purchaseFailedTitle') as string,
-        t('paywall.purchaseUnavailableMessage') as string,
-      );
-      return;
-    }
-    if (isPurchasesNetworkError(error)) {
-      Alert.alert(
-        t('paywall.purchaseFailedTitle') as string,
-        t('paywall.purchaseNetworkError') as string,
-      );
-      return;
-    }
-    const hint = formatPurchasesUserMessage(error);
-    Alert.alert(
-      t('paywall.purchaseFailedTitle') as string,
-      hint ?? (t('paywall.purchaseUnknownError') as string),
-    );
-  }, []);
-
   const handleBuyPro = useCallback(async () => {
     if (iapBusy !== 'idle') return;
     setIapBusy('pro');
@@ -163,11 +137,11 @@ export default function PaywallScreen() {
       router.back();
     } catch (e) {
       if (isPurchasesCancelError(e)) return;
-      showPurchaseFailure(e);
+      showPurchaseFailureAlert(e);
     } finally {
       setIapBusy('idle');
     }
-  }, [iapBusy, reload, showPurchaseFailure]);
+  }, [iapBusy, reload]);
 
   const handleBuyLifetime = useCallback(async () => {
     if (iapBusy !== 'idle') return;
@@ -178,38 +152,24 @@ export default function PaywallScreen() {
       router.back();
     } catch (e) {
       if (isPurchasesCancelError(e)) return;
-      showPurchaseFailure(e);
+      showPurchaseFailureAlert(e);
     } finally {
       setIapBusy('idle');
     }
-  }, [iapBusy, reload, showPurchaseFailure]);
+  }, [iapBusy, reload]);
 
   const handleRestore = useCallback(async () => {
     if (iapBusy !== 'idle') return;
     setIapBusy('restore');
     try {
-      const ci = await restorePurchasesSync();
-      await reload();
-      const flags = deriveSubscriptionFlags(ci);
-      if (!flags.isPro && !flags.isLifetime) {
-        Alert.alert(
-          t('paywall.restoreNothingTitle') as string,
-          t('paywall.restoreNothingBody') as string,
-        );
-        return;
-      }
-      Alert.alert(
-        t('paywall.restoreSuccessTitle') as string,
-        t('paywall.restoreSuccessBody') as string,
-        [{ text: t('general.ok') as string, onPress: () => router.back() }],
-      );
-    } catch (e) {
-      if (isPurchasesCancelError(e)) return;
-      showPurchaseFailure(e);
+      await restorePurchasesWithAlerts({
+        reload,
+        onSuccessNavigateBack: () => router.back(),
+      });
     } finally {
       setIapBusy('idle');
     }
-  }, [iapBusy, reload, showPurchaseFailure]);
+  }, [iapBusy, reload]);
 
   return (
     <View style={[styles.root, { backgroundColor: p.surface }]}>
@@ -406,10 +366,20 @@ export default function PaywallScreen() {
 
         {/* ── Footer ── */}
         <View style={styles.footer}>
-          <Pressable onPress={() => void handleRestore()} hitSlop={8} disabled={iapBusy !== 'idle'}>
-            <Text style={[styles.footerLink, { color: p.secondaryBtnLabel }]}>
-              {t('paywall.restore') as string}
-            </Text>
+          <Pressable
+            onPress={() => void handleRestore()}
+            hitSlop={8}
+            disabled={iapBusy !== 'idle'}
+            accessibilityRole="button"
+            accessibilityLabel={t('paywall.restore') as string}
+          >
+            {iapBusy === 'restore' ? (
+              <ActivityIndicator color={p.secondaryBtnLabel} size="small" />
+            ) : (
+              <Text style={[styles.footerLink, { color: p.secondaryBtnLabel }]}>
+                {t('paywall.restore') as string}
+              </Text>
+            )}
           </Pressable>
 
           <Text style={[styles.footerNote, { color: p.muted }]}>
@@ -417,13 +387,25 @@ export default function PaywallScreen() {
           </Text>
 
           <View style={styles.legalRow}>
-            <Pressable hitSlop={8}>
+            <Pressable
+              hitSlop={8}
+              accessibilityRole="link"
+              accessibilityLabel={t('paywall.privacy') as string}
+              onPress={() =>
+                void Linking.openURL('https://freetom108.github.io/terrana-privacy-policy/')
+              }
+            >
               <Text style={[styles.footerLink, { color: p.muted }]}>
                 {t('paywall.privacy') as string}
               </Text>
             </Pressable>
             <Text style={[styles.footerDot, { color: p.muted }]}>·</Text>
-            <Pressable hitSlop={8}>
+            <Pressable
+              hitSlop={8}
+              accessibilityRole="link"
+              accessibilityLabel={t('paywall.terms') as string}
+              onPress={() => void Linking.openURL('https://freetom108.github.io/terrana-terms/')}
+            >
               <Text style={[styles.footerLink, { color: p.muted }]}>
                 {t('paywall.terms') as string}
               </Text>

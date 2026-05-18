@@ -8,6 +8,7 @@ import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { getLocale, setLocale, t } from '../../services/i18n/i18n';
 import { exportCollectionAsPDF } from '../../services/export/pdfExport';
+import { restorePurchasesWithAlerts } from '../../services/purchase/restorePurchasesFlow';
 import { createBackup, restoreBackup } from '../../services/storage/backup';
 import { clearAllAppStorage } from '../../services/storage/clearAppData';
 import {
@@ -20,6 +21,7 @@ import Constants from 'expo-constants';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useReducer, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Linking,
   Platform,
@@ -76,6 +78,7 @@ export default function SettingsTab() {
   const [exportingPdf, setExportingPdf] = useState(false);
   const [backingUp, setBackingUp] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [iapRestoreBusy, setIapRestoreBusy] = useState(false);
   const [themePref, setThemePrefState] = useState<ThemePreference>('auto');
 
   useFocusEffect(
@@ -148,6 +151,15 @@ export default function SettingsTab() {
         : 'https://play.google.com/store/apps/details?id=com.tommi07051967.terrana';
     openExternalUrl(url);
   }, [openExternalUrl]);
+
+  const handleRestorePurchases = useCallback(async () => {
+    setIapRestoreBusy(true);
+    try {
+      await restorePurchasesWithAlerts({ reload });
+    } finally {
+      setIapRestoreBusy(false);
+    }
+  }, [reload]);
 
   const handleDeleteAllAppData = useCallback(() => {
     Alert.alert(
@@ -575,13 +587,19 @@ export default function SettingsTab() {
           <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
 
           <Pressable
-            onPress={() => router.push('/paywall')}
-            accessibilityRole="link"
+            onPress={() => void handleRestorePurchases()}
+            disabled={iapRestoreBusy}
+            accessibilityRole="button"
+            accessibilityState={{ busy: iapRestoreBusy }}
             style={styles.aboutRestoreLinkWrap}
           >
-            <Text style={[styles.aboutRestoreLinkText, { color: colors.sage }]}>
-              {t('settings.restorePurchases')}
-            </Text>
+            {iapRestoreBusy ? (
+              <ActivityIndicator color={colors.sage} size="small" />
+            ) : (
+              <Text style={[styles.aboutRestoreLinkText, { color: colors.sage }]}>
+                {t('settings.restorePurchases')}
+              </Text>
+            )}
           </Pressable>
         </View>
 

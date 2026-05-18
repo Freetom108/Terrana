@@ -300,10 +300,6 @@
     "purchaseUnavailableMessage": "Das Produkt ist gerade nicht verfügbar. Prüfen Sie, ob In-App-Käufe für Terrana im Store korrekt eingerichtet sind.",
     "purchaseNetworkError": "Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.",
     "purchaseUnknownError": "Es ist ein Fehler aufgetreten. Bitte erneut versuchen.",
-    "restoreSuccessTitle": "Wiederhergestellt",
-    "restoreSuccessBody": "Ihre Käufe wurden wiederhergestellt.",
-    "restoreNothingTitle": "Keine Käufe gefunden",
-    "restoreNothingBody": "Für dieses Konto wurden keine aktiven Käufe gefunden.",
     "shareMethodWhatsapp": "WhatsApp",
     "shareMethodEmail": "E-Mail",
     "shareMethodSms": "SMS",
@@ -400,7 +396,9 @@
     "removeFavorite": "Aus Favoriten entfernen",
     "share": "Teilen",
     "pdfPrint": "PDF und Druck",
-    "closePaywall": "Schließen"
+    "closePaywall": "Schließen",
+    "restoreSuccess": "Käufe erfolgreich wiederhergestellt",
+    "restoreNone": "Keine früheren Käufe gefunden"
   },
   "faq": {
     "q0": "App Intro wiederholen",

@@ -300,10 +300,6 @@
     "purchaseUnavailableMessage": "This product isn't available right now. Check that Terrana purchases are configured in the store.",
     "purchaseNetworkError": "Network error. Check your connection and try again.",
     "purchaseUnknownError": "Something went wrong. Please try again.",
-    "restoreSuccessTitle": "Restored",
-    "restoreSuccessBody": "Your purchases have been restored.",
-    "restoreNothingTitle": "No purchases found",
-    "restoreNothingBody": "We couldn't find active purchases for this account.",
     "shareMethodWhatsapp": "WhatsApp",
     "shareMethodEmail": "Email",
     "shareMethodSms": "SMS",
@@ -400,7 +396,9 @@
     "removeFavorite": "Remove from favorites",
     "share": "Share",
     "pdfPrint": "PDF / Print",
-    "closePaywall": "Close"
+    "closePaywall": "Close",
+    "restoreSuccess": "Purchases restored successfully",
+    "restoreNone": "No previous purchases found"
   },
   "faq": {
     "q0": "Replay app intro",

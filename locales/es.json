@@ -300,10 +300,6 @@
     "purchaseUnavailableMessage": "Este producto no está disponible ahora. Comprueba los pagos dentro de la app para Terrana.",
     "purchaseNetworkError": "Error de red. Comprueba la conexión e inténtalo de nuevo.",
     "purchaseUnknownError": "Algo salió mal. Inténtalo de nuevo.",
-    "restoreSuccessTitle": "Restaurado",
-    "restoreSuccessBody": "Tus compras se han restaurado.",
-    "restoreNothingTitle": "Sin compras",
-    "restoreNothingBody": "No se encontraron compras activas para esta cuenta.",
     "shareMethodWhatsapp": "WhatsApp",
     "shareMethodEmail": "Correo",
     "shareMethodSms": "SMS",
@@ -400,7 +396,9 @@
     "removeFavorite": "Quitar de favoritos",
     "share": "Compartir",
     "pdfPrint": "PDF / impresión",
-    "closePaywall": "Cerrar"
+    "closePaywall": "Cerrar",
+    "restoreSuccess": "Compras restauradas con éxito",
+    "restoreNone": "No se encontraron compras anteriores"
   },
   "faq": {
     "q0": "Repetir la intro de la app",
