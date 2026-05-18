@@ -214,15 +214,17 @@ export default function HomeTab() {
       <View style={[styles.headerSafe, { paddingTop: insets.top + 6 }]}>
         <View style={[styles.homeHeaderCard, styles.homeHeaderCardTint, { borderColor: colors.sage }]}>
           <View style={styles.headerBrandRow}>
-            <Text style={styles.headerBrandText}>{t('settings.appName')}</Text>
+            <View style={styles.headerTextBlock}>
+              <Text style={styles.headerBrandText}>{t('settings.appName')}</Text>
+              <Text style={[styles.headerGreeting, { color: p.muted }]}>{t(greetingKey)}</Text>
+              <Text style={[styles.headerStats, { color: p.muted }]}>{statsSubtitle}</Text>
+            </View>
             <Image
               source={require('../../assets/images/icon.png')}
               style={styles.headerAppIcon}
               accessibilityIgnoresInvertColors
             />
           </View>
-          <Text style={[styles.headerGreeting, { color: p.muted }]}>{t(greetingKey)}</Text>
-          <Text style={[styles.headerStats, { color: p.muted }]}>{statsSubtitle}</Text>
         </View>
       </View>
     ),
@@ -394,30 +396,33 @@ const styles = StyleSheet.create({
   },
   headerBrandRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     gap: 12,
   },
-  headerBrandText: {
+  headerTextBlock: {
     flex: 1,
+    justifyContent: 'center',
+    minHeight: 72,
+  },
+  headerBrandText: {
     fontSize: 22,
     fontWeight: '800',
     letterSpacing: -0.5,
     color: colors.sageDark,
   },
   headerAppIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
+    width: 72,
+    height: 72,
+    borderRadius: 16,
   },
   headerGreeting: {
-    marginTop: 10,
+    marginTop: 4,
     fontSize: 13,
     fontWeight: '500',
     letterSpacing: -0.2,
   },
   headerStats: {
-    marginTop: 5,
+    marginTop: 3,
     fontSize: 12,
     fontWeight: '500',
     letterSpacing: -0.1,
