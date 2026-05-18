@@ -9,6 +9,7 @@ import { useThemePalette } from '../../hooks/useThemePalette';
 import { getLocale, setLocale, t } from '../../services/i18n/i18n';
 import { exportCollectionAsPDF } from '../../services/export/pdfExport';
 import { createBackup, restoreBackup } from '../../services/storage/backup';
+import { clearAllAppStorage } from '../../services/storage/clearAppData';
 import {
   getThemePreference,
   setSavedLanguageCode,
@@ -20,6 +21,8 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useReducer, useState } from 'react';
 import {
   Alert,
+  Linking,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -32,6 +35,11 @@ import {
 } from 'react-native-safe-area-context';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
+
+const URL_CONTACT_FEEDBACK = 'https://freetom108.github.io/Terrana/';
+
+const URL_PRIVACY_POLICY = 'https://freetom108.github.io/terrana-privacy-policy/';
+const URL_TERMS_OF_USE = 'https://terrana.app/terms';
 
 const FAQ_ITEMS = [
   { q: 'faq.q0', a: 'faq.a0', btnKey: 'faq.a0', action: 'onboarding' as const, btnOnly: true as const },
@@ -125,6 +133,42 @@ export default function SettingsTab() {
     }
   }, [router]);
 
+  const openExternalUrl = useCallback((url: string) => {
+    void Linking.openURL(url).catch(() => {});
+  }, []);
+
+  const handleContactFeedback = useCallback(() => {
+    openExternalUrl(URL_CONTACT_FEEDBACK);
+  }, [openExternalUrl]);
+
+  const handleRateTerrana = useCallback(() => {
+    const url =
+      Platform.OS === 'ios'
+        ? 'https://apps.apple.com/app/idXXXXXXXXX'
+        : 'https://play.google.com/store/apps/details?id=com.tommi07051967.terrana';
+    openExternalUrl(url);
+  }, [openExternalUrl]);
+
+  const handleDeleteAllAppData = useCallback(() => {
+    Alert.alert(
+      '',
+      t('settings.dangerDeleteMessage') as string,
+      [
+        { text: t('general.cancel') as string, style: 'cancel' },
+        {
+          text: t('general.delete') as string,
+          style: 'destructive',
+          onPress: () => {
+            void (async () => {
+              await clearAllAppStorage();
+              router.replace('/onboarding');
+            })();
+          },
+        },
+      ],
+    );
+  }, [router]);
+
   const surfaceBg = p.surface;
   const headline = p.text;
   const muted = p.muted;
@@ -167,7 +211,7 @@ export default function SettingsTab() {
             <Text style={[styles.upgradeTitle, { color: colors.sageDark }]}>
               {t('settings.upgradeLifetimeTitle') as string}
             </Text>
-            <Text style={[styles.upgradeHint, { color: p.muted }]}>
+            <Text style={[styles.upgradeHint, { color: p.muted, marginBottom: 0 }]}>
               {t('settings.upgradeLifetimeHint') as string}
             </Text>
           </View>
@@ -176,15 +220,15 @@ export default function SettingsTab() {
             <Text style={[styles.upgradeTitle, { color: colors.sage }]}>
               {t('settings.upgradeProTitle') as string}
             </Text>
-            <Text style={[styles.upgradeHint, { color: p.muted }]}>
-              {t('settings.upgradeProHint') as string}
-            </Text>
             <Pressable
-              style={[styles.upgradeBtn, styles.upgradeBtnPro]}
+              accessibilityRole="link"
+              hitSlop={8}
               onPress={() => router.push('/paywall')}
-              accessibilityRole="button"
+              style={styles.upgradeProLinkWrap}
             >
-              <Text style={styles.upgradeBtnText}>{t('settings.upgradeProButton') as string}</Text>
+              <Text style={[styles.upgradeProLinkText, { color: colors.sage }]}>
+                {t('settings.upgradeProLifetimeLink') as string}
+              </Text>
             </Pressable>
           </View>
         ) : (
@@ -192,11 +236,8 @@ export default function SettingsTab() {
             <Text style={[styles.upgradeTitle, { color: p.text }]}>
               {t('settings.upgradeFreeTitle') as string}
             </Text>
-            <Text style={[styles.upgradeFeatures, { color: p.muted }]}>
-              {t('settings.upgradeFreeFeatures') as string}
-            </Text>
             <Pressable
-              style={[styles.upgradeBtn, styles.upgradeBtnFree]}
+              style={[styles.upgradeBtn, styles.upgradeBtnFree, { marginTop: 12 }]}
               onPress={() => router.push('/paywall')}
               accessibilityRole="button"
             >
@@ -206,7 +247,6 @@ export default function SettingsTab() {
         )}
 
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>{t('settings.sectionAppearance')}</Text>
-        <Text style={[styles.sectionLabel, { color: muted }]}>{t('settings.appearanceLabel')}</Text>
         <View style={styles.rowGap}>
           {THEME_OPTIONS.map(({ value, labelKey }) => {
             const sel = themePref === value;
@@ -440,6 +480,82 @@ export default function SettingsTab() {
           </Pressable>
         </View>
 
+        {/* ── Support & Feedback ── */}
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
+          {t('settings.sectionSupport')}
+        </Text>
+        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
+          <Pressable
+            style={styles.exportRow}
+            onPress={handleContactFeedback}
+            accessibilityRole="link"
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="mail-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
+                  {t('settings.contactFeedback') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="open-outline" size={18} color={muted} />
+          </Pressable>
+          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+          <Pressable
+            style={styles.exportRow}
+            onPress={handleRateTerrana}
+            accessibilityRole="link"
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="star-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
+                  {t('settings.rateTerrana') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={muted} />
+          </Pressable>
+        </View>
+
+        {/* ── Legal ── */}
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
+          {t('settings.sectionLegal')}
+        </Text>
+        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
+          <Pressable
+            style={styles.exportRow}
+            onPress={() => openExternalUrl(URL_PRIVACY_POLICY)}
+            accessibilityRole="link"
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="shield-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
+                  {t('settings.privacyPolicy') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="open-outline" size={18} color={muted} />
+          </Pressable>
+          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+          <Pressable
+            style={styles.exportRow}
+            onPress={() => openExternalUrl(URL_TERMS_OF_USE)}
+            accessibilityRole="link"
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="document-text-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
+                  {t('settings.termsOfUse') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="open-outline" size={18} color={muted} />
+          </Pressable>
+        </View>
+
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
           {t('settings.sectionAbout')}
         </Text>
@@ -456,6 +572,32 @@ export default function SettingsTab() {
             <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.statusLabel')}</Text>
             <Text style={[styles.aboutVal, { color: headline }]}>{subscriptionLabel}</Text>
           </View>
+
+          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+
+          <Pressable
+            onPress={() => router.push('/paywall')}
+            accessibilityRole="link"
+            style={styles.aboutRestoreLinkWrap}
+          >
+            <Text style={[styles.aboutRestoreLinkText, { color: colors.sage }]}>
+              {t('settings.restorePurchases')}
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* ── Danger zone ── */}
+        <Text style={[styles.sectionHeading, styles.sectionDangerSpacer, styles.sectionDangerHeading]}>
+          {t('settings.sectionDangerZone')}
+        </Text>
+        <View style={[styles.aboutCard, styles.dangerCard, { borderColor: '#FECACA', backgroundColor: cardBg }]}>
+          <Pressable
+            style={styles.dangerDeleteBtn}
+            onPress={handleDeleteAllAppData}
+            accessibilityRole="button"
+          >
+            <Text style={styles.dangerDeleteBtnText}>{t('settings.dangerDeleteAll') as string}</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -486,10 +628,12 @@ const styles = StyleSheet.create({
   sectionSpacer: {
     marginTop: 26,
   },
-  sectionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 10,
+  sectionDangerSpacer: {
+    marginTop: 26,
+    marginBottom: 8,
+  },
+  sectionDangerHeading: {
+    color: '#DC2626',
   },
   rowGap: {
     flexDirection: 'row',
@@ -554,6 +698,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
+  aboutRestoreLinkWrap: {
+    alignSelf: 'flex-start',
+    paddingVertical: 2,
+  },
+  aboutRestoreLinkText: {
+    fontSize: 15,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
 
   /* Upgrade card */
   upgradeCard: {
@@ -582,11 +735,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginBottom: 12,
   },
-  upgradeFeatures: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginBottom: 12,
-  },
   upgradeBtn: {
     borderRadius: 12,
     paddingVertical: 11,
@@ -595,13 +743,20 @@ const styles = StyleSheet.create({
   upgradeBtnFree: {
     backgroundColor: colors.sage,
   },
-  upgradeBtnPro: {
-    backgroundColor: colors.sageDark,
-  },
   upgradeBtnText: {
     color: colors.white,
     fontSize: 14,
     fontWeight: '700',
+  },
+  upgradeProLinkWrap: {
+    alignSelf: 'flex-start',
+    paddingTop: 8,
+    paddingVertical: 2,
+  },
+  upgradeProLinkText: {
+    fontSize: 14,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 
   /* FAQ accordion */
@@ -673,8 +828,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 2,
   },
+  exportRowTitleOnly: {
+    marginBottom: 0,
+    flexShrink: 1,
+  },
   exportRowHint: {
     fontSize: 12,
     fontWeight: '400',
+  },
+  dangerCard: {
+    borderWidth: 1,
+  },
+  dangerDeleteBtn: {
+    backgroundColor: '#DC2626',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 0,
+  },
+  dangerDeleteBtnText: {
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
