@@ -14,8 +14,8 @@ import { PRODUCT_CATEGORY, PURCHASES_ERROR_CODE } from 'react-native-purchases';
 
 import { setIsLifetime, setIsPro } from '../storage/settings';
 
-export const PRODUCT_ID_PRO = 'terrana_pro';
-export const PRODUCT_ID_LIFETIME = 'terrana_lifetime';
+export const PRODUCT_ID_PRO = 'terrana_lite';
+export const PRODUCT_ID_LIFETIME = 'terrana_pro';
 
 /** Must match RevenueCat entitlement identifiers. */
 export const ENTITLEMENT_PRO = 'pro';
