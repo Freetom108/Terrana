@@ -15,13 +15,15 @@ Terrana ist eine Organizer-App für Naturprodukte (ätherische Öle, Kräuter & 
 npm install
 ```
 
-Kopieren Sie `.env.example` nach `.env` und tragen Sie die benötigten Öffentliche-Client-Variablen ein:
+Kopieren Sie `.env.example` nach `.env` und tragen Sie die benötigten öffentlichen Client-Variablen ein:
 
 | Variable | Beschreibung |
 |----------|----------------|
-| `EXPO_PUBLIC_ANTHROPIC_API_KEY` | API-Key für Anthropic (KI-Import aus Text) |
+| `EXPO_PUBLIC_TERRANA_AI_PROXY_URL` | Optional: eigener Cloudflare-Worker-Endpoint für KI-Import; Standard ist im Code gesetzt. |
 | `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` | RevenueCat **Public SDK Key** (Android) |
 | `EXPO_PUBLIC_REVENUECAT_IOS_KEY` | RevenueCat **Public SDK Key** (iOS) |
+
+**KI-Import:** Es wird kein Anthropic-Key mehr in der App benötigt (`EXPO_PUBLIC_ANTHROPIC_API_KEY` ist entfernt/deprecated). Auf **EAS** / im Expo-Dashboard unter Environment Variables bitte `EXPO_PUBLIC_ANTHROPIC_API_KEY` löschen, falls noch vorhanden.
 
 Nach Änderungen an der `.env`: Dev-Server mit `npx expo start --clear` neu starten.
 

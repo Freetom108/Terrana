@@ -43,15 +43,19 @@ const URL_CONTACT_FEEDBACK = 'https://freetom108.github.io/Terrana/';
 const URL_PRIVACY_POLICY = 'https://freetom108.github.io/terrana-privacy-policy/';
 const URL_TERMS_OF_USE = 'https://freetom108.github.io/terrana-terms/';
 
-const FAQ_ITEMS = [
-  { q: 'faq.q0', a: 'faq.a0', btnKey: 'faq.a0', action: 'onboarding' as const, btnOnly: true as const },
-  { q: 'faq.q1', a: 'faq.a1', btnKey: undefined },
-  { q: 'faq.q3', a: 'faq.a3', btnKey: undefined },
-  { q: 'faq.q4', a: 'faq.a4', btnKey: undefined },
-  { q: 'faq.q5', a: 'faq.a5', btnKey: undefined },
-  { q: 'faq.q6', a: 'faq.a6', btnKey: 'faq.a6Btn' },
-  { q: 'faq.q7', a: 'faq.a7', btnKey: undefined },
-] satisfies Array<{ q: string; a: string; btnKey: string | undefined; action?: string; btnOnly?: boolean }>;
+type FaqEntry =
+  | { kind: 'link'; labelKey: string; target: 'onboarding' | 'paywall' }
+  | { kind: 'accordion'; q: string; a: string };
+
+const FAQ_ENTRIES: FaqEntry[] = [
+  { kind: 'link', labelKey: 'faq.q0', target: 'onboarding' },
+  { kind: 'link', labelKey: 'faq.linkUpgradeOptions', target: 'paywall' },
+  { kind: 'accordion', q: 'faq.q1', a: 'faq.a1' },
+  { kind: 'accordion', q: 'faq.q3', a: 'faq.a3' },
+  { kind: 'accordion', q: 'faq.q4', a: 'faq.a4' },
+  { kind: 'accordion', q: 'faq.q5', a: 'faq.a5' },
+  { kind: 'accordion', q: 'faq.q7', a: 'faq.a7' },
+];
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
   { value: 'light', labelKey: 'settings.themeLight' },
@@ -310,11 +314,44 @@ export default function SettingsTab() {
           {t('settings.sectionFaq')}
         </Text>
         <View style={[styles.faqCard, { backgroundColor: cardBg, borderColor: p.border }]}>
-          {FAQ_ITEMS.map(({ q, a, btnKey, action, btnOnly }, idx) => {
+          {FAQ_ENTRIES.map((item, idx) => {
+            const isLast = idx === FAQ_ENTRIES.length - 1;
+
+            if (item.kind === 'link') {
+              return (
+                <View key={item.labelKey}>
+                  <Pressable
+                    style={styles.faqRow}
+                    onPress={() => {
+                      if (item.target === 'onboarding') {
+                        router.push({ pathname: '/onboarding', params: { from: 'settings' } });
+                      } else {
+                        router.push('/paywall');
+                      }
+                    }}
+                    accessibilityRole="link"
+                    hitSlop={4}
+                  >
+                    <Text style={[styles.faqQuestion, { color: headline }]}>
+                      {t(item.labelKey) as string}
+                    </Text>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={18}
+                      color={muted}
+                      style={styles.faqChevron}
+                    />
+                  </Pressable>
+                  {!isLast ? (
+                    <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+                  ) : null}
+                </View>
+              );
+            }
+
             const isOpen = openFaq === idx;
-            const isLast = idx === FAQ_ITEMS.length - 1;
             return (
-              <View key={q}>
+              <View key={item.q}>
                 <Pressable
                   style={styles.faqRow}
                   onPress={() => setOpenFaq(isOpen ? null : idx)}
@@ -322,7 +359,7 @@ export default function SettingsTab() {
                   accessibilityState={{ expanded: isOpen }}
                 >
                   <Text style={[styles.faqQuestion, { color: headline }]} numberOfLines={isOpen ? undefined : 2}>
-                    {t(q) as string}
+                    {t(item.q) as string}
                   </Text>
                   <Ionicons
                     name={isOpen ? 'chevron-up' : 'chevron-down'}
@@ -333,24 +370,7 @@ export default function SettingsTab() {
                 </Pressable>
                 {isOpen ? (
                   <View style={styles.faqAnswerWrap}>
-                    {!btnOnly ? (
-                      <Text style={[styles.faqAnswer, { color: muted }]}>{t(a) as string}</Text>
-                    ) : null}
-                    {btnKey ? (
-                      <Pressable
-                        onPress={() => {
-                          if (action === 'onboarding') {
-                            router.push({ pathname: '/onboarding', params: { from: 'settings' } });
-                          } else {
-                            router.push('/paywall');
-                          }
-                        }}
-                        style={[styles.faqBtn, { backgroundColor: colors.sage }]}
-                        accessibilityRole="button"
-                      >
-                        <Text style={styles.faqBtnText}>{t(btnKey) as string}</Text>
-                      </Pressable>
-                    ) : null}
+                    <Text style={[styles.faqAnswer, { color: muted }]}>{t(item.a) as string}</Text>
                   </View>
                 ) : null}
                 {!isLast ? (
@@ -811,17 +831,6 @@ const styles = StyleSheet.create({
   faqDivider: {
     height: StyleSheet.hairlineWidth,
     marginHorizontal: 16,
-  },
-  faqBtn: {
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    alignSelf: 'flex-start',
-  },
-  faqBtnText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '700',
   },
   exportRow: {
     flexDirection: 'row',

@@ -313,7 +313,8 @@
     "errorNoJson": "Extraction returned no valid JSON.",
     "errorNoText": "No text to extract.",
     "errorGeneric": "The request failed.",
-    "errorNoKey": "API key is not configured. Please contact support.",
+    "workerRateLimited": "Too many requests from this connection. Please try again in a minute.",
+    "workerUpstream": "The assistant service reported an error.",
     "errorEmptyResponse": "Empty or invalid model response.",
     "errorParseJson": "Could not read JSON from model response.",
     "errorHttp": "Error %{status}: %{message}",
@@ -415,9 +416,7 @@
     "a4": "If you reinstalled the app or switched to a new device, you can restore your previous purchases for free. Tap 'Restore Purchases' in the upgrade screen or directly in Settings under 'About Terrana'.",
     "q5": "How does the AI import work?",
     "a5": "Copy the relevant text sections from a website, paste them into the Import area and tap 'Import'. The more relevant text you provide, the better the AI recognizes all information and automatically fills in the corresponding fields.",
-    "q6": "Where can I find the upgrade options?",
-    "a6": "You can view all upgrade options in the Terrana upgrade screen.",
-    "a6Btn": "View upgrade options →",
+    "linkUpgradeOptions": "View upgrade options",
     "q7": "What is Backup & Restore?",
     "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature."
   }

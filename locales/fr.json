@@ -313,7 +313,8 @@
     "errorNoJson": "L'extraction n'a pas retourné de JSON valide.",
     "errorNoText": "Aucun texte à extraire.",
     "errorGeneric": "La requête a échoué.",
-    "errorNoKey": "Clé API non configurée. Veuillez contacter le support.",
+    "workerRateLimited": "Trop de requêtes depuis cette connexion. Réessayez dans une minute.",
+    "workerUpstream": "Le service d’assistant a signalé une erreur.",
     "errorEmptyResponse": "Réponse du modèle vide ou invalide.",
     "errorParseJson": "Impossible de lire le JSON de la réponse du modèle.",
     "errorHttp": "Erreur %{status}: %{message}",
@@ -415,9 +416,7 @@
     "a4": "Si vous avez réinstallé l'application ou changé d'appareil, vous pouvez restaurer vos achats gratuitement. Appuyez sur 'Restaurer les achats' dans l'écran de mise à niveau ou directement dans Paramètres sous 'À propos de Terrana'.",
     "q5": "Comment fonctionne l'import IA ?",
     "a5": "Copiez les sections de texte appropriées d'un site web, collez-les dans la zone d'importation et appuyez sur 'Importer'. Plus le texte est pertinent, mieux l'IA reconnaît toutes les informations et les saisit automatiquement dans les champs correspondants.",
-    "q6": "Où puis-je trouver les options d'upgrade ?",
-    "a6": "Vous trouverez toutes les options de mise à niveau dans l'écran Upgrade de Terrana.",
-    "a6Btn": "Voir les options d'upgrade →",
+    "linkUpgradeOptions": "Voir les options de mise à niveau",
     "q7": "Qu'est-ce que Backup & Restore ?",
     "a7": "Avec Backup & Restore, tu peux exporter toute ta collection – tous les produits, mélanges et paramètres – sous forme de fichier et la stocker en sécurité. Sur un nouvel appareil ou après une réinstallation, tu restaures tout d'un seul tap. Backup & Restore est une fonctionnalité exclusive Lifetime."
   }

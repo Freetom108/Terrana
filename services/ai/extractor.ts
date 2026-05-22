@@ -1,13 +1,9 @@
 import { t } from '../i18n/i18n';
 import type { ExtractedData } from '../../types/import';
-import { EXTRACTION_PROMPT } from './prompt';
 
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-haiku-4-5-20251001';
-const MAX_TOKENS = 1000;
-const MAX_USER_TEXT_LENGTH = 3000;
-const ANTHROPIC_VERSION = '2023-06-01';
-
+/** Production proxy; überschreibbar mit EXPO_PUBLIC_TERRANA_AI_PROXY_URL (trim, ohne Slash am Ende). */
+const DEFAULT_AI_PROXY_ORIGIN = 'https://terrana-ai-proxy.terrana.workers.dev';
+const MAX_USER_TEXT_LENGTH = 15_000;
 const FETCH_TIMEOUT_MS = 30_000;
 
 export type ExtractProductResult =
@@ -24,6 +20,22 @@ type RawExtracted = {
   notes?: string | null;
   tags?: string[] | null;
 };
+
+type AnthropicMessagesBody = {
+  content?: Array<{ type?: string; text?: string }>;
+  /** Anthropic upstream: `{ type, message }`; Worker-Fehler: string */
+  error?: { type?: string; message?: string } | string;
+  detail?: unknown;
+};
+
+function resolveAiProxyOrigin(): string {
+  const explicit =
+    typeof process.env.EXPO_PUBLIC_TERRANA_AI_PROXY_URL === 'string'
+      ? process.env.EXPO_PUBLIC_TERRANA_AI_PROXY_URL.trim()
+      : '';
+  const base = explicit.length > 0 ? explicit : DEFAULT_AI_PROXY_ORIGIN;
+  return base.replace(/\/+$/, '');
+}
 
 function stripCodeFence(text: string): string {
   const trimmed = text.trim();
@@ -76,103 +88,90 @@ function normalizeExtracted(raw: unknown): ExtractedData {
     category: typeof r.category === 'string' ? r.category : '',
     usage: usage === null ? [] : Array.isArray(usage) ? usage.filter((u): u is string => typeof u === 'string') : [],
     notes: typeof r.notes === 'string' ? r.notes : '',
-    tags: tags === null ? [] : Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
+    tags: tags === null ? [] : Array.isArray(tags) ? tags.filter((x): x is string => typeof x === 'string') : [],
   };
 }
 
-function logApiKeyFingerprint(trimmedKey: string): void {
-  if (!__DEV__) return;
-  const len = trimmedKey.length;
-  if (len === 0) {
-    console.log('[Anthropic] EXPO_PUBLIC_ANTHROPIC_API_KEY: empty after trim');
-    return;
+/** Body shape vom Proxy ({ error: string }) vs. Anthropic ({ error: { … } }). */
+function isWorkerFlatError(record: AnthropicMessagesBody): boolean {
+  const e = record.error;
+  return typeof e === 'string';
+}
+
+function mapWorkerFlatError(
+  record: AnthropicMessagesBody & { detail?: unknown },
+  httpStatus: number,
+): string {
+  const code = typeof record.error === 'string' ? record.error : '';
+  switch (code) {
+    case 'rate_limit_exceeded':
+      return t('extractor.workerRateLimited') as string;
+    case 'upstream_fetch_failed': {
+      const d = typeof record.detail === 'string' ? sanitizeUserFacingError(record.detail.trim()) : '';
+      if (d) {
+        return `${t('extractor.workerUpstream') as string}: ${d}`;
+      }
+      return t('extractor.workerUpstream') as string;
+    }
+    default:
+      return formatHttpApiError(httpStatus, code || (t('extractor.errorUnknown') as string));
   }
-  if (len < 8) {
-    console.log(
-      '[Anthropic] EXPO_PUBLIC_ANTHROPIC_API_KEY: loaded, length:',
-      len,
-      '(skipped 4+4 fingerprint — key too short)'
-    );
-    return;
-  }
-  const first = trimmedKey.slice(0, 4);
-  const last = trimmedKey.slice(-4);
-  console.log(
-    '[Anthropic] EXPO_PUBLIC_ANTHROPIC_API_KEY fingerprint:',
-    `${first}...${last}`,
-    'length:',
-    len
-  );
 }
 
 export async function extractProductFromText(
   userText: string
 ): Promise<ExtractProductResult> {
-  const rawKey = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
-  const trimmedKey = typeof rawKey === 'string' ? rawKey.trim() : '';
-
-  if (!trimmedKey) {
-    return {
-      success: false,
-      error: t('extractor.errorNoKey') as string,
-    };
-  }
-
-  logApiKeyFingerprint(trimmedKey);
+  const proxyOrigin = resolveAiProxyOrigin();
 
   const text = userText.trim();
   if (!text) {
     return { success: false, error: t('extractor.errorNoText') as string };
   }
 
-  /** Long input is truncated silently — no user-facing error. */
+  /** Gleiches Limit wie der Worker — kürzt überschüssiges still. */
   const excerpt = text.length > MAX_USER_TEXT_LENGTH ? text.slice(0, MAX_USER_TEXT_LENGTH) : text;
 
   const abort = new AbortController();
   const timeoutId = setTimeout(() => abort.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const res = await fetch(ANTHROPIC_API_URL, {
+    const res = await fetch(proxyOrigin, {
       method: 'POST',
       signal: abort.signal,
       headers: {
         'content-type': 'application/json',
-        'x-api-key': trimmedKey,
-        'anthropic-version': ANTHROPIC_VERSION,
       },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        system: [
-          {
-            type: 'text',
-            text: EXTRACTION_PROMPT,
-            cache_control: { type: 'ephemeral' },
-          },
-        ],
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `Extract structured data from the following text. Follow the system instructions exactly. Return only the JSON object.\n\n---\n\n${excerpt}`,
-              },
-            ],
-          },
-        ],
-      }),
+      body: JSON.stringify({ text: excerpt }),
     });
 
-    const body = (await res.json()) as {
-      content?: Array<{ type?: string; text?: string }>;
-      error?: { type?: string; message?: string };
-    };
+    const rawText = await res.text();
+    let body: AnthropicMessagesBody;
+    try {
+      body = rawText.trim() !== '' ? (JSON.parse(rawText) as AnthropicMessagesBody) : {};
+    } catch {
+      return {
+        success: false,
+        error: formatHttpApiError(res.status, t('extractor.errorGeneric') as string),
+      };
+    }
 
     if (!res.ok) {
+      if (isWorkerFlatError(body)) {
+        return {
+          success: false,
+          error: mapWorkerFlatError(body as AnthropicMessagesBody & { detail?: unknown }, res.status),
+        };
+      }
+
       const errObj = body.error;
-      const msg = typeof errObj?.message === 'string' ? errObj.message.trim() : '';
-      const typ = typeof errObj?.type === 'string' ? errObj.type.trim() : '';
+      const msg =
+        errObj !== undefined && typeof errObj === 'object' && errObj !== null && 'message' in errObj
+          ? String((errObj as { message?: string }).message ?? '').trim()
+          : '';
+      const typ =
+        errObj !== undefined && typeof errObj === 'object' && errObj !== null && 'type' in errObj
+          ? String((errObj as { type?: string }).type ?? '').trim()
+          : '';
       let raw: string;
       if (msg && typ) {
         raw = msg.includes(typ) ? msg : `${typ}: ${msg}`;

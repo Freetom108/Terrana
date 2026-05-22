@@ -313,7 +313,8 @@
     "errorNoJson": "Extraktion lieferte kein gültiges JSON.",
     "errorNoText": "Kein Text zum Extrahieren.",
     "errorGeneric": "Die Anfrage ist fehlgeschlagen.",
-    "errorNoKey": "API-Schlüssel nicht konfiguriert. Bitte Support kontaktieren.",
+    "workerRateLimited": "Zu viele Anfragen von dieser Verbindung. Bitte kurz warten.",
+    "workerUpstream": "Der Assistent meldet einen Fehler.",
     "errorEmptyResponse": "Leere oder ungültige Modell-Antwort.",
     "errorParseJson": "Konnte JSON aus der Modell-Antwort nicht lesen.",
     "errorHttp": "Fehler %{status}: %{message}",
@@ -415,9 +416,7 @@
     "a4": "Wenn du die App neu installiert hast oder ein neues Gerät verwendest, kannst du deine Käufe kostenlos wiederherstellen. Tippe auf 'Käufe wiederherstellen' im Upgrade-Bereich oder direkt in den Einstellungen unter 'Über Terrana'.",
     "q5": "Wie funktioniert der KI-Import?",
     "a5": "Kopiere die passenden Textabschnitte einer Webseite, füge sie in den Import-Bereich ein und tippe auf 'Importieren'. Je mehr relevanter Text, desto besser erkennt die KI alle Informationen und trägt sie automatisch in die entsprechenden Felder ein.",
-    "q6": "Wo finde ich die Upgrade-Optionen?",
-    "a6": "Du findest alle Upgrade-Optionen im Terrana Upgrade-Bereich.",
-    "a6Btn": "Upgrade-Optionen ansehen →",
+    "linkUpgradeOptions": "Upgrade-Optionen anzeigen",
     "q7": "Was ist Backup & Restore?",
     "a7": "Mit Backup & Restore kannst du deine gesamte Sammlung – alle Produkte, Mischungen und Einstellungen – als Datei exportieren und sicher speichern. Bei einem neuen Gerät oder nach einer Neuinstallation stellst du alles mit einem Tipp wieder her. Backup & Restore ist ein exklusives Lifetime-Feature."
   }

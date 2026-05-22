@@ -1,0 +1,9 @@
+name = "terrana-ai-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-05-21"
+account_id = "e2deefbff8f2f90bf7c18e73e843347a"
+
+# Rate limiting: 5 req/min/IP (see src/index.ts)
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "d071e973e090438bb2af3a252f0bdd31"
