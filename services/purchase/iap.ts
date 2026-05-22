@@ -17,8 +17,9 @@ import { setIsLifetime, setIsPro } from '../storage/settings';
 export const PRODUCT_ID_PRO = 'terrana_lite';
 export const PRODUCT_ID_LIFETIME = 'terrana_pro';
 
-/** Must match RevenueCat entitlement identifiers. */
-export const ENTITLEMENT_PRO = 'pro';
+/** Must match RevenueCat entitlement identifiers (Dashboard). */
+export const ENTITLEMENT_LITE = 'lite';
+/** „Pro“-Kauf im Store; RevenueCat-Entitlement-Kennung bleibt hier `lifetime`. */
 export const ENTITLEMENT_LIFETIME = 'lifetime';
 
 const SUBSCRIPTION_CHANGED = 'terrana_subscription_changed';
@@ -35,10 +36,10 @@ function notifyPurchasesMutation(): void {
 /** Derive Pro/Lifetime flags from CustomerInfo (entitlements + purchased product fallback). */
 export function deriveSubscriptionFlags(ci: CustomerInfo): { isLifetime: boolean; isPro: boolean } {
   const active = ci.entitlements.active;
-  const ltEnt = active[ENTITLEMENT_LIFETIME];
-  const proEnt = active[ENTITLEMENT_PRO];
-  let isLifetime = !!ltEnt?.isActive;
-  let isPro = !!proEnt?.isActive || isLifetime;
+  const topTierEnt = active[ENTITLEMENT_LIFETIME];
+  const liteEnt = active[ENTITLEMENT_LITE];
+  let isLifetime = !!topTierEnt?.isActive;
+  let isPro = !!liteEnt?.isActive || isLifetime;
 
   const purchased = ci.allPurchasedProductIdentifiers ?? [];
   if (!isLifetime && purchased.includes(PRODUCT_ID_LIFETIME)) {
