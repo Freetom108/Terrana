@@ -1,13 +1,4 @@
 import { colors } from '../constants/colors';
-import {
-  FREE_BLEND_DISPLAY_MAX,
-  FREE_IMPORT_DISPLAY_MAX,
-  FREE_PRODUCT_DISPLAY_MAX,
-  LIFETIME_LIMIT,
-  PRO_BLEND_LIMIT,
-  PRO_IMPORT_LIMIT,
-  PRO_PRODUCT_LIMIT,
-} from '../constants/limits';
 import { usePro } from '../hooks/usePro';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
@@ -23,8 +14,10 @@ import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
@@ -47,50 +40,50 @@ interface FeatureRow {
 const FEATURES: FeatureRow[] = [
   {
     labelKey: 'paywall.featureProducts',
-    free: String(FREE_PRODUCT_DISPLAY_MAX),
-    pro: String(PRO_PRODUCT_LIMIT),
-    lifetime: String(LIFETIME_LIMIT),
+    free: '10',
+    pro: '100',
+    lifetime: '1000',
   },
   {
     labelKey: 'paywall.featureBlends',
-    free: String(FREE_BLEND_DISPLAY_MAX),
-    pro: String(PRO_BLEND_LIMIT),
-    lifetime: String(LIFETIME_LIMIT),
+    free: '10',
+    pro: '100',
+    lifetime: '1000',
   },
   {
     labelKey: 'paywall.featureAiImport',
-    free: String(FREE_IMPORT_DISPLAY_MAX),
-    pro: String(PRO_IMPORT_LIMIT),
-    lifetime: String(LIFETIME_LIMIT),
+    free: '10',
+    pro: '100',
+    lifetime: '1000',
   },
   {
     labelKey: 'paywall.featureSharing',
-    free: false,
+    free: true,
     pro: true,
     lifetime: true,
   },
   {
     labelKey: 'paywall.featurePdf',
-    free: false,
+    free: true,
     pro: true,
     lifetime: true,
   },
   {
-    labelKey: 'paywall.featurePrint',
-    free: false,
-    pro: false,
+    labelKey: 'paywall.featureCollection',
+    free: true,
+    pro: true,
     lifetime: true,
   },
   {
     labelKey: 'paywall.featureInventory',
-    free: false,
-    pro: false,
+    free: true,
+    pro: true,
     lifetime: true,
   },
   {
     labelKey: 'paywall.featureBackup',
-    free: false,
-    pro: false,
+    free: true,
+    pro: true,
     lifetime: true,
   },
 ];
@@ -104,6 +97,9 @@ const SHARE_METHODS: Array<{
   { icon: 'chatbubble-outline', labelKey: 'paywall.shareMethodSms' },
   { icon: 'share-outline', labelKey: 'paywall.shareMethodMore' },
 ];
+
+const PAYWALL_SHARE_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.tommi07051967.terrana';
 
 // ─── Cell renderer ────────────────────────────────────────────────────────────
 
@@ -171,6 +167,24 @@ export default function PaywallScreen() {
     }
   }, [iapBusy, reload]);
 
+  const handlePaywallShare = useCallback(async () => {
+    const message = t('paywall.shareMessage') as string;
+    try {
+      if (Platform.OS === 'android') {
+        await Share.share({
+          message: `${message}\n${PAYWALL_SHARE_STORE_URL}`,
+        });
+      } else {
+        await Share.share({
+          message,
+          url: PAYWALL_SHARE_STORE_URL,
+        });
+      }
+    } catch {
+      /* user dismissed sheet or platform error */
+    }
+  }, []);
+
   return (
     <View style={[styles.root, { backgroundColor: p.surface }]}>
       {/* ── Header gradient ── */}
@@ -236,7 +250,7 @@ export default function PaywallScreen() {
               ]}
             >
               <View style={styles.colFeature}>
-                <Text style={[styles.featureLabel, { color: p.text }]} numberOfLines={1}>
+                <Text style={[styles.featureLabel, { color: p.text }]} numberOfLines={2}>
                   {t(row.labelKey) as string}
                 </Text>
               </View>
@@ -253,63 +267,25 @@ export default function PaywallScreen() {
           ))}
         </View>
 
-        {/* ── Sharing highlight card ── */}
-        <View
-          style={[
-            styles.sharingCard,
-            {
-              backgroundColor: p.isDark ? '#2C3B2E' : 'rgba(122,158,126,0.1)',
-              borderColor: colors.sage,
-            },
-          ]}
-        >
-          <View style={styles.sharingHeader}>
-            <View style={styles.sharingTitleRow}>
-              <Text style={[styles.sharingTitle, { color: p.text }]}>
-                {t('paywall.sharing') as string}
-              </Text>
-              <View style={styles.sharingBadge}>
-                <Text style={styles.sharingBadgeText}>{t('paywall.sharingBadge') as string}</Text>
-              </View>
-            </View>
-            <Text style={[styles.sharingDesc, { color: p.muted }]}>
-              {t('paywall.sharingDesc') as string}
-            </Text>
-          </View>
-
-          <View style={styles.shareMethodsRow}>
+        {/* ── Share shortcuts (compact, centered; opens native Share) ── */}
+        <View style={styles.shareShortcuts}>
+          <View style={styles.shareShortcutsInner}>
             {SHARE_METHODS.map((method) => (
-              <View key={method.labelKey} style={styles.shareMethod}>
-                <View style={[styles.shareIconWrap, { backgroundColor: p.chipBg }]}>
-                  <Ionicons name={method.icon} size={22} color={colors.sageDark} />
-                </View>
-                <Text style={[styles.shareMethodLabel, { color: p.muted }]}>
+              <Pressable
+                key={method.labelKey}
+                style={({ pressed }) => [styles.shareShortcut, pressed && styles.shareShortcutPressed]}
+                onPress={() => void handlePaywallShare()}
+                disabled={iapBusy !== 'idle'}
+                accessibilityRole="button"
+                accessibilityLabel={t(method.labelKey) as string}
+              >
+                <Ionicons name={method.icon} size={24} color={colors.sageDark} />
+                <Text style={[styles.shareShortcutLabel, { color: p.muted }]}>
                   {t(method.labelKey) as string}
                 </Text>
-              </View>
+              </Pressable>
             ))}
           </View>
-        </View>
-
-        {/* ── Backup highlight card (Lifetime) ── */}
-        <View
-          style={[
-            styles.sharingCard,
-            {
-              backgroundColor: p.isDark ? '#2C3B2E' : 'rgba(122,158,126,0.1)',
-              borderColor: colors.sage,
-            },
-          ]}
-        >
-          <Text style={[styles.sharingTitle, { color: p.text }]}>
-            {t('paywall.backupHighlightTitle') as string}
-          </Text>
-          <View style={[styles.sharingBadge, styles.backupBadge]}>
-            <Text style={styles.sharingBadgeText}>{t('paywall.backupHighlightBadge') as string}</Text>
-          </View>
-          <Text style={[styles.sharingDesc, styles.backupHighlightDesc, { color: p.muted }]}>
-            {t('paywall.backupHighlightDesc') as string}
-          </Text>
         </View>
 
         {/* ── Buy buttons ── */}
@@ -336,32 +312,27 @@ export default function PaywallScreen() {
             )}
           </Pressable>
 
-          {/* Lifetime button — golden border + floating badge top-right */}
-          <View style={styles.lifetimeWrap}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.buyBtn,
-                styles.buyBtnLifetime,
-                pressed && styles.buyBtnPressed,
-                iapBusy !== 'idle' && styles.buyBtnDisabled,
-              ]}
-              onPress={() => void handleBuyLifetime()}
-              disabled={iapBusy !== 'idle'}
-              accessibilityRole="button"
-            >
-              {iapBusy === 'lifetime' ? (
-                <ActivityIndicator color={colors.white} />
-              ) : (
-                <>
-                  <Text style={styles.buyBtnTitle}>{t('paywall.buyLifetime') as string}</Text>
-                  <Text style={styles.buyBtnPrice}>{t('paywall.buyLifetimePrice') as string}</Text>
-                </>
-              )}
-            </Pressable>
-            <View style={styles.popularBadge} pointerEvents="none">
-              <Text style={styles.popularBadgeText}>{t('paywall.mostPopular') as string}</Text>
-            </View>
-          </View>
+          {/* Lifetime button */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.buyBtn,
+              styles.buyBtnLifetime,
+              pressed && styles.buyBtnPressed,
+              iapBusy !== 'idle' && styles.buyBtnDisabled,
+            ]}
+            onPress={() => void handleBuyLifetime()}
+            disabled={iapBusy !== 'idle'}
+            accessibilityRole="button"
+          >
+            {iapBusy === 'lifetime' ? (
+              <ActivityIndicator color={colors.white} />
+            ) : (
+              <>
+                <Text style={styles.buyBtnTitle}>{t('paywall.buyLifetime') as string}</Text>
+                <Text style={styles.buyBtnPrice}>{t('paywall.buyLifetimePrice') as string}</Text>
+              </>
+            )}
+          </Pressable>
         </View>
 
         {/* ── Footer ── */}
@@ -534,94 +505,45 @@ const styles = StyleSheet.create({
     color: colors.sageDark,
   },
 
-  backupBadge: {
-    alignSelf: 'flex-start',
-    marginTop: 6,
-    marginBottom: 6,
+  /* Share shortcuts (no frame; opens system Share sheet) */
+  shareShortcuts: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    paddingVertical: 6,
+    marginBottom: 8,
   },
-  backupHighlightDesc: {
-    marginTop: 0,
-  },
-
-  /* Sharing card */
-  sharingCard: {
-    borderRadius: 16,
-    borderWidth: 1.5,
-    padding: 16,
-    marginBottom: 16,
-  },
-  sharingHeader: {
-    marginBottom: 14,
-  },
-  sharingTitleRow: {
+  shareShortcutsInner: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-    flexWrap: 'wrap',
-  },
-  sharingTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  sharingBadge: {
-    backgroundColor: colors.sage,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-  },
-  sharingBadgeText: {
-    color: colors.white,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  sharingDesc: {
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: '500',
-  },
-  shareMethodsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  shareMethod: {
-    alignItems: 'center',
-    gap: 6,
-  },
-  shareIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'flex-start',
+    flexWrap: 'nowrap',
+    columnGap: 4,
+    maxWidth: 360,
+    width: '100%',
   },
-  shareMethodLabel: {
-    fontSize: 11,
+  shareShortcut: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+    minWidth: 0,
+    maxWidth: 88,
+  },
+  shareShortcutPressed: {
+    opacity: 0.65,
+  },
+  shareShortcutLabel: {
+    marginTop: 4,
+    fontSize: 10,
     fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: 13,
   },
 
   /* Buy buttons */
   buttonsSection: {
     gap: 10,
     marginBottom: 20,
-  },
-  lifetimeWrap: {
-    position: 'relative',
-  },
-  popularBadge: {
-    position: 'absolute',
-    top: -10,
-    right: 14,
-    backgroundColor: colors.earth,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    zIndex: 2,
-  },
-  popularBadgeText: {
-    color: colors.white,
-    fontSize: 11,
-    fontWeight: '800',
   },
   buyBtn: {
     borderRadius: 16,
@@ -634,8 +556,6 @@ const styles = StyleSheet.create({
   },
   buyBtnLifetime: {
     backgroundColor: colors.sageDark,
-    borderWidth: 2,
-    borderColor: '#C9A84C',
   },
   buyBtnPressed: {
     opacity: 0.82,
@@ -648,11 +568,13 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     marginBottom: 3,
+    textAlign: 'center',
   },
   buyBtnPrice: {
     color: 'rgba(255,255,255,0.82)',
     fontSize: 13,
     fontWeight: '500',
+    textAlign: 'center',
   },
   /* Footer */
   footer: {

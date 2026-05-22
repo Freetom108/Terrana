@@ -26,8 +26,8 @@ export const FREE_PRODUCT_WARN = FREE_PRODUCT_DISPLAY_MAX - 2; // 8
 export const FREE_BLEND_WARN = FREE_BLEND_DISPLAY_MAX - 1; // 9
 export const FREE_IMPORT_WARN = FREE_IMPORT_DISPLAY_MAX - 2; // 8
 
-export const PRICE_PRO = 14.99;
-export const PRICE_LIFETIME = 24.99;
+export const PRICE_PRO = 24.99;
+export const PRICE_LIFETIME = 44.99;
 
 export const PRO_FEATURES = [
   'unlimited_products',
