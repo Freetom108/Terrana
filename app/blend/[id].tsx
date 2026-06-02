@@ -603,26 +603,20 @@ export default function BlendScreen() {
     });
   }, [blend]);
 
-  const handlePdfPrint = useCallback(() => {
+  const handlePdf = useCallback(() => {
     if (!blend) return;
-    const actions: Parameters<typeof Alert.alert>[2] = [
-      {
-        text: t('alerts.pdf') as string,
-        onPress: () => void exportBlendAsPDF(blend).catch((e) => {
-          const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert(t('alerts.pdf') as string, msg);
-        }),
-      },
-    ];
-    actions.push({
-      text: t('pdf.print') as string,
-      onPress: () => void printBlend(blend).catch((e) => {
-        const msg = e instanceof Error ? e.message : String(e);
-        Alert.alert(t('alerts.print') as string, msg);
-      }),
+    void exportBlendAsPDF(blend).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert(t('alerts.pdf') as string, msg);
     });
-    actions.push({ text: t('general.cancel') as string, style: 'cancel' });
-    Alert.alert(blend.name, undefined, actions);
+  }, [blend]);
+
+  const handlePrint = useCallback(() => {
+    if (!blend) return;
+    void printBlend(blend).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert(t('alerts.print') as string, msg);
+    });
   }, [blend]);
 
   if (blend === undefined) {
@@ -728,13 +722,22 @@ export default function BlendScreen() {
                 <Ionicons name="share-outline" size={24} color={colors.white} />
               </Pressable>
               <Pressable
-                onPress={handlePdfPrint}
+                onPress={handlePdf}
                 accessibilityRole="button"
-                accessibilityLabel={t('general.pdfPrint') as string}
+                accessibilityLabel={t('alerts.pdf') as string}
                 style={styles.iconBtn}
                 hitSlop={12}
               >
                 <Ionicons name="document-text-outline" size={24} color={colors.white} />
+              </Pressable>
+              <Pressable
+                onPress={handlePrint}
+                accessibilityRole="button"
+                accessibilityLabel={t('pdf.print') as string}
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="print-outline" size={24} color={colors.white} />
               </Pressable>
               <Pressable
                 onPress={handleDelete}
@@ -743,7 +746,7 @@ export default function BlendScreen() {
                 style={styles.iconBtn}
                 hitSlop={12}
               >
-                <Ionicons name="trash-outline" size={24} color={colors.white} />
+                <Ionicons name="trash" size={24} color={colors.white} />
               </Pressable>
               <Pressable
                 onPress={enterEdit}

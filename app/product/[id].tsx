@@ -170,26 +170,20 @@ export default function ProductScreen() {
     });
   }, [product]);
 
-  const handlePdfPrint = useCallback(() => {
+  const handlePdf = useCallback(() => {
     if (!product) return;
-    const actions: Parameters<typeof Alert.alert>[2] = [
-      {
-        text: t('alerts.pdf') as string,
-        onPress: () => void exportProductAsPDF(product).catch((e) => {
-          const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert(t('alerts.pdf') as string, msg);
-        }),
-      },
-    ];
-    actions.push({
-      text: t('pdf.print') as string,
-      onPress: () => void printProduct(product).catch((e) => {
-        const msg = e instanceof Error ? e.message : String(e);
-        Alert.alert(t('alerts.print') as string, msg);
-      }),
+    void exportProductAsPDF(product).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert(t('alerts.pdf') as string, msg);
     });
-    actions.push({ text: t('general.cancel') as string, style: 'cancel' });
-    Alert.alert(product.name, undefined, actions);
+  }, [product]);
+
+  const handlePrint = useCallback(() => {
+    if (!product) return;
+    void printProduct(product).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      Alert.alert(t('alerts.print') as string, msg);
+    });
   }, [product]);
 
   const handleToggleFavorite = useCallback(async () => {
@@ -312,13 +306,22 @@ export default function ProductScreen() {
                 <Ionicons name="share-outline" size={24} color={colors.white} />
               </Pressable>
               <Pressable
-                onPress={handlePdfPrint}
+                onPress={handlePdf}
                 accessibilityRole="button"
-                accessibilityLabel={t('general.pdfPrint') as string}
+                accessibilityLabel={t('alerts.pdf') as string}
                 style={styles.iconBtn}
                 hitSlop={12}
               >
                 <Ionicons name="document-text-outline" size={24} color={colors.white} />
+              </Pressable>
+              <Pressable
+                onPress={handlePrint}
+                accessibilityRole="button"
+                accessibilityLabel={t('pdf.print') as string}
+                style={styles.iconBtn}
+                hitSlop={12}
+              >
+                <Ionicons name="print-outline" size={24} color={colors.white} />
               </Pressable>
               <Pressable
                 onPress={handleDelete}
@@ -327,7 +330,7 @@ export default function ProductScreen() {
                 style={styles.iconBtn}
                 hitSlop={12}
               >
-                <Ionicons name="trash-outline" size={23} color="rgba(255,255,255,0.80)" />
+                <Ionicons name="trash" size={24} color="rgba(255,255,255,0.80)" />
               </Pressable>
               <Pressable
                 onPress={enterEdit}
