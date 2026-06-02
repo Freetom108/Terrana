@@ -484,19 +484,16 @@ export default function SettingsTab() {
               <Ionicons
                 name="document-text-outline"
                 size={22}
-                color={isPro || isLifetime ? colors.sage : p.muted}
+                color={colors.sage}
               />
               <View style={styles.exportRowText}>
                 <Text style={[styles.exportRowTitle, { color: headline, opacity: exportingPdf ? 0.5 : 1 }]}>
                   {t('settings.exportCollection') as string}
                 </Text>
-                <Text style={[styles.exportRowHint, { color: muted }]}>
-                  {t('settings.exportCollectionHint') as string}
-                </Text>
               </View>
             </View>
             <Ionicons
-              name={isPro || isLifetime ? 'chevron-forward' : 'lock-closed-outline'}
+              name="chevron-forward"
               size={18}
               color={muted}
             />
