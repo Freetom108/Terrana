@@ -128,13 +128,16 @@
     "restorePurchases": "Käufe wiederherstellen",
     "sectionSupport": "SUPPORT & FEEDBACK",
     "contactFeedback": "Kontakt / Feedback",
+    "userId": "User ID",
+    "userIdCopied": "User ID in die Zwischenablage kopiert.",
     "rateTerrana": "Terrana bewerten",
     "sectionLegal": "RECHTLICHES",
     "privacyPolicy": "Datenschutz",
     "termsOfUse": "Nutzungsbedingungen",
+    "impressum": "Impressum",
     "sectionDangerZone": "GEFAHRENZONE",
     "dangerDeleteAll": "Alle App-Daten löschen",
-    "dangerDeleteMessage": "Warnung: Dies löscht ALLE deine Produkte, Blends und Einstellungen unwiderruflich. Bist du sicher?"
+    "dangerDeleteMessage": "Hiermit werden alle von dir angelegten Produkte, Blends und Einstellungen gelöscht. Die App selbst bleibt installiert und voll funktionsfähig. Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "tabs": {
     "home": "Sammlung",
@@ -418,6 +421,8 @@
     "a5": "Kopiere die passenden Textabschnitte einer Webseite, füge sie in den Import-Bereich ein und tippe auf 'Importieren'. Je mehr relevanter Text, desto besser erkennt die KI alle Informationen und trägt sie automatisch in die entsprechenden Felder ein.",
     "linkUpgradeOptions": "Upgrade-Optionen anzeigen",
     "q7": "Was ist Backup & Restore?",
-    "a7": "Mit Backup & Restore kannst du deine gesamte Sammlung – alle Produkte, Mischungen und Einstellungen – als Datei exportieren und sicher speichern. Bei einem neuen Gerät oder nach einer Neuinstallation stellst du alles mit einem Tipp wieder her. Backup & Restore ist ein exklusives Lifetime-Feature."
+    "a7": "Mit Backup & Restore kannst du deine gesamte Sammlung – alle Produkte, Mischungen und Einstellungen – als Datei exportieren und sicher speichern. Bei einem neuen Gerät oder nach einer Neuinstallation stellst du alles mit einem Tipp wieder her. Backup & Restore ist ein exklusives Lifetime-Feature.",
+    "q_userid": "Was ist meine User ID?",
+    "a_userid": "Deine User ID ist eine eindeutige Kennung für dein Konto. Beim Support kann sie abgefragt werden. Du findest sie in den Einstellungen unter Support & Feedback – tippe darauf um sie zu kopieren."
   }
 }

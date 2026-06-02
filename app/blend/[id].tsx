@@ -597,22 +597,14 @@ export default function BlendScreen() {
 
   const handleShare = useCallback(() => {
     if (!blend) return;
-    if (!isPro && !isLifetime) {
-      router.push('/paywall');
-      return;
-    }
     void shareBlend(blend).catch((e) => {
       const msg = e instanceof Error ? e.message : String(e);
       Alert.alert(t('alerts.share') as string, msg);
     });
-  }, [blend, isPro, isLifetime]);
+  }, [blend]);
 
   const handlePdfPrint = useCallback(() => {
     if (!blend) return;
-    if (!isPro && !isLifetime) {
-      router.push('/paywall');
-      return;
-    }
     const actions: Parameters<typeof Alert.alert>[2] = [
       {
         text: t('alerts.pdf') as string,
@@ -622,18 +614,16 @@ export default function BlendScreen() {
         }),
       },
     ];
-    if (isLifetime) {
-      actions.push({
-        text: t('pdf.print') as string,
-        onPress: () => void printBlend(blend).catch((e) => {
-          const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert(t('alerts.print') as string, msg);
-        }),
-      });
-    }
+    actions.push({
+      text: t('pdf.print') as string,
+      onPress: () => void printBlend(blend).catch((e) => {
+        const msg = e instanceof Error ? e.message : String(e);
+        Alert.alert(t('alerts.print') as string, msg);
+      }),
+    });
     actions.push({ text: t('general.cancel') as string, style: 'cancel' });
     Alert.alert(blend.name, undefined, actions);
-  }, [blend, isPro, isLifetime]);
+  }, [blend]);
 
   if (blend === undefined) {
     return (

@@ -15,11 +15,15 @@
     },
     "ios": {
       "bundleIdentifier": "com.tommi07051967.terrana",
-      "supportsTablet": true
+      "buildNumber": "6",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.tommi07051967.terrana",
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": [
         "com.android.vending.BILLING"
       ],
@@ -38,6 +42,9 @@
         "projectId": "30de8186-fe7f-423f-b5e7-206fc94ad66d"
       }
     },
-    "owner": "tommi07051967"
+    "owner": "tommi07051967",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

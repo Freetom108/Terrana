@@ -17,9 +17,12 @@ import {
   setThemePreference,
 } from '../../services/storage/settings';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Clipboard from '@react-native-clipboard/clipboard';
 import Constants from 'expo-constants';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useReducer, useState } from 'react';
+import * as StoreReview from 'expo-store-review';
+import { useCallback, useEffect, useReducer, useState } from 'react';
+import Purchases from 'react-native-purchases';
 import {
   ActivityIndicator,
   Alert,
@@ -42,6 +45,7 @@ const URL_CONTACT_FEEDBACK = 'https://freetom108.github.io/Terrana/';
 
 const URL_PRIVACY_POLICY = 'https://freetom108.github.io/terrana-privacy-policy/';
 const URL_TERMS_OF_USE = 'https://freetom108.github.io/terrana-terms/';
+const URL_IMPRESSUM = 'https://freetom108.github.io/terrana-impressum/';
 
 type FaqEntry =
   | { kind: 'link'; labelKey: string; target: 'onboarding' | 'paywall' }
@@ -55,7 +59,13 @@ const FAQ_ENTRIES: FaqEntry[] = [
   { kind: 'accordion', q: 'faq.q4', a: 'faq.a4' },
   { kind: 'accordion', q: 'faq.q5', a: 'faq.a5' },
   { kind: 'accordion', q: 'faq.q7', a: 'faq.a7' },
+  { kind: 'accordion', q: 'faq.q_userid', a: 'faq.a_userid' },
 ];
+
+function truncateAppUserId(id: string): string {
+  if (id.length <= 10) return id;
+  return `${id.slice(0, 6)}...${id.slice(-4)}`;
+}
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
   { value: 'light', labelKey: 'settings.themeLight' },
@@ -83,21 +93,28 @@ export default function SettingsTab() {
   const [backingUp, setBackingUp] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [iapRestoreBusy, setIapRestoreBusy] = useState(false);
+  const [isRatingBusy, setIsRatingBusy] = useState(false);
+  const [appUserId, setAppUserId] = useState('');
   const [themePref, setThemePrefState] = useState<ThemePreference>('auto');
+
+  useEffect(() => {
+    void Purchases.getAppUserID()
+      .then(setAppUserId)
+      .catch(() => setAppUserId(''));
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
       void reload();
       void getThemePreference().then(setThemePrefState);
       void refreshProducts();
+      void Purchases.getAppUserID()
+        .then(setAppUserId)
+        .catch(() => setAppUserId(''));
     }, [reload, refreshProducts]),
   );
 
   const handleExportCollection = useCallback(async () => {
-    if (!isPro && !isLifetime) {
-      router.push('/paywall');
-      return;
-    }
     if (products.length === 0) {
       Alert.alert(t('home.emptyProductsTitle') as string, t('home.emptyProductsMessage') as string);
       return;
@@ -111,7 +128,7 @@ export default function SettingsTab() {
     } finally {
       setExportingPdf(false);
     }
-  }, [isPro, isLifetime, products, router]);
+  }, [products]);
 
   const handleBackup = useCallback(async () => {
     setBackingUp(true);
@@ -148,12 +165,35 @@ export default function SettingsTab() {
     openExternalUrl(URL_CONTACT_FEEDBACK);
   }, [openExternalUrl]);
 
-  const handleRateTerrana = useCallback(() => {
-    const url =
-      Platform.OS === 'ios'
-        ? 'https://apps.apple.com/app/idXXXXXXXXX'
-        : 'https://play.google.com/store/apps/details?id=com.tommi07051967.terrana';
-    openExternalUrl(url);
+  const handleCopyUserId = useCallback(async () => {
+    try {
+      const id = appUserId || (await Purchases.getAppUserID());
+      if (!id) return;
+      Clipboard.setString(id);
+      Alert.alert('', t('settings.userIdCopied') as string);
+    } catch {
+      /* ignore */
+    }
+  }, [appUserId]);
+
+  const handleRateTerrana = useCallback(async () => {
+    setIsRatingBusy(true);
+    try {
+      const isAvailable = await StoreReview.isAvailableAsync();
+
+      if (isAvailable) {
+        await StoreReview.requestReview();
+      } else {
+        // Fallback falls der Dialog nicht verfügbar ist
+        const url =
+          Platform.OS === 'ios'
+            ? 'https://apps.apple.com/app/idXXXXXXXXX'
+            : 'https://play.google.com/store/apps/details?id=com.tommi07051967.terrana';
+        openExternalUrl(url);
+      }
+    } finally {
+      setIsRatingBusy(false);
+    }
   }, [openExternalUrl]);
 
   const handleRestorePurchases = useCallback(async () => {
@@ -386,95 +426,47 @@ export default function SettingsTab() {
           {t('settings.sectionBackup')}
         </Text>
         <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
-          {isLifetime ? (
-            <>
-              {/* Backup */}
-              <Pressable
-                style={styles.exportRow}
-                onPress={() => void handleBackup()}
-                accessibilityRole="button"
-                disabled={backingUp}
-              >
-                <View style={styles.exportRowLeft}>
-                  <Ionicons name="cloud-upload-outline" size={22} color={colors.sageDark} />
-                  <View style={styles.exportRowText}>
-                    <Text style={[styles.exportRowTitle, { color: headline, opacity: backingUp ? 0.5 : 1 }]}>
-                      {t('settings.backupCreate') as string}
-                    </Text>
-                    <Text style={[styles.exportRowHint, { color: muted }]}>
-                      {t('settings.backupCreateHint') as string}
-                    </Text>
-                  </View>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color={muted} />
-              </Pressable>
+          <Pressable
+            style={styles.exportRow}
+            onPress={() => void handleBackup()}
+            accessibilityRole="button"
+            disabled={backingUp}
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="cloud-upload-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, { color: headline, opacity: backingUp ? 0.5 : 1 }]}>
+                  {t('settings.backupCreate') as string}
+                </Text>
+                <Text style={[styles.exportRowHint, { color: muted }]}>
+                  {t('settings.backupCreateHint') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={muted} />
+          </Pressable>
 
-              <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
 
-              {/* Restore */}
-              <Pressable
-                style={styles.exportRow}
-                onPress={() => void handleRestore()}
-                accessibilityRole="button"
-                disabled={restoring}
-              >
-                <View style={styles.exportRowLeft}>
-                  <Ionicons name="cloud-download-outline" size={22} color={colors.sageDark} />
-                  <View style={styles.exportRowText}>
-                    <Text style={[styles.exportRowTitle, { color: headline, opacity: restoring ? 0.5 : 1 }]}>
-                      {t('settings.backupRestore') as string}
-                    </Text>
-                    <Text style={[styles.exportRowHint, { color: muted }]}>
-                      {t('settings.backupRestoreHint') as string}
-                    </Text>
-                  </View>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color={muted} />
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <Pressable
-                style={styles.exportRow}
-                onPress={() => router.push('/paywall')}
-                accessibilityRole="button"
-              >
-                <View style={styles.exportRowLeft}>
-                  <Ionicons name="lock-closed-outline" size={22} color={muted} />
-                  <View style={styles.exportRowText}>
-                    <Text style={[styles.exportRowTitle, { color: headline }]}>
-                      {t('settings.backupCreate') as string}
-                    </Text>
-                    <Text style={[styles.exportRowHint, { color: muted }]}>
-                      {t('settings.backupLockedHint') as string}
-                    </Text>
-                  </View>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color={muted} />
-              </Pressable>
-
-              <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
-
-              <Pressable
-                style={styles.exportRow}
-                onPress={() => router.push('/paywall')}
-                accessibilityRole="button"
-              >
-                <View style={styles.exportRowLeft}>
-                  <Ionicons name="lock-closed-outline" size={22} color={muted} />
-                  <View style={styles.exportRowText}>
-                    <Text style={[styles.exportRowTitle, { color: headline }]}>
-                      {t('settings.backupRestore') as string}
-                    </Text>
-                    <Text style={[styles.exportRowHint, { color: muted }]}>
-                      {t('settings.backupLockedHint') as string}
-                    </Text>
-                  </View>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color={muted} />
-              </Pressable>
-            </>
-          )}
+          <Pressable
+            style={styles.exportRow}
+            onPress={() => void handleRestore()}
+            accessibilityRole="button"
+            disabled={restoring}
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="cloud-download-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, { color: headline, opacity: restoring ? 0.5 : 1 }]}>
+                  {t('settings.backupRestore') as string}
+                </Text>
+                <Text style={[styles.exportRowHint, { color: muted }]}>
+                  {t('settings.backupRestoreHint') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={muted} />
+          </Pressable>
         </View>
 
         {/* ── Export ── */}
@@ -518,6 +510,28 @@ export default function SettingsTab() {
         <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
           <Pressable
             style={styles.exportRow}
+            onPress={() => void handleCopyUserId()}
+            accessibilityRole="button"
+            accessibilityLabel={t('settings.userId') as string}
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="person-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
+                  {t('settings.userId') as string}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.userIdRight}>
+              <Text style={[styles.userIdValue, { color: muted }]} numberOfLines={1}>
+                {appUserId ? truncateAppUserId(appUserId) : '—'}
+              </Text>
+              <Ionicons name="copy-outline" size={18} color={muted} />
+            </View>
+          </Pressable>
+          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+          <Pressable
+            style={styles.exportRow}
             onPress={handleContactFeedback}
             accessibilityRole="link"
           >
@@ -534,13 +548,21 @@ export default function SettingsTab() {
           <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
           <Pressable
             style={styles.exportRow}
-            onPress={handleRateTerrana}
+            onPress={() => void handleRateTerrana()}
+            disabled={isRatingBusy}
             accessibilityRole="link"
+            accessibilityState={{ busy: isRatingBusy }}
           >
             <View style={styles.exportRowLeft}>
               <Ionicons name="star-outline" size={22} color={colors.sageDark} />
               <View style={styles.exportRowText}>
-                <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
+                <Text
+                  style={[
+                    styles.exportRowTitle,
+                    styles.exportRowTitleOnly,
+                    { color: headline, opacity: isRatingBusy ? 0.5 : 1 },
+                  ]}
+                >
                   {t('settings.rateTerrana') as string}
                 </Text>
               </View>
@@ -580,6 +602,22 @@ export default function SettingsTab() {
               <View style={styles.exportRowText}>
                 <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
                   {t('settings.termsOfUse') as string}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="open-outline" size={18} color={muted} />
+          </Pressable>
+          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+          <Pressable
+            style={styles.exportRow}
+            onPress={() => openExternalUrl(URL_IMPRESSUM)}
+            accessibilityRole="link"
+          >
+            <View style={styles.exportRowLeft}>
+              <Ionicons name="business-outline" size={22} color={colors.sageDark} />
+              <View style={styles.exportRowText}>
+                <Text style={[styles.exportRowTitle, styles.exportRowTitleOnly, { color: headline }]}>
+                  {t('settings.impressum') as string}
                 </Text>
               </View>
             </View>
@@ -861,6 +899,18 @@ const styles = StyleSheet.create({
   exportRowHint: {
     fontSize: 12,
     fontWeight: '400',
+  },
+  userIdRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 0,
+    maxWidth: '52%',
+  },
+  userIdValue: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontVariant: ['tabular-nums'],
   },
   dangerCard: {
     borderWidth: 1,

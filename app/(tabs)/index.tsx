@@ -287,14 +287,23 @@ export default function HomeTab() {
             ) : null}
           </View>
         );
-      case 'emptyProducts':
+      case 'emptyProducts': {
+        const emptyHref =
+          item.rowId === 'empty-recent-products' ? '/(tabs)/import' : '/product/new';
         return (
-          <EmptyState
-            title={t('home.emptyProductsTitle')}
-            message={t('home.emptyProductsMessage')}
-            emoji={item.emoji}
-          />
+          <Pressable
+            onPress={() => router.push(emptyHref)}
+            style={({ pressed }) => (pressed ? styles.emptyPressablePressed : undefined)}
+            accessibilityRole="button"
+          >
+            <EmptyState
+              title={t('home.emptyProductsTitle')}
+              message={t('home.emptyProductsMessage')}
+              emoji={item.emoji}
+            />
+          </Pressable>
         );
+      }
       case 'productRecent':
         inner = (
           <HomeProductCard
@@ -476,5 +485,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     flexShrink: 0,
+  },
+  emptyPressablePressed: {
+    opacity: 0.7,
   },
 });

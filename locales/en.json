@@ -128,13 +128,16 @@
     "restorePurchases": "Restore Purchases",
     "sectionSupport": "SUPPORT & FEEDBACK",
     "contactFeedback": "Contact / Feedback",
+    "userId": "User ID",
+    "userIdCopied": "User ID copied to clipboard.",
     "rateTerrana": "Rate Terrana",
     "sectionLegal": "LEGAL",
     "privacyPolicy": "Privacy Policy",
     "termsOfUse": "Terms of Use",
+    "impressum": "Imprint",
     "sectionDangerZone": "DANGER ZONE",
     "dangerDeleteAll": "Delete all app data",
-    "dangerDeleteMessage": "Warning: This will permanently delete ALL your products, blends and settings. This cannot be undone. Are you sure?"
+    "dangerDeleteMessage": "This will delete all products, blends and settings you have created. The app itself remains installed and fully functional. This action cannot be undone."
   },
   "tabs": {
     "home": "Collection",
@@ -418,6 +421,8 @@
     "a5": "Copy the relevant text sections from a website, paste them into the Import area and tap 'Import'. The more relevant text you provide, the better the AI recognizes all information and automatically fills in the corresponding fields.",
     "linkUpgradeOptions": "View upgrade options",
     "q7": "What is Backup & Restore?",
-    "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature."
+    "a7": "With Backup & Restore you can export your entire collection – all products, blends and settings – as a file and store it safely. On a new device or after a reinstall, you restore everything with a single tap. Backup & Restore is an exclusive Lifetime feature.",
+    "q_userid": "What is my User ID?",
+    "a_userid": "Your User ID is a unique identifier for your account. If you contact support, we may ask for it. Find it in Settings under Support & Feedback — tap it to copy."
   }
 }

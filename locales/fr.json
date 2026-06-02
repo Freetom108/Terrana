@@ -128,13 +128,16 @@
     "restorePurchases": "Restaurer les achats",
     "sectionSupport": "ASSISTANCE & AVIS",
     "contactFeedback": "Contact / Commentaires",
+    "userId": "User ID",
+    "userIdCopied": "Identifiant copié dans le presse-papiers.",
     "rateTerrana": "Noter Terrana",
     "sectionLegal": "MENTIONS LÉGALES",
     "privacyPolicy": "Politique de confidentialité",
     "termsOfUse": "Conditions d'utilisation",
+    "impressum": "Mentions légales",
     "sectionDangerZone": "ZONE DANGEREUSE",
     "dangerDeleteAll": "Supprimer toutes les données",
-    "dangerDeleteMessage": "Attention : Ceci supprimera définitivement TOUS vos produits, mélanges et paramètres. Êtes-vous sûr ?"
+    "dangerDeleteMessage": "Cela supprimera tous les produits, mélanges et paramètres que vous avez créés. L'application reste installée et pleinement fonctionnelle. Cette action est irréversible."
   },
   "tabs": {
     "home": "Collection",
@@ -418,6 +421,8 @@
     "a5": "Copiez les sections de texte appropriées d'un site web, collez-les dans la zone d'importation et appuyez sur 'Importer'. Plus le texte est pertinent, mieux l'IA reconnaît toutes les informations et les saisit automatiquement dans les champs correspondants.",
     "linkUpgradeOptions": "Voir les options de mise à niveau",
     "q7": "Qu'est-ce que Backup & Restore ?",
-    "a7": "Avec Backup & Restore, tu peux exporter toute ta collection – tous les produits, mélanges et paramètres – sous forme de fichier et la stocker en sécurité. Sur un nouvel appareil ou après une réinstallation, tu restaures tout d'un seul tap. Backup & Restore est une fonctionnalité exclusive Lifetime."
+    "a7": "Avec Backup & Restore, tu peux exporter toute ta collection – tous les produits, mélanges et paramètres – sous forme de fichier et la stocker en sécurité. Sur un nouvel appareil ou après une réinstallation, tu restaures tout d'un seul tap. Backup & Restore est une fonctionnalité exclusive Lifetime.",
+    "q_userid": "Qu'est-ce que mon identifiant utilisateur ?",
+    "a_userid": "Votre identifiant est unique à votre compte. Le support peut vous le demander. Trouvez-le dans Réglages sous Support & Commentaires."
   }
 }

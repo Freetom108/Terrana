@@ -128,13 +128,16 @@
     "restorePurchases": "Restaurar compras",
     "sectionSupport": "SOPORTE Y COMENTARIOS",
     "contactFeedback": "Contacto / Comentarios",
+    "userId": "User ID",
+    "userIdCopied": "ID de usuario copiado al portapapeles.",
     "rateTerrana": "Valorar Terrana",
     "sectionLegal": "INFORMACIÓN LEGAL",
     "privacyPolicy": "Política de privacidad",
     "termsOfUse": "Términos de uso",
+    "impressum": "Aviso legal",
     "sectionDangerZone": "ZONA DE PELIGRO",
     "dangerDeleteAll": "Eliminar todos los datos",
-    "dangerDeleteMessage": "Advertencia: Esto eliminará permanentemente TODOS tus productos, mezclas y ajustes. ¿Estás seguro?"
+    "dangerDeleteMessage": "Esto eliminará todos los productos, mezclas y ajustes que hayas creado. La aplicación permanece instalada y completamente funcional. Esta acción no se puede deshacer."
   },
   "tabs": {
     "home": "Colección",
@@ -418,6 +421,8 @@
     "a5": "Copia las secciones de texto relevantes de un sitio web, pégalas en el área de importación y pulsa 'Importar'. Cuanto más texto relevante proporciones, mejor reconocerá la IA toda la información y la introducirá automáticamente en los campos correspondientes.",
     "linkUpgradeOptions": "Ver opciones de actualización",
     "q7": "¿Qué es Backup & Restore?",
-    "a7": "Con Backup & Restore puedes exportar toda tu colección – todos los productos, mezclas y ajustes – como archivo y guardarlo de forma segura. En un nuevo dispositivo o tras una reinstalación, restauras todo con un solo toque. Backup & Restore es una función exclusiva Lifetime."
+    "a7": "Con Backup & Restore puedes exportar toda tu colección – todos los productos, mezclas y ajustes – como archivo y guardarlo de forma segura. En un nuevo dispositivo o tras una reinstalación, restauras todo con un solo toque. Backup & Restore es una función exclusiva Lifetime.",
+    "q_userid": "¿Qué es mi ID de usuario?",
+    "a_userid": "Tu ID de usuario es único para tu cuenta. El soporte puede pedírtelo. Encuéntralo en Ajustes bajo Soporte y comentarios."
   }
 }

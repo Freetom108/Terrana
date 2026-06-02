@@ -164,22 +164,14 @@ export default function ProductScreen() {
 
   const handleShare = useCallback(() => {
     if (!product) return;
-    if (!isPro && !isLifetime) {
-      router.push('/paywall');
-      return;
-    }
     void shareProduct(product).catch((e) => {
       const msg = e instanceof Error ? e.message : String(e);
       Alert.alert(t('alerts.share') as string, msg);
     });
-  }, [product, isPro, isLifetime]);
+  }, [product]);
 
   const handlePdfPrint = useCallback(() => {
     if (!product) return;
-    if (!isPro && !isLifetime) {
-      router.push('/paywall');
-      return;
-    }
     const actions: Parameters<typeof Alert.alert>[2] = [
       {
         text: t('alerts.pdf') as string,
@@ -189,18 +181,16 @@ export default function ProductScreen() {
         }),
       },
     ];
-    if (isLifetime) {
-      actions.push({
-        text: t('pdf.print') as string,
-        onPress: () => void printProduct(product).catch((e) => {
-          const msg = e instanceof Error ? e.message : String(e);
-          Alert.alert(t('alerts.print') as string, msg);
-        }),
-      });
-    }
+    actions.push({
+      text: t('pdf.print') as string,
+      onPress: () => void printProduct(product).catch((e) => {
+        const msg = e instanceof Error ? e.message : String(e);
+        Alert.alert(t('alerts.print') as string, msg);
+      }),
+    });
     actions.push({ text: t('general.cancel') as string, style: 'cancel' });
     Alert.alert(product.name, undefined, actions);
-  }, [product, isPro, isLifetime]);
+  }, [product]);
 
   const handleToggleFavorite = useCallback(async () => {
     if (!product) return;
