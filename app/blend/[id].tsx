@@ -1,6 +1,5 @@
 import { categoryLabelKey } from '../../constants/categories';
 import { colors } from '../../constants/colors';
-import { usePro } from '../../hooks/usePro';
 import { useProducts } from '../../hooks/useProducts';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
@@ -10,7 +9,6 @@ import { deleteBlend, getBlendById, updateBlend } from '../../services/storage/b
 import {
   BLEND_KINDS,
   blendKindLabelKey,
-  blendStructuredItemCount,
   cloneBlend,
   deriveDropsFromQuantityLabel,
   type Blend,
@@ -64,58 +62,6 @@ function protocolTimingKey(timing: ProtocolTiming): string {
       return 'blends.timingFlexible';
     default:
       return 'blends.timingMorning';
-  }
-}
-
-function mixLineText(row: MixDropletLine): string {
-  const q = row.quantityLabel?.trim();
-  if (q) return `${row.productName}: ${q}`;
-  return t('blends.detailMixDropRow', { product: row.productName, drops: row.drops }) as string;
-}
-
-function mixBaseOilText(blend: Blend): string | null {
-  const oil = blend.mixRecipe?.baseOil;
-  if (!oil) return null;
-  const name = typeof oil.name === 'string' ? oil.name.trim() : '';
-  const hasAmt = typeof oil.amount === 'number' && Number.isFinite(oil.amount);
-  const unit = typeof oil.unit === 'string' ? oil.unit.trim() : '';
-  if (name && hasAmt && unit) {
-    return t('blends.detailMixCarrierLineFull', {
-      name,
-      amount: oil.amount as number,
-      unit,
-    }) as string;
-  }
-  if (name && hasAmt) {
-    return t('blends.detailMixCarrierNameAmount', { name, amount: oil.amount as number }) as string;
-  }
-  if (hasAmt && unit) {
-    return t('blends.detailMixCarrierAmountUnit', {
-      amount: oil.amount as number,
-      unit,
-    }) as string;
-  }
-  if (name) return (t('blends.detailMixCarrierNameOnly', { name }) as string).trim();
-  return null;
-}
-
-function heroSubtitleForBlend(blend: Blend): string {
-  switch (blend.kind) {
-    case 'mix': {
-      const c = blendStructuredItemCount(blend);
-      return t(c === 1 ? 'blends.heroSubtitleMixOne' : 'blends.heroSubtitleMixOther', {
-        count: c,
-      }) as string;
-    }
-    case 'combination':
-      return t('blends.heroSubtitleCombo', {
-        count: blend.combinationSlots?.length ?? 0,
-      }) as string;
-    case 'protocol':
-    default:
-      return t('blends.heroSubtitleProtocol', {
-        count: blend.protocolSteps?.length ?? 0,
-      }) as string;
   }
 }
 
@@ -288,7 +234,6 @@ export default function BlendScreen() {
   const insets = useSafeAreaInsets();
   const palette = useThemePalette();
   const p = palette;
-  const { isPro, isLifetime } = usePro();
   const { products } = useProducts();
 
   const [, redrawLocale] = useReducer((n: number) => n + 1, 0);
@@ -301,15 +246,22 @@ export default function BlendScreen() {
   blendPickerTargetRef.current = blendPickerTarget;
 
   const [pickerSearch, setPickerSearch] = useState('');
-  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Blend | null>(null);
   const [tagInput, setTagInput] = useState('');
 
   const [baseOilAmountStr, setBaseOilAmountStr] = useState('');
   const [totalVolAmtStr, setTotalVolAmtStr] = useState('');
+  const loadedBlendIdRef = useRef<string | null>(null);
+
+  const syncDraftVolumeFields = useCallback((d: Blend) => {
+    const amt = d.mixRecipe?.baseOil?.amount;
+    setBaseOilAmountStr(amt !== undefined && Number.isFinite(amt) ? String(amt) : '');
+    const tv = d.mixRecipe?.totalVolumeAmount;
+    setTotalVolAmtStr(tv !== undefined && Number.isFinite(tv) ? String(tv) : '');
+  }, []);
 
   useEffect(() => {
-    setEditing(false);
+    loadedBlendIdRef.current = null;
     setDraft(null);
     setTagInput('');
     setBaseOilAmountStr('');
@@ -320,49 +272,38 @@ export default function BlendScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (editing) {
-        return () => {};
-      }
       let active = true;
       void (async () => {
         if (!blendId) {
-          if (active) setBlend(null);
+          if (active) {
+            setBlend(null);
+            setDraft(null);
+          }
           return;
         }
         const found = await getBlendById(blendId);
-        if (active) setBlend(found ?? null);
+        if (!active) return;
+        if (!found) {
+          setBlend(null);
+          setDraft(null);
+          return;
+        }
+        setBlend(found);
+        if (loadedBlendIdRef.current !== blendId) {
+          loadedBlendIdRef.current = blendId;
+          const d = ensureDraftForEdit(found);
+          setDraft(d);
+          syncDraftVolumeFields(d);
+          setTagInput('');
+          setBlendPickerTarget(null);
+          setPickerSearch('');
+        }
       })();
       return () => {
         active = false;
       };
-    }, [blendId, editing]),
+    }, [blendId, syncDraftVolumeFields]),
   );
-
-  const enterEdit = useCallback(() => {
-    if (!blend) return;
-    const d = ensureDraftForEdit(blend);
-    setDraft(d);
-    const amt = d.mixRecipe?.baseOil?.amount;
-    setBaseOilAmountStr(
-      amt !== undefined && Number.isFinite(amt) ? String(amt) : '',
-    );
-    const tv = d.mixRecipe?.totalVolumeAmount;
-    setTotalVolAmtStr(tv !== undefined && Number.isFinite(tv) ? String(tv) : '');
-    setTagInput('');
-    setBlendPickerTarget(null);
-    setPickerSearch('');
-    setEditing(true);
-  }, [blend]);
-
-  const cancelEdit = useCallback(() => {
-    setEditing(false);
-    setDraft(null);
-    setTagInput('');
-    setBaseOilAmountStr('');
-    setTotalVolAmtStr('');
-    setBlendPickerTarget(null);
-    setPickerSearch('');
-  }, []);
 
   const selectDraftKind = useCallback((k: BlendKind) => {
     setDraft((prev) => {
@@ -559,14 +500,12 @@ export default function BlendScreen() {
 
     await updateBlend(next);
     setBlend(next);
-    setEditing(false);
-    setDraft(null);
+    setDraft(ensureDraftForEdit(next));
+    syncDraftVolumeFields(next);
     setTagInput('');
-    setBaseOilAmountStr('');
-    setTotalVolAmtStr('');
     setBlendPickerTarget(null);
     setPickerSearch('');
-  }, [draft, baseOilAmountStr, totalVolAmtStr]);
+  }, [draft, baseOilAmountStr, totalVolAmtStr, syncDraftVolumeFields]);
 
   const addTagToDraft = useCallback(() => {
     const x = tagInput.trim();
@@ -646,27 +585,13 @@ export default function BlendScreen() {
     );
   }
 
-  const display: Blend = draft ?? blend;
-
-  const notes = display.notes.trim();
-  const description = display.description.trim();
-  const kindLabel = t(blendKindLabelKey(display.kind)) as string;
-  const heroSubtitle = heroSubtitleForBlend(display);
-
-  const baseOilLine = display.kind === 'mix' ? mixBaseOilText(display) : null;
-
-  const mixDroplets = display.kind === 'mix' ? (display.mixRecipe?.droplets ?? []) : [];
-  const comboSlots = display.kind === 'combination' ? (display.combinationSlots ?? []) : [];
-  const protoSteps = display.kind === 'protocol' ? (display.protocolSteps ?? []) : [];
-  const totalVol =
-    display.kind === 'mix' &&
-    display.mixRecipe?.totalVolumeAmount !== undefined &&
-    display.mixRecipe?.totalVolumeUnit
-      ? {
-          amt: display.mixRecipe!.totalVolumeAmount!,
-          u: display.mixRecipe!.totalVolumeUnit!,
-        }
-      : null;
+  if (!draft) {
+    return (
+      <View style={[styles.centered, { backgroundColor: p.surface }]}>
+        <ActivityIndicator color={colors.sage} />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -689,29 +614,17 @@ export default function BlendScreen() {
             <Text style={styles.backHeroText}>{t('general.back')}</Text>
           </Pressable>
 
-          {editing ? (
-            <View style={styles.heroActions}>
-              <Pressable
-                onPress={cancelEdit}
-                accessibilityRole="button"
-                accessibilityLabel={t('general.cancel')}
-                style={styles.heroTextBtn}
-                hitSlop={8}
-              >
-                <Text style={styles.heroActionText}>{t('general.cancel')}</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => void commitSave()}
-                accessibilityRole="button"
-                accessibilityLabel={t('general.save')}
-                style={styles.heroTextBtnStrong}
-                hitSlop={8}
-              >
-                <Text style={styles.heroActionTextStrong}>{t('general.save')}</Text>
-              </Pressable>
-            </View>
-          ) : (
-            <View style={styles.heroActions}>
+          <View style={styles.heroActionsRight}>
+            <Pressable
+              onPress={() => void commitSave()}
+              accessibilityRole="button"
+              accessibilityLabel={t('general.save')}
+              style={styles.heroTextBtnStrong}
+              hitSlop={8}
+            >
+              <Text style={styles.heroActionTextStrong}>{t('general.save')}</Text>
+            </Pressable>
+            <View style={styles.heroIconBar}>
               <Pressable
                 onPress={handleShare}
                 accessibilityRole="button"
@@ -748,66 +661,43 @@ export default function BlendScreen() {
               >
                 <Ionicons name="trash" size={24} color={colors.white} />
               </Pressable>
-              <Pressable
-                onPress={enterEdit}
-                accessibilityRole="button"
-                accessibilityLabel={t('blend.edit')}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="pencil-outline" size={26} color={colors.white} />
-              </Pressable>
             </View>
-          )}
+          </View>
         </View>
 
-        {editing && draft ? (
-          <>
-            <View style={styles.heroKindSelector}>
-              {BLEND_KINDS.map((k) => {
-                const sel = draft.kind === k;
-                return (
-                  <Pressable
-                    key={k}
-                    onPress={() => selectDraftKind(k)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: sel }}
-                    style={({ pressed }) => [
-                      styles.kindChip,
-                      {
-                        backgroundColor: sel ? colors.sage : p.card,
-                        borderColor: sel ? colors.sage : p.border,
-                        opacity: pressed ? 0.88 : 1,
-                      },
-                    ]}
-                  >
-                    <Text style={[styles.kindChipText, { color: sel ? colors.white : p.text }]}>
-                      {t(blendKindLabelKey(k)) as string}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-            <TextInput
-              value={draft.name}
-              onChangeText={(txt) => setDraft({ ...draft, name: txt })}
-              placeholder={t('blendNew.fieldNamePlaceholder') as string}
-              placeholderTextColor="rgba(255,255,255,0.55)"
-              style={styles.heroNameInput}
-              maxLength={200}
-            />
-          </>
-        ) : (
-          <>
-            <Text style={styles.heroTitle} numberOfLines={3}>
-              {display.name}
-            </Text>
-            <View style={styles.heroKindWrap}>
-              <Text style={styles.heroKind}>{kindLabel}</Text>
-            </View>
-            <Text style={styles.heroCategory}>{heroSubtitle}</Text>
-          </>
-        )}
+        <View style={styles.heroKindSelector}>
+          {BLEND_KINDS.map((k) => {
+            const sel = draft.kind === k;
+            return (
+              <Pressable
+                key={k}
+                onPress={() => selectDraftKind(k)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: sel }}
+                style={({ pressed }) => [
+                  styles.kindChip,
+                  {
+                    backgroundColor: sel ? colors.sage : p.card,
+                    borderColor: sel ? colors.sage : p.border,
+                    opacity: pressed ? 0.88 : 1,
+                  },
+                ]}
+              >
+                <Text style={[styles.kindChipText, { color: sel ? colors.white : p.text }]}>
+                  {t(blendKindLabelKey(k)) as string}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <TextInput
+          value={draft.name}
+          onChangeText={(txt) => setDraft({ ...draft, name: txt })}
+          placeholder={t('blendNew.fieldNamePlaceholder') as string}
+          placeholderTextColor="rgba(255,255,255,0.55)"
+          style={styles.heroNameInput}
+          maxLength={200}
+        />
       </LinearGradient>
 
       <ScrollView
@@ -816,32 +706,24 @@ export default function BlendScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {!editing ? (
-          <Text style={[styles.editHint, { color: p.muted }]}>{t('blendEdit.readOnlyHint')}</Text>
-        ) : null}
-
         <Section palette={palette} title={t('blendNew.fieldDescription')}>
-          {editing && draft ? (
-            <TextInput
-              value={draft.description}
-              onChangeText={(txt) => setDraft({ ...draft, description: txt })}
-              style={[
-                styles.inputMulti,
-                { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-              ]}
-              placeholderTextColor={p.placeholderColor}
-              multiline
-              textAlignVertical="top"
-            />
-          ) : (
-            <Text style={[styles.body, { color: p.text }]}>{description.length > 0 ? description : '—'}</Text>
-          )}
+          <TextInput
+            value={draft.description}
+            onChangeText={(txt) => setDraft({ ...draft, description: txt })}
+            style={[
+              styles.inputMulti,
+              { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+            ]}
+            placeholderTextColor={p.placeholderColor}
+            multiline
+            textAlignVertical="top"
+          />
         </Section>
 
-        {display.kind === 'mix' ? (
+        {draft.kind === 'mix' ? (
           <>
             <Section palette={palette} title={t('blends.detailMixCarrierHeading')}>
-              {editing && draft && draft.kind === 'mix' && draft.mixRecipe ? (
+              {draft.mixRecipe ? (
                 <>
                   <View style={[styles.editCard, { borderColor: p.border, backgroundColor: p.card }]}>
                     <View style={styles.pickRow}>
@@ -910,15 +792,11 @@ export default function BlendScreen() {
                     />
                   </View>
                 </>
-              ) : baseOilLine ? (
-                <Text style={[styles.body, { color: p.text }]}>{baseOilLine}</Text>
-              ) : (
-                <Text style={[styles.body, { color: p.muted }]}>—</Text>
-              )}
+              ) : null}
             </Section>
 
             <Section palette={palette} title={t('blends.detailMixDropletsHeading')}>
-              {editing && draft && draft.kind === 'mix' && draft.mixRecipe ? (
+              {draft.mixRecipe ? (
                 <>
                   {draft.mixRecipe.droplets.map((row, idx) => (
                     <View
@@ -1009,24 +887,11 @@ export default function BlendScreen() {
                     </Text>
                   </Pressable>
                 </>
-              ) : mixDroplets.length === 0 ? (
-                <Text style={[styles.body, { color: p.muted }]}>—</Text>
-              ) : (
-                <View style={styles.usageList}>
-                  {mixDroplets.map((row) => (
-                    <Text
-                      key={`${row.productName}-${row.drops}-${row.productId ?? ''}-${row.quantityLabel ?? ''}`}
-                      style={[styles.usageRow, { color: p.text }]}
-                    >
-                      {mixLineText(row)}
-                    </Text>
-                  ))}
-                </View>
-              )}
+              ) : null}
             </Section>
 
             <Section palette={palette} title={t('blends.detailMixTotalVolumeHeading')}>
-              {editing && draft && draft.kind === 'mix' && draft.mixRecipe ? (
+              {draft.mixRecipe ? (
                 <View style={styles.rowTwo}>
                   <TextInput
                     value={totalVolAmtStr}
@@ -1055,27 +920,15 @@ export default function BlendScreen() {
                     ]}
                   />
                 </View>
-              ) : totalVol ? (
-                <View style={[styles.infoBand, { backgroundColor: p.card, borderColor: p.border }]}>
-                  <Text style={[styles.bodyEmph, { color: p.text }]}>
-                    {t('blends.detailMixTotalVolumeBody', {
-                      amount: totalVol.amt,
-                      unit: totalVol.u,
-                    })}
-                  </Text>
-                </View>
-              ) : (
-                <Text style={[styles.body, { color: p.muted }]}>—</Text>
-              )}
+              ) : null}
             </Section>
           </>
         ) : null}
 
-        {display.kind === 'combination' ? (
+        {draft.kind === 'combination' ? (
           <Section palette={palette} title={t('blends.detailComboHeading')}>
-            {editing && draft && draft.kind === 'combination' ? (
-              <>
-                {(draft.combinationSlots ?? []).map((slot, idx) => (
+            <>
+              {(draft.combinationSlots ?? []).map((slot, idx) => (
                   <View
                     key={`c-${idx}`}
                     style={[styles.editCard, { borderColor: p.border, backgroundColor: p.card }]}
@@ -1132,35 +985,14 @@ export default function BlendScreen() {
                     {t('blendNew.addProduct')}
                   </Text>
                 </Pressable>
-              </>
-            ) : comboSlots.length === 0 ? (
-              <Text style={[styles.body, { color: p.muted }]}>—</Text>
-            ) : (
-              <View style={styles.usageList}>
-                {comboSlots.map((slot, idx) => (
-                  <View
-                    key={`${slot.productId}-${slot.productName}-${idx}`}
-                    style={[styles.comboCard, { backgroundColor: p.card, borderColor: p.border }]}
-                  >
-                    <Text style={[styles.comboProduct, { color: p.text }]}>{slot.productName}</Text>
-                    <Text style={[styles.comboSiteLabel, { color: p.muted }]}>
-                      {t('blends.detailComboSiteLabel')}
-                    </Text>
-                    <Text style={[styles.comboSiteValue, { color: p.text }]}>
-                      {slot.applicationSite.trim() ? slot.applicationSite : '—'}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
+            </>
           </Section>
         ) : null}
 
-        {display.kind === 'protocol' ? (
+        {draft.kind === 'protocol' ? (
           <Section palette={palette} title={t('blends.detailProtocolHeading')}>
-            {editing && draft && draft.kind === 'protocol' ? (
-              <>
-                {(draft.protocolSteps ?? []).map((step, idx) => (
+            <>
+              {(draft.protocolSteps ?? []).map((step, idx) => (
                   <View
                     key={`p-${idx}`}
                     style={[styles.editCard, { borderColor: p.border, backgroundColor: p.card }]}
@@ -1252,114 +1084,66 @@ export default function BlendScreen() {
                     {t('blendNew.addStep')}
                   </Text>
                 </Pressable>
-              </>
-            ) : protoSteps.length === 0 ? (
-              <Text style={[styles.body, { color: p.muted }]}>—</Text>
-            ) : (
-              <View style={styles.usageList}>
-                {protoSteps.map((step, idx) => (
-                  <View
-                    key={`${step.productName}-${idx}`}
-                    style={[styles.protocolCard, { backgroundColor: p.card, borderColor: p.border }]}
-                  >
-                    <Text style={[styles.stepTitle, { color: p.text }]}>
-                      {t('blends.detailProtocolStepLine', {
-                        step: idx + 1,
-                        product: step.productName,
-                      })}
-                    </Text>
-                    <Text style={[styles.timingTag, { color: p.secondaryBtnLabel }]}>
-                      {t(protocolTimingKey(step.timing))}
-                    </Text>
-                    {step.stepNote?.trim() ? (
-                      <Text style={[styles.stepNote, { color: p.muted }]}>{step.stepNote.trim()}</Text>
-                    ) : null}
-                  </View>
-                ))}
-              </View>
-            )}
+            </>
           </Section>
         ) : null}
 
         <Section palette={palette} title={t('import.fieldNotes')}>
-          {editing && draft ? (
-            <TextInput
-              value={draft.notes}
-              onChangeText={(txt) => setDraft({ ...draft, notes: txt })}
-              style={[
-                styles.inputMulti,
-                { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-              ]}
-              placeholder={t('import.fieldNotesPlaceholder') as string}
-              placeholderTextColor={p.placeholderColor}
-              multiline
-              textAlignVertical="top"
-            />
-          ) : (
-            <Text style={[styles.body, { color: p.text }]}>{notes.length > 0 ? notes : '—'}</Text>
-          )}
+          <TextInput
+            value={draft.notes}
+            onChangeText={(txt) => setDraft({ ...draft, notes: txt })}
+            style={[
+              styles.inputMulti,
+              { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+            ]}
+            placeholder={t('import.fieldNotesPlaceholder') as string}
+            placeholderTextColor={p.placeholderColor}
+            multiline
+            textAlignVertical="top"
+          />
         </Section>
 
         <Section palette={palette} title={t('import.fieldTags')}>
-          {editing && draft ? (
-            <>
-              <View style={styles.tagRow}>
-                <TextInput
-                  value={tagInput}
-                  onChangeText={setTagInput}
-                  placeholder={t('blendNew.tagPlaceholder') as string}
-                  placeholderTextColor={p.placeholderColor}
-                  style={[
-                    styles.tagInputField,
-                    { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-                  ]}
-                  onSubmitEditing={addTagToDraft}
-                />
-                <Pressable
-                  onPress={addTagToDraft}
-                  style={[styles.tagAddBtn, { borderColor: colors.sageDark }]}
-                >
-                  <Text style={{ color: p.secondaryBtnLabel, fontWeight: '700' }}>
-                    {t('blendNew.addTag')}
-                  </Text>
-                </Pressable>
-              </View>
-              <View style={styles.tagWrap}>
-                {draft.tags.map((tag) => (
-                  <Pressable
-                    key={tag}
-                    onPress={() =>
-                      setDraft({ ...draft, tags: draft.tags.filter((x) => x !== tag) })
-                    }
-                    style={[styles.tagPill, { backgroundColor: p.chipBg, borderColor: p.border }]}
-                    accessibilityLabel={t('blendNew.removeTagA11y', { tag }) as string}
-                  >
-                    <Text style={[styles.tagText, { color: p.text }]}>{tag}</Text>
-                    <Ionicons name="close-circle" size={18} color={p.muted} style={{ marginLeft: 4 }} />
-                  </Pressable>
-                ))}
-              </View>
-            </>
-          ) : (
-            <View style={styles.tagWrap}>
-              {display.tags.length === 0 ? (
-                <Text style={[styles.body, { color: p.muted }]}>—</Text>
-              ) : (
-                display.tags.map((tag) => (
-                  <View
-                    key={tag}
-                    style={[styles.tagPill, { backgroundColor: p.chipBg, borderColor: p.border }]}
-                  >
-                    <Text style={[styles.tagText, { color: p.text }]}>{tag}</Text>
-                  </View>
-                ))
-              )}
-            </View>
-          )}
+          <View style={styles.tagRow}>
+            <TextInput
+              value={tagInput}
+              onChangeText={setTagInput}
+              placeholder={t('blendNew.tagPlaceholder') as string}
+              placeholderTextColor={p.placeholderColor}
+              style={[
+                styles.tagInputField,
+                { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+              ]}
+              onSubmitEditing={addTagToDraft}
+            />
+            <Pressable
+              onPress={addTagToDraft}
+              style={[styles.tagAddBtn, { borderColor: colors.sageDark }]}
+            >
+              <Text style={{ color: p.secondaryBtnLabel, fontWeight: '700' }}>
+                {t('blendNew.addTag')}
+              </Text>
+            </Pressable>
+          </View>
+          <View style={styles.tagWrap}>
+            {draft.tags.map((tag) => (
+              <Pressable
+                key={tag}
+                onPress={() =>
+                  setDraft({ ...draft, tags: draft.tags.filter((x) => x !== tag) })
+                }
+                style={[styles.tagPill, { backgroundColor: p.chipBg, borderColor: p.border }]}
+                accessibilityLabel={t('blendNew.removeTagA11y', { tag }) as string}
+              >
+                <Text style={[styles.tagText, { color: p.text }]}>{tag}</Text>
+                <Ionicons name="close-circle" size={18} color={p.muted} style={{ marginLeft: 4 }} />
+              </Pressable>
+            ))}
+          </View>
         </Section>
 
         <Section palette={palette} title={t('blends.detailCreatedHeading')}>
-          <Text style={[styles.body, { color: p.text }]}>{formatLocalizedDate(display.createdAt)}</Text>
+          <Text style={[styles.body, { color: p.text }]}>{formatLocalizedDate(draft.createdAt)}</Text>
         </Section>
 
       </ScrollView>
@@ -1462,23 +1246,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
   },
-  heroActions: {
+  heroActionsRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 10,
+    marginLeft: 'auto',
+    flexShrink: 0,
   },
-  heroTextBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+  heroIconBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6,
   },
   heroTextBtnStrong: {
     paddingVertical: 6,
     paddingHorizontal: 4,
-  },
-  heroActionText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
   },
   heroActionTextStrong: {
     color: colors.sageLight,

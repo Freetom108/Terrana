@@ -1,6 +1,5 @@
 import { categoryLabelKey, PRODUCT_CATEGORIES, resolveProductCategory } from '../../constants/categories';
 import { colors } from '../../constants/colors';
-import { usePro } from '../../hooks/usePro';
 import { useThemePalette } from '../../hooks/useThemePalette';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { exportProductAsPDF, printProduct } from '../../services/export/pdfExport';
@@ -11,7 +10,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useReducer, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -62,19 +61,17 @@ export default function ProductScreen() {
   const insets = useSafeAreaInsets();
   const palette = useThemePalette();
   const p = palette;
-  const { isPro, isLifetime } = usePro();
-
   const [, redrawLocale] = useReducer((n: number) => n + 1, 0);
   useEffect(() => subscribeLocale(redrawLocale), []);
 
   const [product, setProduct] = useState<Product | null | undefined>(undefined);
-  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Product | null>(null);
   const [usagesBuffer, setUsagesBuffer] = useState('');
   const [tagInput, setTagInput] = useState('');
+  const loadedProductIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setEditing(false);
+    loadedProductIdRef.current = null;
     setDraft(null);
     setTagInput('');
     setUsagesBuffer('');
@@ -82,39 +79,36 @@ export default function ProductScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (editing) {
-        return () => {};
-      }
       let active = true;
       void (async () => {
         if (!productId) {
-          if (active) setProduct(null);
+          if (active) {
+            setProduct(null);
+            setDraft(null);
+          }
           return;
         }
         const found = await getProductById(productId);
-        if (active) setProduct(found ?? null);
+        if (!active) return;
+        if (!found) {
+          setProduct(null);
+          setDraft(null);
+          return;
+        }
+        setProduct(found);
+        if (loadedProductIdRef.current !== productId) {
+          loadedProductIdRef.current = productId;
+          const c = cloneProduct(found);
+          setDraft(c);
+          setUsagesBuffer(c.usages.join('\n'));
+          setTagInput('');
+        }
       })();
       return () => {
         active = false;
       };
-    }, [productId, editing]),
+    }, [productId]),
   );
-
-  const enterEdit = useCallback(() => {
-    if (!product) return;
-    const c = cloneProduct(product);
-    setDraft(c);
-    setUsagesBuffer(c.usages.join('\n'));
-    setTagInput('');
-    setEditing(true);
-  }, [product]);
-
-  const cancelEdit = useCallback(() => {
-    setEditing(false);
-    setDraft(null);
-    setUsagesBuffer('');
-    setTagInput('');
-  }, []);
 
   const commitSave = useCallback(async () => {
     if (!draft) return;
@@ -138,10 +132,8 @@ export default function ProductScreen() {
     };
     await saveProduct(next);
     setProduct(next);
-    setEditing(false);
-    setDraft(null);
-    setUsagesBuffer('');
-    setTagInput('');
+    setDraft(next);
+    setUsagesBuffer(next.usages.join('\n'));
   }, [draft, usagesBuffer]);
 
   const handleDelete = useCallback(() => {
@@ -222,10 +214,13 @@ export default function ProductScreen() {
     );
   }
 
-  const display: Product = draft ?? product;
-
-  const desc = display.description.trim();
-  const notes = display.notes.trim();
+  if (!draft) {
+    return (
+      <View style={[styles.centered, { backgroundColor: p.surface }]}>
+        <ActivityIndicator color={colors.sage} />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -256,29 +251,17 @@ export default function ProductScreen() {
             <Text style={styles.backHeroText}>{t('general.back')}</Text>
           </Pressable>
 
-          {editing ? (
-            <View style={styles.heroActions}>
-              <Pressable
-                onPress={cancelEdit}
-                accessibilityRole="button"
-                accessibilityLabel={t('general.cancel')}
-                style={styles.heroTextBtn}
-                hitSlop={8}
-              >
-                <Text style={styles.heroActionText}>{t('general.cancel')}</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => void commitSave()}
-                accessibilityRole="button"
-                accessibilityLabel={t('general.save')}
-                style={styles.heroTextBtnStrong}
-                hitSlop={8}
-              >
-                <Text style={styles.heroActionTextStrong}>{t('general.save')}</Text>
-              </Pressable>
-            </View>
-          ) : (
-            <View style={styles.heroActions}>
+          <View style={styles.heroActionsRight}>
+            <Pressable
+              onPress={() => void commitSave()}
+              accessibilityRole="button"
+              accessibilityLabel={t('general.save')}
+              style={styles.heroTextBtnStrong}
+              hitSlop={8}
+            >
+              <Text style={styles.heroActionTextStrong}>{t('general.save')}</Text>
+            </Pressable>
+            <View style={styles.heroIconBar}>
               <Pressable
                 onPress={() => void handleToggleFavorite()}
                 accessibilityRole="button"
@@ -293,7 +276,7 @@ export default function ProductScreen() {
                 <Ionicons
                   name={product.isFavorite ? 'star' : 'star-outline'}
                   size={24}
-                  color={product.isFavorite ? '#FFD700' : colors.white}
+                  color={product.isFavorite ? colors.sageDark : colors.white}
                 />
               </Pressable>
               <Pressable
@@ -332,288 +315,213 @@ export default function ProductScreen() {
               >
                 <Ionicons name="trash" size={24} color="rgba(255,255,255,0.80)" />
               </Pressable>
-              <Pressable
-                onPress={enterEdit}
-                accessibilityRole="button"
-                accessibilityLabel={t('product.edit')}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="pencil-outline" size={26} color={colors.white} />
-              </Pressable>
             </View>
-          )}
+          </View>
         </View>
 
-        {editing && draft ? (
-          <>
-            <TextInput
-              value={draft.name}
-              onChangeText={(txt) => setDraft({ ...draft, name: txt })}
-              placeholder={t('import.fieldPlaceholderName')}
-              placeholderTextColor="rgba(255,255,255,0.55)"
-              style={styles.heroNameInput}
-              maxLength={200}
-              accessibilityLabel={t('import.fieldProductName')}
-            />
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryRow}
-            >
-              {PRODUCT_CATEGORIES.map((cat) => {
-                const sel = draft.category === cat;
-                return (
-                  <Pressable
-                    key={cat}
-                    onPress={() => setDraft({ ...draft, category: cat })}
-                    style={[
-                      styles.categoryChip,
-                      sel ? styles.categoryChipSelected : styles.categoryChipIdle,
-                    ]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: sel }}
-                  >
-                    <Text style={sel ? styles.categoryChipTextSel : styles.categoryChipTextIdle}>
-                      {t(categoryLabelKey(cat)) as string}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </>
-        ) : (
-          <>
-            <Text style={styles.heroTitle} numberOfLines={3}>
-              {display.name}
-            </Text>
-            <Text style={styles.heroCategory}>{t(categoryLabelKey(display.category)) as string}</Text>
-          </>
-        )}
+        <TextInput
+          value={draft.name}
+          onChangeText={(txt) => setDraft({ ...draft, name: txt })}
+          placeholder={t('import.fieldPlaceholderName')}
+          placeholderTextColor="rgba(255,255,255,0.55)"
+          style={styles.heroNameInput}
+          maxLength={200}
+          accessibilityLabel={t('import.fieldProductName')}
+        />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryRow}
+        >
+          {PRODUCT_CATEGORIES.map((cat) => {
+            const sel = draft.category === cat;
+            return (
+              <Pressable
+                key={cat}
+                onPress={() => setDraft({ ...draft, category: cat })}
+                style={[
+                  styles.categoryChip,
+                  sel ? styles.categoryChipSelected : styles.categoryChipIdle,
+                ]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: sel }}
+              >
+                <Text style={sel ? styles.categoryChipTextSel : styles.categoryChipTextIdle}>
+                  {t(categoryLabelKey(cat)) as string}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
       </LinearGradient>
 
         <View style={styles.scrollInner}>
         <Section palette={palette} title={t('import.fieldBrand')}>
-          {editing && draft ? (
-            <TextInput
-              value={draft.brand}
-              onChangeText={(txt) => setDraft({ ...draft, brand: txt })}
-              style={[
-                styles.inputSingle,
-                { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-              ]}
-              placeholderTextColor={p.placeholderColor}
-              maxLength={120}
-              accessibilityLabel={t('import.fieldBrand')}
-            />
-          ) : (
-            <Text style={[styles.body, { color: p.text }]}>{display.brand.trim() ? display.brand : '—'}</Text>
-          )}
+          <TextInput
+            value={draft.brand}
+            onChangeText={(txt) => setDraft({ ...draft, brand: txt })}
+            style={[
+              styles.inputSingle,
+              { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+            ]}
+            placeholderTextColor={p.placeholderColor}
+            maxLength={120}
+            accessibilityLabel={t('import.fieldBrand')}
+          />
         </Section>
 
         <Section palette={palette} title={t('import.fieldDescription')}>
-          {editing && draft ? (
-            <TextInput
-              value={draft.description}
-              onChangeText={(txt) => setDraft({ ...draft, description: txt })}
-              style={[
-                styles.inputMulti,
-                { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-              ]}
-              placeholderTextColor={p.placeholderColor}
-              multiline
-              textAlignVertical="top"
-              accessibilityLabel={t('import.fieldDescription')}
-            />
-          ) : (
-            <Text style={[styles.body, { color: p.text }]}>{desc.length > 0 ? desc : '—'}</Text>
-          )}
+          <TextInput
+            value={draft.description}
+            onChangeText={(txt) => setDraft({ ...draft, description: txt })}
+            style={[
+              styles.inputMulti,
+              { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+            ]}
+            placeholderTextColor={p.placeholderColor}
+            multiline
+            textAlignVertical="top"
+            accessibilityLabel={t('import.fieldDescription')}
+          />
         </Section>
 
         <Section palette={palette} title={t('import.fieldUsages')}>
-          {editing ? (
-            <>
-              <Text style={[styles.hint, { color: p.muted }]}>{t('product.usagesHint')}</Text>
-              <TextInput
-                value={usagesBuffer}
-                onChangeText={setUsagesBuffer}
-                style={[
-                  styles.inputMulti,
-                  styles.inputMultiTall,
-                  { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-                ]}
-                placeholderTextColor={p.placeholderColor}
-                multiline
-                textAlignVertical="top"
-                accessibilityLabel={t('import.fieldUsages')}
-              />
-            </>
-          ) : display.usages.length === 0 ? (
-            <Text style={[styles.body, { color: p.muted }]}>—</Text>
-          ) : (
-            <View style={styles.usageList}>
-              {display.usages.map((line, idx) => (
-                <Text key={`${idx}-${line}`} style={[styles.usageRow, { color: p.text }]}>
-                  • {line}
-                </Text>
-              ))}
-            </View>
-          )}
+          <Text style={[styles.hint, { color: p.muted }]}>{t('product.usagesHint')}</Text>
+          <TextInput
+            value={usagesBuffer}
+            onChangeText={setUsagesBuffer}
+            style={[
+              styles.inputMulti,
+              styles.inputMultiTall,
+              { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+            ]}
+            placeholderTextColor={p.placeholderColor}
+            multiline
+            textAlignVertical="top"
+            accessibilityLabel={t('import.fieldUsages')}
+          />
         </Section>
 
         <Section palette={palette} title={t('import.fieldNotes')}>
-          {editing && draft ? (
-            <TextInput
-              value={draft.notes}
-              onChangeText={(txt) => setDraft({ ...draft, notes: txt })}
-              style={[
-                styles.inputMulti,
-                styles.inputMultiTall,
-                { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-              ]}
-              placeholder={t('import.fieldNotesPlaceholder')}
-              placeholderTextColor={p.placeholderColor}
-              multiline
-              textAlignVertical="top"
-              accessibilityLabel={t('import.fieldNotes')}
-            />
-          ) : (
-            <Text style={[styles.body, { color: p.text }]}>{notes.length > 0 ? notes : '—'}</Text>
-          )}
+          <TextInput
+            value={draft.notes}
+            onChangeText={(txt) => setDraft({ ...draft, notes: txt })}
+            style={[
+              styles.inputMulti,
+              styles.inputMultiTall,
+              { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+            ]}
+            placeholder={t('import.fieldNotesPlaceholder')}
+            placeholderTextColor={p.placeholderColor}
+            multiline
+            textAlignVertical="top"
+            accessibilityLabel={t('import.fieldNotes')}
+          />
         </Section>
 
         <Section palette={palette} title={t('product.rating')}>
-          {editing && draft ? (
-            <View style={styles.starRow}>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <Pressable
-                  key={n}
-                  onPress={() => setDraft({ ...draft, rating: n })}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${n}`}
-                  hitSlop={6}
-                >
-                  <Ionicons
-                    name={n <= draft.rating ? 'star' : 'star-outline'}
-                    size={32}
-                    color={n <= draft.rating ? starColor : starEmpty}
-                  />
-                </Pressable>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.starRow}>
-              {[1, 2, 3, 4, 5].map((n) => (
+          <View style={styles.starRow}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <Pressable
+                key={n}
+                onPress={() => setDraft({ ...draft, rating: n })}
+                accessibilityRole="button"
+                accessibilityLabel={`${n}`}
+                hitSlop={6}
+              >
                 <Ionicons
-                  key={n}
-                  name={n <= display.rating ? 'star' : 'star-outline'}
-                  size={28}
-                  color={n <= display.rating ? starColor : starEmpty}
+                  name={n <= draft.rating ? 'star' : 'star-outline'}
+                  size={32}
+                  color={n <= draft.rating ? starColor : starEmpty}
                 />
-              ))}
-            </View>
-          )}
+              </Pressable>
+            ))}
+          </View>
         </Section>
 
         <Section palette={palette} title={t('import.fieldTags')}>
           <View style={styles.tagWrap}>
-            {(editing && draft ? draft.tags : display.tags).length === 0 && !editing ? (
-              <Text style={[styles.body, { color: p.muted }]}>—</Text>
-            ) : (
-              (editing && draft ? draft.tags : display.tags).map((tag) => (
-                <View
-                  key={tag}
-                  style={[styles.tagPillRow, { backgroundColor: p.chipBg, borderColor: p.border }]}
-                >
-                  <Text style={[styles.tagText, { color: p.text }]}>{tag}</Text>
-                  {editing && draft ? (
-                    <Pressable
-                      onPress={() =>
-                        setDraft({ ...draft, tags: draft.tags.filter((x) => x !== tag) })
-                      }
-                      accessibilityRole="button"
-                      accessibilityLabel={t('product.removeTagA11y', { tag }) as string}
-                      hitSlop={8}
-                      style={styles.tagRemoveHit}
-                    >
-                      <Ionicons name="close-circle" size={20} color={p.muted} />
-                    </Pressable>
-                  ) : null}
-                </View>
-              ))
-            )}
-          </View>
-          {editing && draft ? (
-            <View style={styles.tagAddRow}>
-              <TextInput
-                value={tagInput}
-                onChangeText={setTagInput}
-                placeholder={t('product.tagPlaceholder')}
-                placeholderTextColor={p.placeholderColor}
-                style={[
-                  styles.tagInput,
-                  { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
-                ]}
-                accessibilityLabel={t('product.tagPlaceholder')}
-              />
-              <Pressable
-                onPress={() => {
-                  const next = tagInput.trim();
-                  if (!next || draft.tags.includes(next)) return;
-                  setDraft({ ...draft, tags: [...draft.tags, next] });
-                  setTagInput('');
-                }}
-                style={[styles.addTagBtn, { borderColor: colors.sage }]}
-                accessibilityRole="button"
-                accessibilityLabel={t('product.addTag')}
+            {draft.tags.map((tag) => (
+              <View
+                key={tag}
+                style={[styles.tagPillRow, { backgroundColor: p.chipBg, borderColor: p.border }]}
               >
-                <Text style={[styles.addTagBtnText, { color: palette.secondaryBtnLabel }]}>
-                  {t('product.addTag')}
-                </Text>
-              </Pressable>
-            </View>
-          ) : null}
+                <Text style={[styles.tagText, { color: p.text }]}>{tag}</Text>
+                <Pressable
+                  onPress={() =>
+                    setDraft({ ...draft, tags: draft.tags.filter((x) => x !== tag) })
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={t('product.removeTagA11y', { tag }) as string}
+                  hitSlop={8}
+                  style={styles.tagRemoveHit}
+                >
+                  <Ionicons name="close-circle" size={20} color={p.muted} />
+                </Pressable>
+              </View>
+            ))}
+          </View>
+          <View style={styles.tagAddRow}>
+            <TextInput
+              value={tagInput}
+              onChangeText={setTagInput}
+              placeholder={t('product.tagPlaceholder')}
+              placeholderTextColor={p.placeholderColor}
+              style={[
+                styles.tagInput,
+                { backgroundColor: p.inputBg, borderColor: p.border, color: p.text },
+              ]}
+              accessibilityLabel={t('product.tagPlaceholder')}
+            />
+            <Pressable
+              onPress={() => {
+                const next = tagInput.trim();
+                if (!next || draft.tags.includes(next)) return;
+                setDraft({ ...draft, tags: [...draft.tags, next] });
+                setTagInput('');
+              }}
+              style={[styles.addTagBtn, { borderColor: colors.sage }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('product.addTag')}
+            >
+              <Text style={[styles.addTagBtnText, { color: palette.secondaryBtnLabel }]}>
+                {t('product.addTag')}
+              </Text>
+            </Pressable>
+          </View>
         </Section>
 
         <Section palette={palette} title={t('import.fieldInventory')}>
-          {editing && draft ? (
-            <View style={styles.invGrid}>
-              {INVENTORY_SEQUENCE.map((level) => {
-                const sel = draft.inventory === level;
-                return (
-                  <Pressable
-                    key={level}
-                    onPress={() => setDraft({ ...draft, inventory: level })}
+          <View style={styles.invGrid}>
+            {INVENTORY_SEQUENCE.map((level) => {
+              const sel = draft.inventory === level;
+              return (
+                <Pressable
+                  key={level}
+                  onPress={() => setDraft({ ...draft, inventory: level })}
+                  style={[
+                    styles.invOption,
+                    {
+                      backgroundColor: sel ? colors.sageDark : p.card,
+                      borderColor: sel ? colors.sageDark : p.border,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: sel }}
+                >
+                  <Text
                     style={[
-                      styles.invOption,
-                      {
-                        backgroundColor: sel ? colors.sageDark : p.card,
-                        borderColor: sel ? colors.sageDark : p.border,
-                      },
+                      styles.invOptionText,
+                      { color: sel ? colors.white : p.text },
                     ]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: sel }}
+                    numberOfLines={2}
                   >
-                    <Text
-                      style={[
-                        styles.invOptionText,
-                        { color: sel ? colors.white : p.text },
-                      ]}
-                      numberOfLines={2}
-                    >
-                      {inventoryLabel(level)}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          ) : (
-            <View style={[styles.inventoryBanner, { backgroundColor: p.card, borderColor: p.border }]}>
-              <Text style={[styles.inventoryText, { color: p.text }]}>
-                {inventoryLabel(display.inventory)}
-              </Text>
-            </View>
-          )}
+                    {inventoryLabel(level)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </Section>
         </View>
       </ScrollView>
@@ -697,24 +605,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 2,
   },
-  heroActions: {
+  heroActionsRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 10,
+    marginLeft: 'auto',
     flexShrink: 0,
   },
-  heroTextBtn: {
-    paddingVertical: 4,
-    paddingHorizontal: 4,
+  heroIconBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6,
   },
   heroTextBtnStrong: {
     paddingVertical: 4,
     paddingHorizontal: 4,
-  },
-  heroActionText: {
-    color: colors.sageLight,
-    fontSize: 16,
-    fontWeight: '600',
   },
   heroActionTextStrong: {
     color: colors.white,
