@@ -56,9 +56,7 @@ const FAQ_ENTRIES: FaqEntry[] = [
   { kind: 'link', labelKey: 'faq.linkUpgradeOptions', target: 'paywall' },
   { kind: 'accordion', q: 'faq.q1', a: 'faq.a1' },
   { kind: 'accordion', q: 'faq.q3', a: 'faq.a3' },
-  { kind: 'accordion', q: 'faq.q4', a: 'faq.a4' },
   { kind: 'accordion', q: 'faq.q5', a: 'faq.a5' },
-  { kind: 'accordion', q: 'faq.q_userid', a: 'faq.a_userid' },
   { kind: 'accordion', q: 'faq.q7', a: 'faq.a7' },
 ];
 
@@ -259,6 +257,42 @@ export default function SettingsTab() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={[styles.screenTitle, { color: headline }]}>{t('settings.title')}</Text>
+
+        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
+          {t('settings.sectionAbout')}
+        </Text>
+        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
+          <View style={styles.aboutRow}>
+            <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.appNameLabel')}</Text>
+            <Text style={[styles.aboutVal, { color: headline }]}>{t('settings.appName')}</Text>
+          </View>
+          <View style={styles.aboutRow}>
+            <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.versionLabel')}</Text>
+            <Text style={[styles.aboutVal, { color: headline }]}>{APP_VERSION}</Text>
+          </View>
+          <View style={styles.aboutRow}>
+            <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.statusLabel')}</Text>
+            <Text style={[styles.aboutVal, { color: headline }]}>{subscriptionLabel}</Text>
+          </View>
+
+          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
+
+          <Pressable
+            onPress={() => void handleRestorePurchases()}
+            disabled={iapRestoreBusy}
+            accessibilityRole="button"
+            accessibilityState={{ busy: iapRestoreBusy }}
+            style={styles.aboutRestoreLinkWrap}
+          >
+            {iapRestoreBusy ? (
+              <ActivityIndicator color={colors.sage} size="small" />
+            ) : (
+              <Text style={[styles.aboutRestoreLinkText, { color: colors.sage }]}>
+                {t('settings.restorePurchases')}
+              </Text>
+            )}
+          </Pressable>
+        </View>
 
         {/* ── Upgrade card ── */}
         {isLifetime ? (
@@ -619,42 +653,6 @@ export default function SettingsTab() {
               </View>
             </View>
             <Ionicons name="open-outline" size={18} color={muted} />
-          </Pressable>
-        </View>
-
-        <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>
-          {t('settings.sectionAbout')}
-        </Text>
-        <View style={[styles.aboutCard, { backgroundColor: cardBg, borderColor: p.border }]}>
-          <View style={styles.aboutRow}>
-            <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.appNameLabel')}</Text>
-            <Text style={[styles.aboutVal, { color: headline }]}>{t('settings.appName')}</Text>
-          </View>
-          <View style={styles.aboutRow}>
-            <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.versionLabel')}</Text>
-            <Text style={[styles.aboutVal, { color: headline }]}>{APP_VERSION}</Text>
-          </View>
-          <View style={styles.aboutRow}>
-            <Text style={[styles.aboutKey, { color: muted }]}>{t('settings.statusLabel')}</Text>
-            <Text style={[styles.aboutVal, { color: headline }]}>{subscriptionLabel}</Text>
-          </View>
-
-          <View style={[styles.faqDivider, { backgroundColor: p.border }]} />
-
-          <Pressable
-            onPress={() => void handleRestorePurchases()}
-            disabled={iapRestoreBusy}
-            accessibilityRole="button"
-            accessibilityState={{ busy: iapRestoreBusy }}
-            style={styles.aboutRestoreLinkWrap}
-          >
-            {iapRestoreBusy ? (
-              <ActivityIndicator color={colors.sage} size="small" />
-            ) : (
-              <Text style={[styles.aboutRestoreLinkText, { color: colors.sage }]}>
-                {t('settings.restorePurchases')}
-              </Text>
-            )}
           </Pressable>
         </View>
 
