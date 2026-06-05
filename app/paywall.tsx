@@ -14,10 +14,8 @@ import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
-  Platform,
   Pressable,
   ScrollView,
-  Share,
   StyleSheet,
   Text,
   View,
@@ -88,19 +86,6 @@ const FEATURES: FeatureRow[] = [
   },
 ];
 
-const SHARE_METHODS: Array<{
-  icon: 'logo-whatsapp' | 'mail-outline' | 'chatbubble-outline' | 'share-outline';
-  labelKey: string;
-}> = [
-  { icon: 'logo-whatsapp', labelKey: 'paywall.shareMethodWhatsapp' },
-  { icon: 'mail-outline', labelKey: 'paywall.shareMethodEmail' },
-  { icon: 'chatbubble-outline', labelKey: 'paywall.shareMethodSms' },
-  { icon: 'share-outline', labelKey: 'paywall.shareMethodMore' },
-];
-
-const PAYWALL_SHARE_STORE_URL =
-  'https://play.google.com/store/apps/details?id=com.tommi07051967.terrana';
-
 // ─── Cell renderer ────────────────────────────────────────────────────────────
 
 function CellContent({ value, highlight }: { value: CellValue; highlight: boolean }) {
@@ -166,24 +151,6 @@ export default function PaywallScreen() {
       setIapBusy('idle');
     }
   }, [iapBusy, reload]);
-
-  const handlePaywallShare = useCallback(async () => {
-    const message = t('paywall.shareMessage') as string;
-    try {
-      if (Platform.OS === 'android') {
-        await Share.share({
-          message: `${message}\n${PAYWALL_SHARE_STORE_URL}`,
-        });
-      } else {
-        await Share.share({
-          message,
-          url: PAYWALL_SHARE_STORE_URL,
-        });
-      }
-    } catch {
-      /* user dismissed sheet or platform error */
-    }
-  }, []);
 
   return (
     <View style={[styles.root, { backgroundColor: p.surface }]}>
@@ -265,27 +232,6 @@ export default function PaywallScreen() {
               </View>
             </View>
           ))}
-        </View>
-
-        {/* ── Share shortcuts (compact, centered; opens native Share) ── */}
-        <View style={styles.shareShortcuts}>
-          <View style={styles.shareShortcutsInner}>
-            {SHARE_METHODS.map((method) => (
-              <Pressable
-                key={method.labelKey}
-                style={({ pressed }) => [styles.shareShortcut, pressed && styles.shareShortcutPressed]}
-                onPress={() => void handlePaywallShare()}
-                disabled={iapBusy !== 'idle'}
-                accessibilityRole="button"
-                accessibilityLabel={t(method.labelKey) as string}
-              >
-                <Ionicons name={method.icon} size={24} color={colors.sageDark} />
-                <Text style={[styles.shareShortcutLabel, { color: p.muted }]}>
-                  {t(method.labelKey) as string}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
         </View>
 
         {/* ── Buy buttons ── */}
@@ -503,41 +449,6 @@ const styles = StyleSheet.create({
   },
   cellTextHighlight: {
     color: colors.sageDark,
-  },
-
-  /* Share shortcuts (no frame; opens system Share sheet) */
-  shareShortcuts: {
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    paddingVertical: 6,
-    marginBottom: 8,
-  },
-  shareShortcutsInner: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    flexWrap: 'nowrap',
-    columnGap: 4,
-    maxWidth: 360,
-    width: '100%',
-  },
-  shareShortcut: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 2,
-    minWidth: 0,
-    maxWidth: 88,
-  },
-  shareShortcutPressed: {
-    opacity: 0.65,
-  },
-  shareShortcutLabel: {
-    marginTop: 4,
-    fontSize: 10,
-    fontWeight: '600',
-    textAlign: 'center',
-    lineHeight: 13,
   },
 
   /* Buy buttons */

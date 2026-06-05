@@ -614,54 +614,52 @@ export default function BlendScreen() {
             <Text style={styles.backHeroText}>{t('general.back')}</Text>
           </Pressable>
 
-          <View style={styles.heroActionsRight}>
+          <View style={styles.heroIconBar}>
+            <Pressable
+              onPress={handleShare}
+              accessibilityRole="button"
+              accessibilityLabel={t('general.share') as string}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="share-outline" size={24} color={colors.white} />
+            </Pressable>
+            <Pressable
+              onPress={handlePdf}
+              accessibilityRole="button"
+              accessibilityLabel={t('alerts.pdf') as string}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="document-text-outline" size={24} color={colors.white} />
+            </Pressable>
+            <Pressable
+              onPress={handlePrint}
+              accessibilityRole="button"
+              accessibilityLabel={t('pdf.print') as string}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="print-outline" size={24} color={colors.white} />
+            </Pressable>
+            <Pressable
+              onPress={handleDelete}
+              accessibilityRole="button"
+              accessibilityLabel={t('blend.deleteTitle') as string}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="trash" size={24} color={colors.white} />
+            </Pressable>
             <Pressable
               onPress={() => void commitSave()}
               accessibilityRole="button"
               accessibilityLabel={t('general.save')}
-              style={styles.heroTextBtnStrong}
-              hitSlop={8}
+              style={styles.iconBtn}
+              hitSlop={12}
             >
-              <Text style={styles.heroActionTextStrong}>{t('general.save')}</Text>
+              <Ionicons name="checkmark" size={24} color={colors.white} />
             </Pressable>
-            <View style={styles.heroIconBar}>
-              <Pressable
-                onPress={handleShare}
-                accessibilityRole="button"
-                accessibilityLabel={t('general.share') as string}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="share-outline" size={24} color={colors.white} />
-              </Pressable>
-              <Pressable
-                onPress={handlePdf}
-                accessibilityRole="button"
-                accessibilityLabel={t('alerts.pdf') as string}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="document-text-outline" size={24} color={colors.white} />
-              </Pressable>
-              <Pressable
-                onPress={handlePrint}
-                accessibilityRole="button"
-                accessibilityLabel={t('pdf.print') as string}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="print-outline" size={24} color={colors.white} />
-              </Pressable>
-              <Pressable
-                onPress={handleDelete}
-                accessibilityRole="button"
-                accessibilityLabel={t('blend.deleteTitle') as string}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="trash" size={24} color={colors.white} />
-              </Pressable>
-            </View>
           </View>
         </View>
 
@@ -1246,27 +1244,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
   },
-  heroActionsRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginLeft: 'auto',
-    flexShrink: 0,
-  },
   heroIconBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 6,
-  },
-  heroTextBtnStrong: {
-    paddingVertical: 6,
-    paddingHorizontal: 4,
-  },
-  heroActionTextStrong: {
-    color: colors.sageLight,
-    fontSize: 16,
-    fontWeight: '800',
+    marginLeft: 'auto',
+    flexShrink: 0,
   },
   iconBtn: {
     padding: 4,

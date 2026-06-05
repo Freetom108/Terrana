@@ -4,7 +4,7 @@ import { useThemePalette } from '../../hooks/useThemePalette';
 import { subscribeLocale, t } from '../../services/i18n/i18n';
 import { exportProductAsPDF, printProduct } from '../../services/export/pdfExport';
 import { shareProduct } from '../../services/export/shareService';
-import { deleteProduct, getProductById, saveProduct, toggleFavorite } from '../../services/storage/products';
+import { deleteProduct, getProductById, saveProduct } from '../../services/storage/products';
 import type { InventoryLevel, Product } from '../../types/product';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -178,12 +178,6 @@ export default function ProductScreen() {
     });
   }, [product]);
 
-  const handleToggleFavorite = useCallback(async () => {
-    if (!product) return;
-    const next = await toggleFavorite(product.id);
-    setProduct((prev) => prev ? { ...prev, isFavorite: next } : prev);
-  }, [product]);
-
   const starColor = p.isDark ? colors.sageLight : colors.sageDark;
   const starEmpty = p.muted;
 
@@ -251,71 +245,52 @@ export default function ProductScreen() {
             <Text style={styles.backHeroText}>{t('general.back')}</Text>
           </Pressable>
 
-          <View style={styles.heroActionsRight}>
+          <View style={styles.heroIconBar}>
+            <Pressable
+              onPress={handleShare}
+              accessibilityRole="button"
+              accessibilityLabel={t('general.share') as string}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="share-outline" size={24} color={colors.white} />
+            </Pressable>
+            <Pressable
+              onPress={handlePdf}
+              accessibilityRole="button"
+              accessibilityLabel={t('alerts.pdf') as string}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="document-text-outline" size={24} color={colors.white} />
+            </Pressable>
+            <Pressable
+              onPress={handlePrint}
+              accessibilityRole="button"
+              accessibilityLabel={t('pdf.print') as string}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="print-outline" size={24} color={colors.white} />
+            </Pressable>
+            <Pressable
+              onPress={handleDelete}
+              accessibilityRole="button"
+              accessibilityLabel={t('product.deleteTitle')}
+              style={styles.iconBtn}
+              hitSlop={12}
+            >
+              <Ionicons name="trash" size={24} color="rgba(255,255,255,0.80)" />
+            </Pressable>
             <Pressable
               onPress={() => void commitSave()}
               accessibilityRole="button"
               accessibilityLabel={t('general.save')}
-              style={styles.heroTextBtnStrong}
-              hitSlop={8}
+              style={styles.iconBtn}
+              hitSlop={12}
             >
-              <Text style={styles.heroActionTextStrong}>{t('general.save')}</Text>
+              <Ionicons name="checkmark" size={24} color={colors.white} />
             </Pressable>
-            <View style={styles.heroIconBar}>
-              <Pressable
-                onPress={() => void handleToggleFavorite()}
-                accessibilityRole="button"
-                accessibilityLabel={
-                  product.isFavorite
-                    ? (t('general.removeFavorite') as string)
-                    : (t('general.addFavorite') as string)
-                }
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons
-                  name={product.isFavorite ? 'star' : 'star-outline'}
-                  size={24}
-                  color={product.isFavorite ? colors.sageDark : colors.white}
-                />
-              </Pressable>
-              <Pressable
-                onPress={handleShare}
-                accessibilityRole="button"
-                accessibilityLabel={t('general.share') as string}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="share-outline" size={24} color={colors.white} />
-              </Pressable>
-              <Pressable
-                onPress={handlePdf}
-                accessibilityRole="button"
-                accessibilityLabel={t('alerts.pdf') as string}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="document-text-outline" size={24} color={colors.white} />
-              </Pressable>
-              <Pressable
-                onPress={handlePrint}
-                accessibilityRole="button"
-                accessibilityLabel={t('pdf.print') as string}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="print-outline" size={24} color={colors.white} />
-              </Pressable>
-              <Pressable
-                onPress={handleDelete}
-                accessibilityRole="button"
-                accessibilityLabel={t('product.deleteTitle')}
-                style={styles.iconBtn}
-                hitSlop={12}
-              >
-                <Ionicons name="trash" size={24} color="rgba(255,255,255,0.80)" />
-              </Pressable>
-            </View>
           </View>
         </View>
 
@@ -605,27 +580,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 2,
   },
-  heroActionsRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginLeft: 'auto',
-    flexShrink: 0,
-  },
   heroIconBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 6,
-  },
-  heroTextBtnStrong: {
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-  },
-  heroActionTextStrong: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '800',
+    marginLeft: 'auto',
+    flexShrink: 0,
   },
   iconBtn: {
     padding: 4,

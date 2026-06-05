@@ -58,8 +58,8 @@ const FAQ_ENTRIES: FaqEntry[] = [
   { kind: 'accordion', q: 'faq.q3', a: 'faq.a3' },
   { kind: 'accordion', q: 'faq.q4', a: 'faq.a4' },
   { kind: 'accordion', q: 'faq.q5', a: 'faq.a5' },
-  { kind: 'accordion', q: 'faq.q7', a: 'faq.a7' },
   { kind: 'accordion', q: 'faq.q_userid', a: 'faq.a_userid' },
+  { kind: 'accordion', q: 'faq.q7', a: 'faq.a7' },
 ];
 
 function truncateAppUserId(id: string): string {
