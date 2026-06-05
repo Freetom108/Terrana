@@ -294,47 +294,6 @@ export default function SettingsTab() {
           </Pressable>
         </View>
 
-        {/* ── Upgrade card ── */}
-        {isLifetime ? (
-          <View style={[styles.upgradeCard, styles.upgradeCardLifetime, { borderColor: colors.sageDark }]}>
-            <Text style={[styles.upgradeTitle, { color: colors.sageDark }]}>
-              {t('settings.upgradeLifetimeTitle') as string}
-            </Text>
-            <Text style={[styles.upgradeHint, { color: p.muted, marginBottom: 0 }]}>
-              {t('settings.upgradeLifetimeHint') as string}
-            </Text>
-          </View>
-        ) : isPro ? (
-          <View style={[styles.upgradeCard, styles.upgradeCardPro, { borderColor: colors.sage }]}>
-            <Text style={[styles.upgradeTitle, { color: colors.sage }]}>
-              {t('settings.upgradeProTitle') as string}
-            </Text>
-            <Pressable
-              accessibilityRole="link"
-              hitSlop={8}
-              onPress={() => router.push('/paywall')}
-              style={styles.upgradeProLinkWrap}
-            >
-              <Text style={[styles.upgradeProLinkText, { color: colors.sage }]}>
-                {t('settings.upgradeProLifetimeLink') as string}
-              </Text>
-            </Pressable>
-          </View>
-        ) : (
-          <View style={[styles.upgradeCard, styles.upgradeCardFree, { borderColor: colors.sage }]}>
-            <Text style={[styles.upgradeTitle, { color: p.text }]}>
-              {t('settings.upgradeFreeTitle') as string}
-            </Text>
-            <Pressable
-              style={[styles.upgradeBtn, styles.upgradeBtnFree, { marginTop: 12 }]}
-              onPress={() => router.push('/paywall')}
-              accessibilityRole="button"
-            >
-              <Text style={styles.upgradeBtnText}>{t('settings.upgradeFreeButton') as string}</Text>
-            </Pressable>
-          </View>
-        )}
-
         <Text style={[styles.sectionHeading, styles.sectionSpacer, { color: muted }]}>{t('settings.sectionAppearance')}</Text>
         <View style={styles.rowGap}>
           {THEME_OPTIONS.map(({ value, labelKey }) => {
@@ -774,57 +733,6 @@ const styles = StyleSheet.create({
   },
   aboutRestoreLinkText: {
     fontSize: 15,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-
-  /* Upgrade card */
-  upgradeCard: {
-    borderRadius: 16,
-    borderWidth: 1.5,
-    padding: 16,
-    marginBottom: 4,
-  },
-  upgradeCardFree: {
-    backgroundColor: 'rgba(122,158,126,0.10)',
-  },
-  upgradeCardPro: {
-    backgroundColor: 'rgba(122,158,126,0.08)',
-  },
-  upgradeCardLifetime: {
-    backgroundColor: 'rgba(74,107,78,0.10)',
-  },
-  upgradeTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  upgradeHint: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: '500',
-    marginBottom: 12,
-  },
-  upgradeBtn: {
-    borderRadius: 12,
-    paddingVertical: 11,
-    alignItems: 'center',
-  },
-  upgradeBtnFree: {
-    backgroundColor: colors.sage,
-  },
-  upgradeBtnText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  upgradeProLinkWrap: {
-    alignSelf: 'flex-start',
-    paddingTop: 8,
-    paddingVertical: 2,
-  },
-  upgradeProLinkText: {
-    fontSize: 14,
     fontWeight: '600',
     textDecorationLine: 'underline',
   },
