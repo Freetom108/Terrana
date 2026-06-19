@@ -2,7 +2,12 @@ import { colors } from '../constants/colors';
 import { usePro } from '../hooks/usePro';
 import { useThemePalette } from '../hooks/useThemePalette';
 import { t } from '../services/i18n/i18n';
-import { isPurchasesCancelError, purchaseTerranaLifetime, purchaseTerranaPro } from '../services/purchase/iap';
+import {
+  fetchPaywallPriceStrings,
+  isPurchasesCancelError,
+  purchaseTerranaLifetime,
+  purchaseTerranaPro,
+} from '../services/purchase/iap';
 import {
   restorePurchasesWithAlerts,
   showPurchaseFailureAlert,
@@ -10,7 +15,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -108,6 +113,29 @@ export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
   const { reload } = usePro();
   const [iapBusy, setIapBusy] = useState<'idle' | 'pro' | 'lifetime' | 'restore'>('idle');
+  const [prices, setPrices] = useState<{ pro: string | null; lifetime: string | null }>({
+    pro: null,
+    lifetime: null,
+  });
+  const [pricesLoading, setPricesLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    setPricesLoading(true);
+    fetchPaywallPriceStrings()
+      .then((result) => {
+        if (active) setPrices(result);
+      })
+      .catch(() => {
+        if (active) setPrices({ pro: null, lifetime: null });
+      })
+      .finally(() => {
+        if (active) setPricesLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleBuyPro = useCallback(async () => {
     if (iapBusy !== 'idle') return;
@@ -253,7 +281,17 @@ export default function PaywallScreen() {
             ) : (
               <>
                 <Text style={styles.buyBtnTitle}>{t('paywall.buyPro') as string}</Text>
-                <Text style={styles.buyBtnPrice}>{t('paywall.buyProPrice') as string}</Text>
+                {pricesLoading ? (
+                  <ActivityIndicator
+                    color="rgba(255,255,255,0.82)"
+                    size="small"
+                    style={styles.buyBtnPriceLoader}
+                  />
+                ) : prices.pro ? (
+                  <Text style={styles.buyBtnPrice}>
+                    {t('paywall.buyProPrice', { price: prices.pro }) as string}
+                  </Text>
+                ) : null}
               </>
             )}
           </Pressable>
@@ -275,7 +313,17 @@ export default function PaywallScreen() {
             ) : (
               <>
                 <Text style={styles.buyBtnTitle}>{t('paywall.buyLifetime') as string}</Text>
-                <Text style={styles.buyBtnPrice}>{t('paywall.buyLifetimePrice') as string}</Text>
+                {pricesLoading ? (
+                  <ActivityIndicator
+                    color="rgba(255,255,255,0.82)"
+                    size="small"
+                    style={styles.buyBtnPriceLoader}
+                  />
+                ) : prices.lifetime ? (
+                  <Text style={styles.buyBtnPrice}>
+                    {t('paywall.buyLifetimePrice', { price: prices.lifetime }) as string}
+                  </Text>
+                ) : null}
               </>
             )}
           </Pressable>
@@ -486,6 +534,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
     textAlign: 'center',
+  },
+  buyBtnPriceLoader: {
+    marginTop: 3,
+    height: 16,
   },
   /* Footer */
   footer: {

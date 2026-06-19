@@ -3,7 +3,7 @@
     "scheme": "terrana",
     "name": "Terrana",
     "slug": "terrana",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.tommi07051967.terrana",
-      "buildNumber": "6",
+      "buildNumber": "8",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -23,7 +23,7 @@
     },
     "android": {
       "package": "com.tommi07051967.terrana",
-      "versionCode": 7,
+      "versionCode": 9,
       "permissions": [
         "com.android.vending.BILLING"
       ],

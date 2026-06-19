@@ -14,13 +14,13 @@ import { PRODUCT_CATEGORY, PURCHASES_ERROR_CODE } from 'react-native-purchases';
 
 import { setIsLifetime, setIsPro } from '../storage/settings';
 
-export const PRODUCT_ID_PRO = 'terrana_lite';
-export const PRODUCT_ID_LIFETIME = 'terrana_pro';
+export const PRODUCT_ID_PRO = 'terra_lite';
+export const PRODUCT_ID_LIFETIME = 'terra_pro';
 
 /** Must match RevenueCat entitlement identifiers (Dashboard). */
-export const ENTITLEMENT_LITE = 'lite';
+export const ENTITLEMENT_LITE = 'terra_lite';
 /** „Pro“-Kauf im Store; RevenueCat-Entitlement-Kennung bleibt hier `lifetime`. */
-export const ENTITLEMENT_LIFETIME = 'lifetime';
+export const ENTITLEMENT_LIFETIME = 'terra_pro';
 
 const SUBSCRIPTION_CHANGED = 'terrana_subscription_changed';
 
@@ -100,6 +100,30 @@ export async function purchaseTerranaPro(): Promise<CustomerInfo> {
 
 export async function purchaseTerranaLifetime(): Promise<CustomerInfo> {
   return purchaseProductById(PRODUCT_ID_LIFETIME);
+}
+
+/** Store-localized price string for a product (e.g. "€24,99"); null when unavailable. */
+async function getPriceStringById(productId: string): Promise<string | null> {
+  const pkg = await findPackage(productId);
+  if (pkg?.product?.priceString) return pkg.product.priceString;
+  const storeProduct = await getStoreProduct(productId);
+  return storeProduct?.priceString ?? null;
+}
+
+/** Loads localized price strings for the paywall products; values are null when RevenueCat is unavailable. */
+export async function fetchPaywallPriceStrings(): Promise<{
+  pro: string | null;
+  lifetime: string | null;
+}> {
+  try {
+    const [pro, lifetime] = await Promise.all([
+      getPriceStringById(PRODUCT_ID_PRO),
+      getPriceStringById(PRODUCT_ID_LIFETIME),
+    ]);
+    return { pro, lifetime };
+  } catch {
+    return { pro: null, lifetime: null };
+  }
 }
 
 export async function restorePurchasesSync(): Promise<CustomerInfo> {
